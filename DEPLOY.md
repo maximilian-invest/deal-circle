@@ -17,10 +17,9 @@ Das Skript:
 1. testet die SSH-Verbindung zu `srhomes-vps`,
 2. fragt einmal nach Bestätigung (oder `--yes` zum Skippen),
 3. erstellt am Server ein Backup (`/var/www/deal-circle.bak.<timestamp>`),
-4. rsynct `deal-circle/site/` → `/var/www/deal-circle/`,
-5. rsynct `deal-circle/brand/` → `/var/www/deal-circle/brand/`,
-6. setzt `chown www-data` + `nginx -t && systemctl reload nginx`,
-7. ruft `https://deal-circle.at/` ab und prüft HTTP 200.
+4. rsynct `deal-circle/site/` (inkl. `brand/`) → `/var/www/deal-circle/`,
+5. setzt `chown www-data` + `nginx -t && systemctl reload nginx`,
+6. ruft `https://deal-circle.at/` ab und prüft HTTP 200.
 
 **Sicherheit**:
 - `assets/properties/`, `assets/img/`, `.well-known/` werden vom rsync **ausgeschlossen** — deine Bildergalerie und das Let's-Encrypt-Verzeichnis bleiben unangetastet.
@@ -78,8 +77,6 @@ Falls das Skript zickt:
 rsync -av --exclude 'assets/properties/' --exclude '.well-known/' \
   deal-circle/site/  srhomes-vps:/var/www/deal-circle/
 
-rsync -av  deal-circle/brand/ srhomes-vps:/var/www/deal-circle/brand/
-
 ssh srhomes-vps 'chown -R www-data:www-data /var/www/deal-circle && nginx -t && systemctl reload nginx'
 ```
 
@@ -117,11 +114,18 @@ ssh srhomes-vps '
 ## Was wird wo deployt?
 
 ```
-deal-circle/site/index.html      →  /var/www/deal-circle/index.html
-deal-circle/site/styles.css      →  /var/www/deal-circle/styles.css
-deal-circle/site/script.js       →  /var/www/deal-circle/script.js
-deal-circle/brand/*              →  /var/www/deal-circle/brand/
+deal-circle/site/                →  /var/www/deal-circle/
+├── index.html                   →  /var/www/deal-circle/index.html
+├── styles.css                   →  /var/www/deal-circle/styles.css
+├── script.js                    →  /var/www/deal-circle/script.js
+└── brand/                       →  /var/www/deal-circle/brand/
+    ├── tokens.css
+    ├── logo-monogram.svg
+    ├── logo-pin.svg
+    ├── logo-wordmark.svg
+    ├── CORPORATE-DESIGN.md
+    └── preview.html
 ```
 
-Die Site referenziert die Brand-Assets über absolute Pfade
-(`/brand/logo-monogram.svg`, `/brand/tokens.css`).
+Die Site referenziert Brand-Assets über **relative Pfade** (`./brand/...`),
+damit Preview lokal/htmlpreview UND deployed identisch funktioniert.

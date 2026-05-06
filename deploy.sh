@@ -13,7 +13,6 @@ HOST="srhomes-vps"
 TARGET="/var/www/deal-circle"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 SITE_DIR="$SCRIPT_DIR/site"
-BRAND_DIR="$SCRIPT_DIR/brand"
 
 # --- Argumente ---------------------------------------------------------------
 YES=0
@@ -29,8 +28,8 @@ for arg in "$@"; do
 done
 
 # --- Validierung -------------------------------------------------------------
-[[ -d "$SITE_DIR"  ]] || { echo "FEHLER: $SITE_DIR fehlt";  exit 1; }
-[[ -d "$BRAND_DIR" ]] || { echo "FEHLER: $BRAND_DIR fehlt"; exit 1; }
+[[ -d "$SITE_DIR" ]]        || { echo "FEHLER: $SITE_DIR fehlt"; exit 1; }
+[[ -d "$SITE_DIR/brand" ]]  || { echo "FEHLER: $SITE_DIR/brand fehlt"; exit 1; }
 command -v rsync >/dev/null || { echo "FEHLER: rsync nicht installiert"; exit 1; }
 command -v ssh   >/dev/null || { echo "FEHLER: ssh nicht installiert";   exit 1; }
 
@@ -39,13 +38,12 @@ cat <<EOF
 
   ╔════════════════════════════════════════════════════════════════╗
   ║   Deal Circle — Release 03 Deploy                              ║
-  ║   Quelle:  $SITE_DIR
-  ║   + Brand: $BRAND_DIR
-  ║   Ziel:    $HOST:$TARGET
+  ║   Quelle: $SITE_DIR
+  ║   Ziel:   $HOST:$TARGET
   ╚════════════════════════════════════════════════════════════════╝
 
   Wird hochgeladen:
-    - index.html, styles.css, script.js (Site)
+    - index.html, styles.css, script.js
     - brand/ (Logos, tokens, CD-Doc, preview.html)
 
   Bleibt unangetastet (am Server):
@@ -98,11 +96,8 @@ RSYNC_FLAGS=(-av --human-readable --itemize-changes
              --omit-dir-times)
 [[ $DRY -eq 1 ]] && RSYNC_FLAGS+=(--dry-run)
 
-echo "→ Push Site …"
-rsync "${RSYNC_FLAGS[@]}" "$SITE_DIR/"  "$HOST:$TARGET/"
-
-echo "→ Push Brand …"
-rsync "${RSYNC_FLAGS[@]}" "$BRAND_DIR/" "$HOST:$TARGET/brand/"
+echo "→ Push Site (inkl. brand/) …"
+rsync "${RSYNC_FLAGS[@]}" "$SITE_DIR/" "$HOST:$TARGET/"
 
 # --- Permissions + nginx reload ---------------------------------------------
 if [[ $DRY -eq 0 ]]; then
