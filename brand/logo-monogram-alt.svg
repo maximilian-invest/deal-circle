@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" role="img" aria-label="Deal Circle Cipher (Alternative)">
+  <title>Deal Circle — Interlocked Cipher (Bond-Title Variant)</title>
+  <defs>
+    <style>
+      .dc-cipher-fill {
+        font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
+        font-weight: 600;
+        font-size: 132px;
+        fill: #C5A572;
+      }
+      .dc-cipher-outline {
+        font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
+        font-weight: 600;
+        font-size: 132px;
+        fill: none;
+        stroke: #C5A572;
+        stroke-width: 2.4;
+        paint-order: stroke;
+      }
+    </style>
+  </defs>
+
+  <text class="dc-cipher-fill"    x="20"  y="118">D</text>
+  <text class="dc-cipher-outline" x="98"  y="118">C</text>
+</svg>

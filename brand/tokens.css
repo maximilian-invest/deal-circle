@@ -1,28 +1,34 @@
 /* ==========================================================================
-   Deal Circle — Design Tokens
+   Deal Circle — Design Tokens · Release 02
+   Skill-konform: taste-skill (Inter banned → Cabinet Grotesk),
+                  redesign-skill (kein #000, max 1 Akzent),
+                  brandkit (Luxury / Editorial Mode).
    Verwendung: <link rel="stylesheet" href="brand/tokens.css">
+   Schriften: <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,400,500,700&display=swap" rel="stylesheet">
+              + Google Fonts (Cinzel, Cormorant Garamond, JetBrains Mono)
    ========================================================================== */
 
 :root {
   /* ----- Farben ----- */
-  --dc-onyx:           #0B0B0C;   /* Primärer Hintergrund (Schwarz, leicht warm) */
-  --dc-tuxedo:         #141416;   /* Sekundärer Hintergrund / Cards */
-  --dc-bone:           #F2EFE9;   /* Primärer Text auf Dunkel */
-  --dc-bone-soft:      #C9C5BC;   /* Sekundärer Text auf Dunkel */
-  --dc-champagne:      #C5A572;   /* Akzent / Gold */
-  --dc-champagne-deep: #A88857;   /* Hover / Tiefer Goldton */
-  --dc-champagne-soft: #E3D3AE;   /* Heller Goldton (selten) */
-  --dc-smoke:          #6E6E70;   /* Mittelgrau */
-  --dc-hairline:       #2A2A2D;   /* Trennlinien, dezente Borders */
-  --dc-bordeaux:       #5C1A1B;   /* Akzent für Sonderfälle (sparsam) */
+  --dc-onyx:           #0B0B0C;   /* Off-Black — kein #000 (taste-skill) */
+  --dc-tuxedo:         #141416;   /* Sekundärflächen */
+  --dc-charcoal:       #1C1C1E;   /* Card-Surfaces wenn nötig */
+  --dc-bone:           #F2EFE9;   /* Primärtext auf Dunkel / Hellmodus-BG */
+  --dc-bone-soft:      #C9C5BC;   /* Sekundärtext auf Dunkel */
+  --dc-champagne:      #C5A572;   /* EINZIGER Akzent (taste-skill: max 1) */
+  --dc-champagne-deep: #A88857;   /* Hover / Press */
+  --dc-champagne-soft: #E3D3AE;   /* sehr seltene Lichtkante */
+  --dc-smoke:          #6E6E70;   /* Meta / Captions */
+  --dc-hairline:       #2A2A2D;   /* 1px Trennlinien */
+  --dc-bordeaux:       #5C1A1B;   /* RESERVIERT — nur „Sold/Reserved"-Tags */
 
-  /* ----- Typografie ----- */
+  /* ----- Schriften (Stack) ----- */
   --dc-font-display:   'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
   --dc-font-editorial: 'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
-  --dc-font-body:      'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --dc-font-body:      'Cabinet Grotesk', 'Satoshi', 'Geist', 'Helvetica Neue', Arial, sans-serif;
   --dc-font-mono:      'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
 
-  /* Skala (modular ratio 1.250) */
+  /* ----- Skala (Modular Ratio 1.250) ----- */
   --dc-fs-xs:    12px;
   --dc-fs-sm:    14px;
   --dc-fs-base:  16px;
@@ -34,35 +40,49 @@
   --dc-fs-4xl:   72px;
   --dc-fs-hero:  96px;
 
-  /* Tracking */
-  --dc-track-tight:  -0.01em;
-  --dc-track-normal:  0;
-  --dc-track-wide:    0.06em;
-  --dc-track-wider:   0.12em;
-  --dc-track-widest:  0.24em;   /* für SECTION-Labels, Eyebrows */
+  /* ----- Tracking ----- */
+  --dc-track-tighter: -0.02em;  /* Display Hero (taste-skill: tracking-tighter) */
+  --dc-track-tight:   -0.01em;
+  --dc-track-normal:   0;
+  --dc-track-wide:     0.06em;
+  --dc-track-wider:    0.12em;
+  --dc-track-widest:   0.24em;  /* Eyebrows / Caps-Labels */
 
-  /* Line-Heights */
-  --dc-lh-tight:  1.05;   /* Display / Hero */
-  --dc-lh-snug:   1.25;   /* Headlines */
-  --dc-lh-base:   1.6;    /* Body */
-  --dc-lh-loose:  1.75;   /* Long-form */
+  /* ----- Line-Heights ----- */
+  --dc-lh-none:   1.0;    /* taste-skill: leading-none für Display */
+  --dc-lh-tight:  1.05;
+  --dc-lh-snug:   1.25;
+  --dc-lh-base:   1.6;
+  --dc-lh-loose:  1.75;
 
   /* ----- Layout ----- */
-  --dc-content-max: 1180px;
-  --dc-text-max:    640px;
+  --dc-content-max: 1400px;     /* taste-skill: max-w-[1400px] */
+  --dc-text-max:    65ch;       /* taste-skill: max-w-[65ch] */
   --dc-gutter:      40px;
-  --dc-radius:      0;        /* Kanten bleiben scharf — Bond-Ästhetik */
+  --dc-radius:      0;          /* Kanten scharf — Bond/Editorial-Ästhetik */
   --dc-border:      1px solid var(--dc-hairline);
 
-  /* ----- Bewegung ----- */
-  --dc-ease:        cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* ----- Bewegung (taste-skill: spring physics, no linear) ----- */
+  --dc-ease:        cubic-bezier(0.16, 1, 0.3, 1);   /* signature easing */
+  --dc-ease-spring: cubic-bezier(0.22, 0.61, 0.36, 1);
   --dc-dur-fast:    180ms;
-  --dc-dur-base:    320ms;
+  --dc-dur-base:    300ms;
   --dc-dur-slow:    640ms;
+
+  /* ----- Schatten (getönt, nicht generisch schwarz) ----- */
+  --dc-shadow-sm:   0 1px 0 rgba(197,165,114,0.06);
+  --dc-shadow-md:   0 12px 32px -16px rgba(0,0,0,0.55);
+  --dc-shadow-lg:   0 24px 48px -20px rgba(0,0,0,0.65);
+
+  /* ----- Body-Text-Constraint (taste-skill: max-w-[65ch]) ----- */
+  --dc-prose-max:   65ch;
 }
 
-/* Optional: dunkles Theme als Default für die Site */
 html, body {
   background: var(--dc-onyx);
   color: var(--dc-bone);
+  font-feature-settings: "ss01", "kern";
 }
+
+/* Für Datenkolonnen: Tabellenziffern (redesign-skill rule) */
+.dc-tabular { font-variant-numeric: tabular-nums; }

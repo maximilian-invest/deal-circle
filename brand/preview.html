@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Deal Circle — Corporate Design · Release 01</title>
+  <title>Deal Circle — Corporate Design · Release 02</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,400,500,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./tokens.css">
 
   <style>
@@ -21,6 +23,7 @@
       font-weight: 300;
       line-height: var(--dc-lh-base);
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     .container {
@@ -29,10 +32,35 @@
       padding: 80px 40px 120px;
     }
 
+    /* Page-number marker (brandkit: premium detail language) */
+    .page-tag {
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      font-family: var(--dc-font-mono);
+      font-size: 11px;
+      letter-spacing: var(--dc-track-widest);
+      color: var(--dc-smoke);
+      text-transform: uppercase;
+      z-index: 50;
+    }
+
     /* HERO */
     .hero {
       padding: 120px 0 80px;
       border-bottom: 1px solid var(--dc-hairline);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 80px;
+      align-items: end;
+    }
+    .hero .meta {
+      font-family: var(--dc-font-mono);
+      font-size: 11px;
+      letter-spacing: var(--dc-track-widest);
+      color: var(--dc-smoke);
+      text-transform: uppercase;
+      line-height: 2;
     }
     .eyebrow {
       font-family: var(--dc-font-body);
@@ -47,9 +75,9 @@
       font-family: var(--dc-font-display);
       font-weight: 500;
       font-size: clamp(56px, 9vw, var(--dc-fs-hero));
-      letter-spacing: var(--dc-track-wide);
-      line-height: var(--dc-lh-tight);
-      margin: 0 0 16px;
+      letter-spacing: var(--dc-track-tighter);
+      line-height: var(--dc-lh-none);
+      margin: 0 0 24px;
     }
     .hero .lede {
       font-family: var(--dc-font-editorial);
@@ -59,6 +87,7 @@
       color: var(--dc-bone-soft);
       max-width: 540px;
       margin: 0;
+      line-height: 1.4;
     }
 
     /* SECTION */
@@ -66,12 +95,28 @@
       padding: 80px 0;
       border-bottom: 1px solid var(--dc-hairline);
     }
+    .section-head {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 80px;
+      margin-bottom: 56px;
+      align-items: end;
+    }
     .section h2 {
       font-family: var(--dc-font-display);
       font-weight: 500;
       font-size: var(--dc-fs-xl);
       letter-spacing: var(--dc-track-wide);
-      margin: 0 0 40px;
+      margin: 0;
+      line-height: 1;
+    }
+    .section .desc {
+      font-family: var(--dc-font-editorial);
+      font-style: italic;
+      font-size: var(--dc-fs-md);
+      color: var(--dc-bone-soft);
+      margin: 0;
+      max-width: 65ch;
     }
     .section h3 {
       font-family: var(--dc-font-editorial);
@@ -79,10 +124,10 @@
       font-weight: 400;
       font-size: var(--dc-fs-md);
       color: var(--dc-champagne);
-      margin: 32px 0 12px;
+      margin: 48px 0 16px;
     }
 
-    /* LOGO STAGE */
+    /* LOGO STAGE — primary + alt comparison */
     .logo-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -98,10 +143,10 @@
       align-items: center;
       justify-content: center;
       gap: 32px;
-      min-height: 320px;
+      min-height: 340px;
     }
     .logo-cell.light { background: var(--dc-bone); }
-    .logo-cell img { display: block; }
+    .logo-cell img { display: block; max-width: 100%; height: auto; }
     .logo-cell .label {
       font-family: var(--dc-font-body);
       font-size: var(--dc-fs-xs);
@@ -109,28 +154,37 @@
       text-transform: uppercase;
       color: var(--dc-smoke);
     }
-    .logo-cell.light .label { color: var(--dc-smoke); }
+    .logo-cell .badge {
+      font-family: var(--dc-font-mono);
+      font-size: 10px;
+      letter-spacing: var(--dc-track-wider);
+      color: var(--dc-champagne);
+      text-transform: uppercase;
+      border: 1px solid var(--dc-champagne);
+      padding: 4px 10px;
+    }
 
     .wordmark-cell {
       grid-column: 1 / -1;
       background: var(--dc-onyx);
-      padding: 80px 60px;
+      padding: 100px 60px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 32px;
     }
 
-    /* PIN MOCKUP */
+    /* PIN MOCKUPS */
     .pin-stage {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 1px;
+      background: var(--dc-hairline);
+      border: 1px solid var(--dc-hairline);
       margin-top: 32px;
     }
     .pin {
       background: linear-gradient(135deg, #1a1a1c 0%, #0a0a0c 100%);
-      border: 1px solid var(--dc-hairline);
       padding: 60px 40px 40px;
       text-align: center;
       position: relative;
@@ -212,11 +266,11 @@
       padding: 32px 0;
       border-top: 1px solid var(--dc-hairline);
       display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 32px;
+      grid-template-columns: 220px 1fr;
+      gap: 48px;
       align-items: baseline;
     }
-    .type-row:last-child { border-bottom: 1px solid var(--dc-hairline); }
+    .type-row:last-of-type { border-bottom: 1px solid var(--dc-hairline); }
     .type-meta {
       font-family: var(--dc-font-mono);
       font-size: var(--dc-fs-xs);
@@ -226,13 +280,13 @@
     .type-sample.cinzel {
       font-family: var(--dc-font-display);
       font-weight: 500;
-      letter-spacing: var(--dc-track-wide);
+      letter-spacing: var(--dc-track-tighter);
     }
     .type-sample.cormorant {
       font-family: var(--dc-font-editorial);
       font-weight: 400;
     }
-    .type-sample.inter {
+    .type-sample.cabinet {
       font-family: var(--dc-font-body);
       font-weight: 400;
     }
@@ -241,14 +295,16 @@
       font-weight: 400;
     }
 
-    /* MOCK HERO — wie es auf der Site aussehen würde */
+    /* MOCK HERO — Bond-Style Asymmetric */
     .mock-hero {
       background: var(--dc-onyx);
       border: 1px solid var(--dc-hairline);
-      padding: 120px 60px;
       margin-top: 32px;
       position: relative;
       overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      min-height: 480px;
     }
     .mock-hero::before {
       content: "";
@@ -256,28 +312,71 @@
       top: 24px; left: 24px; right: 24px;
       height: 1px;
       background: var(--dc-hairline);
+      z-index: 1;
     }
-    .mock-hero .eyebrow { color: var(--dc-champagne); }
+    .mock-hero-content {
+      padding: 80px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .mock-hero-aside {
+      border-left: 1px solid var(--dc-hairline);
+      padding: 80px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
     .mock-hero h2.mock {
       font-family: var(--dc-font-display);
       font-weight: 500;
-      font-size: clamp(40px, 6vw, 72px);
-      letter-spacing: var(--dc-track-wide);
-      line-height: var(--dc-lh-tight);
+      font-size: clamp(40px, 5vw, 64px);
+      letter-spacing: var(--dc-track-tighter);
+      line-height: var(--dc-lh-none);
       max-width: 14ch;
-      margin: 0 0 24px;
+      margin: 0 0 28px;
     }
-    .mock-hero p {
+    .mock-hero p.lede {
       font-family: var(--dc-font-editorial);
       font-style: italic;
       font-size: var(--dc-fs-md);
       color: var(--dc-bone-soft);
       max-width: 480px;
       margin: 0 0 40px;
+      line-height: 1.4;
+    }
+    .listing-card {
+      border-top: 1px solid var(--dc-hairline);
+      padding: 24px 0;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 20px;
+      align-items: baseline;
+    }
+    .listing-card:last-of-type { border-bottom: 1px solid var(--dc-hairline); }
+    .listing-id {
+      font-family: var(--dc-font-mono);
+      font-size: 11px;
+      color: var(--dc-smoke);
+      letter-spacing: var(--dc-track-wider);
+    }
+    .listing-name {
+      font-family: var(--dc-font-editorial);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--dc-bone);
+    }
+    .listing-status {
+      font-family: var(--dc-font-mono);
+      font-size: 10px;
+      letter-spacing: var(--dc-track-widest);
+      color: var(--dc-champagne);
+      text-transform: uppercase;
     }
     .cta {
       display: inline-block;
-      padding: 16px 32px;
+      padding: 18px 36px;
       border: 1px solid var(--dc-champagne);
       color: var(--dc-champagne);
       font-family: var(--dc-font-body);
@@ -287,58 +386,132 @@
       text-transform: uppercase;
       text-decoration: none;
       transition: all var(--dc-dur-base) var(--dc-ease);
+      align-self: flex-start;
     }
     .cta:hover {
       background: var(--dc-champagne);
       color: var(--dc-onyx);
+      transform: translateY(-1px);
+    }
+    .cta:active {
+      transform: translateY(1px);
+    }
+
+    /* COMPLIANCE STRIP */
+    .compliance {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--dc-hairline);
+      border: 1px solid var(--dc-hairline);
+      margin-top: 32px;
+    }
+    .compliance-cell {
+      background: var(--dc-onyx);
+      padding: 32px;
+    }
+    .compliance-cell h4 {
+      font-family: var(--dc-font-display);
+      font-weight: 500;
+      font-size: var(--dc-fs-sm);
+      letter-spacing: var(--dc-track-wide);
+      margin: 0 0 12px;
+      color: var(--dc-champagne);
+    }
+    .compliance-cell ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-family: var(--dc-font-mono);
+      font-size: 12px;
+      color: var(--dc-bone-soft);
+      line-height: 2;
+    }
+    .compliance-cell li::before {
+      content: "→ ";
+      color: var(--dc-champagne);
     }
 
     footer {
-      padding: 60px 0;
+      padding: 60px 0 0;
       font-family: var(--dc-font-mono);
       font-size: var(--dc-fs-xs);
       color: var(--dc-smoke);
       text-align: center;
+      letter-spacing: var(--dc-track-wider);
     }
 
     @media (max-width: 720px) {
       .container { padding: 60px 24px 80px; }
-      .logo-grid { grid-template-columns: 1fr; }
-      .pin-stage { grid-template-columns: 1fr; }
+      .hero, .section-head, .mock-hero { grid-template-columns: 1fr; gap: 32px; }
+      .mock-hero-aside { border-left: none; border-top: 1px solid var(--dc-hairline); }
+      .logo-grid, .pin-stage, .compliance { grid-template-columns: 1fr; }
       .type-row { grid-template-columns: 1fr; gap: 12px; }
     }
   </style>
 </head>
 <body>
 
+<div class="page-tag">DC — CD · 02 / Mai 2026</div>
+
 <div class="container">
 
   <header class="hero">
-    <p class="eyebrow">Corporate Design — Release 01</p>
-    <h1>Deal Circle</h1>
-    <p class="lede">Bond-inspired identity für ein Salzburger Off-Market-Portfolio.<br>
-      Onyx, Champagner, Cinzel-Serife. Geschnitten, nicht poliert.</p>
+    <div>
+      <p class="eyebrow">Corporate Design — Release 02 · Skill-Konform</p>
+      <h1>Deal Circle</h1>
+      <p class="lede">Bond-inspired identity für ein kuratiertes Salzburger Off-Market-Portfolio.<br>
+        Onyx · Champagne · Cinzel · Cabinet Grotesk. Geschnitten, nicht poliert.</p>
+    </div>
+    <div class="meta">
+      Salzburg<br>
+      Mai 2026<br>
+      Release 02<br>
+      taste-skill · brandkit · redesign-skill
+    </div>
   </header>
 
   <!-- 01 LOGO -->
   <section class="section">
-    <p class="eyebrow">Section 01</p>
-    <h2>Logo</h2>
-    <p>Monogramm „D · C" mit Diamant-Trennzeichen, gerahmt von zwei haarfeinen Ringen.
-      Für den Reverspin entfällt der Ring — der Pin selbst übernimmt den Kreis.</p>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Section 01</p>
+        <h2>Logo</h2>
+      </div>
+      <p class="desc">Monogramm „D · C" mit Diamant-Diakritikon — die Kerbe im Wachs.
+        Zwei Varianten: das Petschaft-Mark als Primär, der Bond-Title-Cipher als
+        Editorial-Alternative.</p>
+    </div>
 
+    <h3>Variante A · Petschaft (Primär)</h3>
     <div class="logo-grid">
       <div class="logo-cell">
-        <img src="./logo-monogram.svg" alt="Monogramm — auf Onyx" width="180" height="180">
-        <span class="label">Monogramm · Onyx</span>
+        <span class="badge">Primary · On Onyx</span>
+        <img src="./logo-monogram.svg" alt="Monogramm auf Onyx" width="220" height="220">
+        <span class="label">Monogram · Onyx</span>
       </div>
       <div class="logo-cell light">
-        <img src="./logo-monogram.svg" alt="Monogramm — auf Bone" width="180" height="180">
-        <span class="label">Monogramm · Bone</span>
+        <span class="badge">Primary · On Bone</span>
+        <img src="./logo-monogram.svg" alt="Monogramm auf Bone" width="220" height="220">
+        <span class="label">Monogram · Bone</span>
       </div>
       <div class="wordmark-cell">
-        <img src="./logo-wordmark.svg" alt="Wordmark" style="width:min(640px, 100%);">
-        <span class="label">Wordmark · Horizontal</span>
+        <img src="./logo-wordmark.svg" alt="Wordmark" style="width:min(680px, 100%);">
+        <span class="label">Wordmark · Horizontal Lockup</span>
+      </div>
+    </div>
+
+    <h3>Variante B · Bond-Title-Cipher (Editorial)</h3>
+    <div class="logo-grid">
+      <div class="logo-cell">
+        <span class="badge">Alt · Cipher</span>
+        <img src="./logo-monogram-alt.svg" alt="Interlocked DC Cipher" style="width:300px;">
+        <span class="label">D solid · C gestochen · überlappt</span>
+      </div>
+      <div class="logo-cell light">
+        <span class="badge">Alt · On Bone</span>
+        <img src="./logo-monogram-alt.svg" alt="Interlocked DC auf Bone" style="width:300px;">
+        <span class="label">Bond-Title-Variante</span>
       </div>
     </div>
 
@@ -370,9 +543,14 @@
 
   <!-- 02 COLOR -->
   <section class="section">
-    <p class="eyebrow">Section 02</p>
-    <h2>Farbpalette</h2>
-    <p>60 % Onyx · 30 % Bone · 10 % Champagne. Bordeaux nur für Sondermarker.</p>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Section 02</p>
+        <h2>Farbpalette</h2>
+      </div>
+      <p class="desc">60 % Onyx · 30 % Bone · 10 % Champagne. Bordeaux fällt
+        außerhalb dieser Verteilung als reine Markierung — nicht als Designelement.</p>
+    </div>
 
     <div class="swatches">
       <div class="swatch" style="background:#0B0B0C; color:#F2EFE9;">
@@ -404,7 +582,7 @@
         <div class="swatch-hex">#6E6E70</div>
       </div>
       <div class="swatch" style="background:#5C1A1B; color:#F2EFE9;">
-        <div class="swatch-name">Bordeaux</div>
+        <div class="swatch-name">Bordeaux<br><small style="font-family:var(--dc-font-mono); font-size:9px; letter-spacing:0.12em; opacity:0.7;">RESERVED-MARKER</small></div>
         <div class="swatch-hex">#5C1A1B</div>
       </div>
     </div>
@@ -412,37 +590,43 @@
 
   <!-- 03 TYPOGRAPHY -->
   <section class="section">
-    <p class="eyebrow">Section 03</p>
-    <h2>Typografie</h2>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Section 03</p>
+        <h2>Typografie</h2>
+      </div>
+      <p class="desc">Cinzel führt das Display, Cormorant das Editorial,
+        Cabinet Grotesk die UI. Inter ist gebannt (taste-skill).</p>
+    </div>
 
     <div class="type-row">
       <div class="type-meta">
-        Cinzel<br>500 · 96 / 1.05<br>+0.06em
+        Cinzel<br>500 · Hero<br>72 / 1.0<br>tracking-tighter
       </div>
-      <div class="type-sample cinzel" style="font-size:72px; line-height:1.05;">Discretion is&nbsp;a&nbsp;currency.</div>
+      <div class="type-sample cinzel" style="font-size:72px; line-height:1.0;">Discretion is&nbsp;a&nbsp;currency.</div>
     </div>
     <div class="type-row">
       <div class="type-meta">
-        Cinzel<br>500 · 42 / 1.1<br>+0.06em
+        Cinzel<br>500 · H1<br>42 / 1.05<br>+0.06em
       </div>
-      <div class="type-sample cinzel" style="font-size:42px; line-height:1.1;">Acht Objekte. Auf Anfrage.</div>
+      <div class="type-sample cinzel" style="font-size:42px; line-height:1.05; letter-spacing:0.06em;">ACHT OBJEKTE. AUF ANFRAGE.</div>
     </div>
     <div class="type-row">
       <div class="type-meta">
-        Cormorant Garamond<br>400 italic · 25 / 1.4<br>+0
+        Cormorant Garamond<br>400 italic · Lead<br>25 / 1.4
       </div>
       <div class="type-sample cormorant" style="font-style:italic; font-size:25px; line-height:1.4;">Salzburg-Stadt und Salzkammergut — vom Stadtpalais bis zur Seevilla.</div>
     </div>
     <div class="type-row">
       <div class="type-meta">
-        Inter<br>400 · 16 / 1.6<br>+0
+        Cabinet Grotesk<br>400 · Body<br>16 / 1.6 · max-w 65ch
       </div>
-      <div class="type-sample inter" style="font-size:16px; line-height:1.6; max-width:560px;">Wir kuratieren ein begrenztes Portfolio. Zugang erfolgt unter Voranmeldung,
-        nach Verifikation und unter Verschwiegenheitsvereinbarung. Keine öffentlichen Listings.</div>
+      <div class="type-sample cabinet" style="font-size:16px; line-height:1.6; max-width:65ch;">Wir kuratieren ein begrenztes Portfolio. Zugang erfolgt unter Voranmeldung,
+        nach Verifikation und unter Verschwiegenheitsvereinbarung. Keine öffentlichen Listings, keine Drohnenaufnahmen, keine lachenden Makler.</div>
     </div>
     <div class="type-row">
       <div class="type-meta">
-        JetBrains Mono<br>500 · 13<br>+0.12em
+        JetBrains Mono<br>500 · Listing-ID<br>13 · +0.12em
       </div>
       <div class="type-sample mono" style="font-size:13px; letter-spacing:0.12em;">DC-2026-074  ·  ALTSTADT-A  ·  ON&nbsp;REQUEST</div>
     </div>
@@ -450,20 +634,100 @@
 
   <!-- 04 LIVE MOCK -->
   <section class="section">
-    <p class="eyebrow">Section 04</p>
-    <h2>Hero-Mock</h2>
-    <p>So liest sich die Startseite, wenn das System angewendet wird.</p>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Section 04</p>
+        <h2>Hero-Mock</h2>
+      </div>
+      <p class="desc">So liest sich die Startseite, wenn das System angewendet wird —
+        asymmetrisches Split-Screen-Layout mit Listing-Stream rechts.</p>
+    </div>
 
     <div class="mock-hero">
-      <p class="eyebrow">DC — SALZBURG · MAI 2026</p>
-      <h2 class="mock">Acht Adressen. Eine Liste.</h2>
-      <p>Kuratierte Off-Market-Objekte zwischen Altstadt, Aigen und Wolfgangsee. Zugang auf Voranmeldung.</p>
-      <a href="#" class="cta">Anfrage stellen</a>
+      <div class="mock-hero-content">
+        <p class="eyebrow">DC — Salzburg · Mai 2026</p>
+        <h2 class="mock">Acht Adressen. Eine Liste.</h2>
+        <p class="lede">Kuratierte Off-Market-Objekte zwischen Altstadt, Aigen
+          und Wolfgangsee. Zugang auf Voranmeldung, unter NDA.</p>
+        <a href="#" class="cta">Anfrage stellen</a>
+      </div>
+      <aside class="mock-hero-aside">
+        <div>
+          <p class="eyebrow" style="margin-bottom:16px;">Aktuelles Inventar</p>
+          <div class="listing-card">
+            <span class="listing-id">DC-074</span>
+            <span class="listing-name">Stadtpalais · Altstadt-A</span>
+            <span class="listing-status">On Request</span>
+          </div>
+          <div class="listing-card">
+            <span class="listing-id">DC-068</span>
+            <span class="listing-name">Seevilla · Wolfgangsee</span>
+            <span class="listing-status">Reserved</span>
+          </div>
+          <div class="listing-card">
+            <span class="listing-id">DC-061</span>
+            <span class="listing-name">Penthouse · Aigen</span>
+            <span class="listing-status">Closed</span>
+          </div>
+        </div>
+        <p style="font-family: var(--dc-font-mono); font-size:10px; letter-spacing:0.24em; color:var(--dc-smoke); text-transform:uppercase; margin:0;">Sechs weitere · auf Anfrage</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 05 SKILL COMPLIANCE -->
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Section 05</p>
+        <h2>Skill-Compliance</h2>
+      </div>
+      <p class="desc">Audit-Trail gegen die drei angewandten Skills aus
+        github.com/leonxlnx/taste-skill.</p>
+    </div>
+
+    <div class="compliance">
+      <div class="compliance-cell">
+        <h4>taste-skill</h4>
+        <ul>
+          <li>NO #000 · Onyx #0B0B0C</li>
+          <li>NO Inter · Cabinet Grotesk</li>
+          <li>NO Purple-Blue Gradient</li>
+          <li>Max 1 Akzent &lt; 80% Sat</li>
+          <li>Spring Easing, kein Linear</li>
+          <li>min-h-[100dvh] reserviert</li>
+          <li>Tabular-Nums für Daten</li>
+        </ul>
+      </div>
+      <div class="compliance-cell">
+        <h4>brandkit</h4>
+        <ul>
+          <li>Monogram + Meaning</li>
+          <li>Construction Geometry</li>
+          <li>Negative Space (Alt)</li>
+          <li>Premium Detail Language</li>
+          <li>Visual Mode: Luxury / Editorial</li>
+          <li>Disciplined Palette: 60/30/10</li>
+          <li>Anti-Stockfoto-Direktive</li>
+        </ul>
+      </div>
+      <div class="compliance-cell">
+        <h4>redesign-skill</h4>
+        <ul>
+          <li>1. Font-Swap → done</li>
+          <li>2. Color Cleanup → done</li>
+          <li>3. Hover/Active States</li>
+          <li>4. Layout & Spacing</li>
+          <li>5. Anti-Generic Components</li>
+          <li>6. Loading/Empty/Error</li>
+          <li>7. Typography Polish</li>
+        </ul>
+      </div>
     </div>
   </section>
 
   <footer>
-    DEAL CIRCLE · CORPORATE DESIGN · RELEASE 01 · MAI 2026
+    Deal Circle · Corporate Design · Release 02 · Skill-Konform · Mai 2026
   </footer>
 
 </div>
