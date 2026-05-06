@@ -1,7 +1,7 @@
 # Deal Circle — Corporate Design
 
-**Release 02 · Bond-inspired Identity · Salzburg**
-*Erstellt unter Anwendung der `taste-skill`, `redesign-skill` und `brandkit`-Methodik
+**Release 03 · Mercedes-Anzug-Casino-Royale · Salzburg**
+*Skill-konform: `taste-skill` / `redesign-skill` / `brandkit`
 (github.com/leonxlnx/taste-skill).*
 
 ---
@@ -10,86 +10,80 @@
 
 | Dimension | Definition |
 |---|---|
-| **Kategorie** | Off-Market Luxury Real Estate · Salzburg-Stadt + Salzkammergut |
+| **Kategorie** | Off-Market Real Estate · Salzburg-Stadt + Salzkammergut |
 | **Zielgruppe** | HNW-Privat, Family Offices, diskrete Verkäufer & Käufer |
-| **Persönlichkeit** | Diskret · präzise · zurückhaltend · österreichisch-souverän |
-| **Kernmetapher** | **Petschaft / Signet** — der Siegelring als Zeichen der vereinbarten Vertraulichkeit |
-| **Logo-Idee** | Monogramm-Cipher „D · C" innerhalb eines Kreises. Der Kreis ist die *Circle* — der Vertragsbund. Das Diamant-Diakritikon ist die Kerbe im Wachs. |
-| **Versprechen** | *„Acht Adressen. Auf Anfrage. Unter NDA."* |
-| **Kulturelle Position** | Das Gegenteil der Sotheby's-Plakatwand. Mehr Privatclub als Schaufenster. |
-| **Was die Marke vermeidet** | Hochglanz-Renderings, Drohnen-Aerials, lachende Makler, Superlativ-Inflation. |
+| **Persönlichkeit** | Klar · präzise · persönlich · zurückhaltend, nicht herablassend |
+| **Kernmetapher** | **Kompass** — Orientierung, Standort, Lage. Real Estate ist Lage. |
+| **Logo-Idee** | 4-Punkt-Kompass-Stern (Mercedes-Stern-Reduktion) — geometrisch, ownable, pin-tauglich |
+| **Versprechen** | *„Salzburger Immobilien jenseits der öffentlichen Auslage."* |
+| **Position** | Persönliche Vermittlung statt Plakatwand. Klein, kuratiert, kein Marketing-Brimborium. |
+| **Vermeidet** | Geheimclub-Sprech, Drohnenflüge, lachende Makler, Superlativ-Inflation. |
 
-**Visual Mode (brandkit)**: Hybrid aus *Luxury / Beauty / Fashion* (Serifen, Embossing,
-Stein/Espresso) und *Light Editorial / Compliance* (Siegel-Logik, präzise Stationery).
-Primär dunkel ausgespielt — **Dark Luxury**.
+**Visual Mode** (brandkit): Hybrid aus *Luxury / Beauty / Fashion*
+und *Light Editorial* — primär hell ausgespielt (Mercedes-Brochure-Look).
 
 ---
 
 ## 1. Logo
 
-### Aufbau (brandkit · Methode 1: Monogram + Meaning, Methode 5: Construction Geometry)
+### Mark · 4-Punkt-Kompass
 
-Ein **Monogramm „D · C"** in Cinzel-Serife, gesetzt in einem haarfeinen Kreis-Siegel.
-Das Diamant-Diakritikon zwischen den Lettern ist die einzige ornamentale Geste —
-es markiert den *Vertragspunkt*, den Moment, an dem der Deal zustande kommt.
-
-### Varianten
+Ein geometrisch reduzierter Kompass-Stern. Vier Spitzen (N · O · S · W),
+zentraler Pivot. Pin-tauglich ab 14 mm, weil reine Silhouette ohne
+filigrane Innendetails. Optional umrahmt von einem haarfeinen Ring (Web).
 
 | Datei | Verwendung |
 |---|---|
-| `logo-monogram.svg` | **Primär** — Web, Print, Visitenkarten, Footer |
-| `logo-monogram-alt.svg` | **Alternative** — Bond-Title-Cipher: D solid, C gestochen, überlappt |
-| `logo-wordmark.svg` | Header, Briefbogen, Präsentationen |
-| `logo-pin.svg` | **Reverspin** — nur Cipher, ohne Ringe (der Pin ist der Kreis) |
+| `logo-monogram.svg` | **Primär** — Web, Print, Visitenkarten, Footer (mit Ring) |
+| `logo-pin.svg` | **Reverspin** — nur Stern, ohne Ring |
+| `logo-wordmark.svg` | Header, Briefbogen, Präsentationen — Stern + DEAL CIRCLE / SALZBURG |
 
 ### Mindestgrößen
-- Monogramm: **24 px** digital · **8 mm** print
+- Mark: **20 px** digital · **6 mm** print
 - Wordmark: **120 px** digital · **30 mm** print
 - Pin (physisch): **14 – 18 mm** Durchmesser
 
 ### Schutzraum
-Mindestabstand zu anderen Elementen = **Höhe des Diamant-Markers** (X) auf allen vier
-Seiten. Auf weniger genug Platz: einfacher Stack ohne Wordmark.
+Mindestabstand zu anderen Elementen = **Höhe des Pivot-Punkts** (X) auf
+allen vier Seiten.
 
-### Don'ts (taste-skill + brandkit)
-- Keine Schatten, keine Verläufe, kein Glow (`taste-skill`: NO neon, NO gradients).
-- Niemals stauchen oder verzerren.
+### Don'ts
+- Keine Schatten, kein Glow, kein Verlauf (`taste-skill`).
+- Niemals stauchen, drehen oder verzerren.
 - Niemals neufärben außer nach Farbtafel (§3).
-- Niemals Inter-Font für „SALZBURG" — Cabinet Grotesk (§4).
-- Niemals als 3-Spalten-Card-Reihe wiederholen (`taste-skill`: NO 3-column).
 
 ---
 
-## 2. Skill-Compliance (Audit-Trail)
+## 2. Skill-Compliance
 
-### `taste-skill` (DESIGN_VARIANCE 8 · MOTION_INTENSITY 6 · VISUAL_DENSITY 4)
+### `taste-skill` (DESIGN_VARIANCE 8 · MOTION_INTENSITY 7 · VISUAL_DENSITY 4)
 
 | Regel | Status |
 |---|---|
-| NO `#000000` | ✓ Onyx = `#0B0B0C` |
-| NO Inter font | ✓ Cabinet Grotesk als Body |
-| Max 1 Akzent · < 80 % Sättigung | ✓ Champagne `#C5A572` (Bordeaux nur Sondermarker) |
+| NO `#000000` | ✓ Midnight `#0E1A2B` als dunkelster Wert |
+| NO Inter | ✓ Cabinet Grotesk (Body) |
+| Max 1 Akzent < 80 % Sättigung | ✓ Champagne nur sehr selten, Bordeaux nur „Sold" |
 | NO Purple/Blue AI gradient | ✓ |
-| Serif nur für Editorial, nicht Dashboard | ✓ Marketing/Editorial-Kontext |
-| Tabular-Nums für Daten | ✓ `--dc-tabular` Klasse |
-| `min-h-[100dvh]`, nicht `h-screen` | (für Landing-Page-Code reserviert) |
-| `max-w-[1400px]`, `max-w-[65ch]` | ✓ Tokens definiert |
-| Spring Physics statt linear | ✓ `--dc-ease: cubic-bezier(0.16, 1, 0.3, 1)` |
+| Spring Easing, kein Linear | ✓ `cubic-bezier(0.16, 1, 0.3, 1)` |
+| `min-h-[100dvh]`, nicht `h-screen` | ✓ Hero |
+| `max-w-[1400px]`, `max-w-[65ch]` | ✓ Tokens |
+| Tabular-Nums für Daten | ✓ `.dc-tabular` Klasse |
+| Magnetic CTA, Cursor Companion | ✓ in `script.js` |
+| Hardware-Accel: nur transform/opacity | ✓ alle Animationen |
 
-### `redesign-skill` (Fix Priority — wird beim Site-Rebuild angewendet)
-1. Font swap → erledigt im Token-System.
-2. Color cleanup → 60/30/10-Regel im CD verankert.
-3. Hover/Active-States → Spec liegt in §7 unten.
-4. Layout & Spacing → Spec liegt in §6.
-5. Generic Components ersetzen → später beim Site-Bau.
-6. Loading / Empty / Error States → später beim Site-Bau.
-7. Typography Polish → §4.
+### `brandkit` Methoden
+- **Construction Geometry** ✓ — Stern aus 4 Achsen + Pivot
+- **Premium Detail Language** ✓ — Hairlines, Page-Tag, Mono-IDs
+- **Visual Mode**: Luxury / Editorial in Hellmodus
 
-### `brandkit` (angewendete Konzept-Methoden)
-- **Monogram + Meaning** ✓ — D·C als Cipher mit Vertragsmetapher.
-- **Construction Geometry** ✓ — Kreis als Konstruktionsbasis.
-- **Negative Space** (Variante) ✓ — `logo-monogram-alt.svg`: gestochenes C neben solidem D.
-- **Premium Detail Language** ✓ — Hairlines, kleine Footer-Labels, Section-Eyebrows.
+### `redesign-skill` Fix-Priority — angewendet auf neue Site
+1. Font-Swap → Cinzel + Cabinet Grotesk + Cormorant ✓
+2. Color cleanup → Pearl/Platinum/Midnight ✓
+3. Hover/Active States → CTA, Cards, Nav-Links ✓
+4. Layout → Asymmetric Hero, Bento-Listings ✓
+5. Anti-Generic Components → keine 3-Spalten-Cards, kein Modal-Spam ✓
+6. Loading/Empty/Error → Form-Submit-Demo ✓
+7. Typography Polish → Display-Tracking, max-w-65ch ✓
 
 ---
 
@@ -97,159 +91,141 @@ Seiten. Auf weniger genug Platz: einfacher Stack ohne Wordmark.
 
 | Token | Hex | Rolle |
 |---|---|---|
-| Onyx | `#0B0B0C` | Primär-Hintergrund (taste-skill: kein `#000`) |
-| Tuxedo | `#141416` | Sekundärflächen |
-| Charcoal | `#1C1C1E` | Cards (sparsam) |
-| Bone | `#F2EFE9` | Primärtext auf Dunkel / Lightmode-BG |
-| Bone Soft | `#C9C5BC` | Sekundärtext |
-| **Champagne** | `#C5A572` | **Einziger Akzent** (Logo, Hairlines, CTAs) |
-| Champagne Deep | `#A88857` | Hover, Press |
-| Smoke | `#6E6E70` | Captions, Meta |
-| Hairline | `#2A2A2D` | 1px Trennlinien |
-| Bordeaux | `#5C1A1B` | RESERVIERT — *nur* „Sold/Reserved"-Tags, max. 1× pro Viewport |
+| Pearl | `#EEECE7` | **Primärer Hintergrund** (Hellmodus) |
+| Pearl Deep | `#E2DED5` | Sekundärflächen hell |
+| Platinum | `#D7D7D5` | Silber-Mark, Pin-Disc |
+| Steel | `#A2A4A8` | Hairlines auf hell, Captions |
+| Gunmetal | `#4A4D52` | Mid-dark Text, Captions |
+| Charcoal | `#2C2C2E` | Dark-Mode-Hintergrund (Galerie-Section) |
+| **Midnight** | `#0E1A2B` | **Mark-Color · Primär-Text · Tuxedo-Navy** |
+| Midnight Deep | `#080F1A` | Footer, tiefste Fläche |
+| Bone | `#F2EFE9` | Text auf Dunkel |
+| Champagne | `#C5A572` | Akzent — sehr selten (Reserved-Tag) |
+| Bordeaux | `#5C1A1B` | RESERVIERT — nur „Sold/Reserved" |
 
-**Regel 60 / 30 / 10**: 60 % Onyx · 30 % Bone · 10 % Champagne. Bordeaux fällt
-außerhalb dieser Verteilung als reine Markierung — nicht als Designelement.
+**Verteilung** (ungefähr):
+- 55 % Pearl
+- 25 % Midnight (Type, Mark)
+- 15 % Steel/Gunmetal (Sekundär)
+- 5 % Champagne / Bordeaux / Charcoal kombiniert
 
 ---
 
-## 4. Typografie (taste-skill-konform)
+## 4. Typografie
 
-| Rolle | Schrift | Quelle | Einsatz |
+| Rolle | Schrift | Quelle |
+|---|---|---|
+| **Display** | Cinzel · 400 / 500 / 600 | Google Fonts |
+| **Editorial** | Cormorant Garamond · 300 / 400 / 500 / 600 (+ italic) | Google Fonts |
+| **Body** | **Cabinet Grotesk** · 300 / 400 / 500 / 700 | Fontshare |
+| **Mono** | JetBrains Mono · 400 / 500 | Google Fonts |
+
+### Tracking & Sizes
+```
+Hero        clamp(48px, 8vw, 104px)   Cinzel 500   tracking-tighter   leading-none
+H1          clamp(34px, 5vw, 56px)    Cinzel 500   tracking-tighter
+H2          clamp(20px, 1.8vw, 26px)  Cinzel 500   tracking-tight
+Lede        clamp(18px, 1.6vw, 22px)  Cormorant italic 400
+Body        16 / 1.6                  Cabinet Grotesk 400 · max-w-65ch
+Eyebrow     11 / 1                    Cabinet Grotesk 500 caps · +0.24em
+Mono        11 — 13                   JetBrains Mono · +0.12em
+```
+
+---
+
+## 5. Reverspin
+
+| Variante | Material | Cipher | Größe |
 |---|---|---|---|
-| **Display** | Cinzel · 400 / 500 / 600 | Google Fonts | Logo, Hero, H1 |
-| **Editorial** | Cormorant Garamond · 300 / 400 / 500 / 600 (+ italic) | Google Fonts | H2 – H4, Pull-Quotes |
-| **Body** | **Cabinet Grotesk** · 300 / 400 / 500 / 700 | Fontshare | Paragraphen, UI, Nav, Buttons |
-| **Mono** | JetBrains Mono · 400 / 500 | Google Fonts | Listing-IDs, Daten, Tabular-Nums |
+| **A · Standard** | Vergoldetes Messing, gebürstet, oder Sterling Silber | Mark in Midnight-Hartemail | **15 mm** |
+| **B · Soft Silver** | Rhodiniertes Messing | Mark graviert | **14 mm** |
+| **C · Anzug-Schwarz** | Schwarz beschichtet | Mark in Champagne-Inlay | **16 mm** |
 
-**Inter ist gebannt** (taste-skill: „NO Inter Font: Banned"). Als Body kommt
-**Cabinet Grotesk** zum Einsatz — höhere Charakterstärke, editorialer Premium-Anspruch.
-
-### Tracking
-- Display Hero: `tracking-tighter` (`-0.02em`)
-- Display Wordmark: `+0.06em – 0.08em`
-- Eyebrows / Caps-Labels: `+0.24em`
-- Body: 0
-- Caption-Caps: `+0.12em`
-
-### Skala (mobil → desktop)
-```
-Hero        56 → 96 px   Cinzel 500    leading-none
-H1          42 → 72 px   Cinzel 500
-H2          25 → 32 px   Cormorant 500
-H3          20 → 25 px   Cormorant 500 italic
-Lead        18 → 20 px   Cormorant 400
-Body        16 → 16 px   Cabinet Grotesk 400 · max-w-[65ch]
-Caption     12 → 13 px   Cabinet Grotesk 500 caps · +0.12em
-```
+Befestigung: Magnet (kein Stechen ins Sakko).
 
 ---
 
-## 5. Reverspin — Spezifikationen
+## 6. Layoutprinzipien
 
-Drei Ausführungen je Anlass / Träger:
-
-### A · Champagne / Onyx (Standard)
-- Material: vergoldetes Messing, leicht gebürstet
-- Cipher: schwarzer Hartemail (Onyx)
-- Durchmesser: **15 mm**
-- Befestigung: Magnet (kein Stechen ins Sakko)
-
-### B · Soft Silver
-- Material: rhodiniertes Messing
-- Cipher: graviert
-- Durchmesser: **14 mm**
-
-### C · Onyx / Champagne Inverse
-- Material: schwarz beschichtetes Messing
-- Cipher: gravierter Champagne-Inlay
-- Durchmesser: **16 mm** · Anlass: Abend, schwarzer Anzug
-
-**Datei**: `logo-pin.svg` — bei A/C in Champagne, bei B mit invertiertem Filter.
+1. **Asymmetrisch** — kein zentrierter Hero (`taste-skill` ANTI-CENTER).
+2. **Hairline-first** — 1 px Steel als Strukturmittel, nicht Cards.
+3. **Eyebrow + Section-Title** — jede Section beginnt mit kleinem Caps-Eyebrow + Cinzel-H2.
+4. **Bento-Grid** statt 3-Spalten-Reihen.
+5. **`min-h-[100dvh]`** im Hero.
+6. **Kanten scharf** — `border-radius: 0`.
+7. **Generöser Whitespace** — 120 px vertical Section-Padding.
+8. **Spring Easing** — alle Transitions `cubic-bezier(0.16, 1, 0.3, 1)`, 320 ms.
 
 ---
 
-## 6. Layoutprinzipien (taste-skill DESIGN_VARIANCE 8)
+## 7. Animationen (taste-skill MOTION_INTENSITY 7)
 
-1. **Hairline first** — Trennlinien als Strukturmittel, nicht Boxen.
-2. **Eyebrow + Headline** — jede Section beginnt mit kleinem Caps-Eyebrow
-   („SECTION 01 — INVENTORY") über Cinzel-Headline.
-3. **Asymmetrisch** — kein zentrierter Hero (`taste-skill`: ANTI-CENTER BIAS bei Variance > 4).
-   Split-Screen, links-aligned Headline mit rechts-aligned Asset, oder asymmetrisches Whitespace.
-4. **Generöser Whitespace** — mind. 80 px vertikales Section-Padding (Desktop).
-5. **Keine Rundungen** — `border-radius: 0`. Editorial-Schärfe.
-6. **Bewegung minimal** — `cubic-bezier(0.16, 1, 0.3, 1)`, 300 ms, keine Bouncy-Easings,
-   keine Linear-Easings.
-7. **Bento statt 3-Card-Row** (`taste-skill`: NO 3-column-card layouts) — Listings
-   als asymmetrisches Grid (z. B. 2fr 1fr 1fr).
-8. **`min-h-[100dvh]`** statt `h-screen` (Mobile Safari Bug).
+| Effekt | Trigger | Mechanik |
+|---|---|---|
+| Reveal-on-scroll | `IntersectionObserver` | opacity + translate3d, 1 s spring |
+| Parallax-Hero | scroll | `transform: translate3d(0, scrollY * factor, 0)` per rAF |
+| Hero-Title-Stagger | section enter | 4 spans mit transition-delay 80/200/320/440 ms |
+| Magnetic-CTA | mousemove | cursor pulls button via translate3d, rAF-throttled |
+| Cursor-Companion | mousemove | dot folgt cursor mit 0.18 lerp, mix-blend-mode difference |
+| Compass slow rotate | always | 90 s pro Umdrehung, `mix-blend-mode: difference` |
+| Number-Counter | enter view | cubic ease, 1.4 s, `Intl.NumberFormat('de-AT')` |
+| Image-Zoom-on-hover | hover | scale 1.04, 1.4 s linear |
+| Sticky-Nav-State | scroll > 24 px | backdrop-filter blur(14px) saturate(140%) |
 
----
-
-## 7. Interaktion & States (redesign-skill)
-
-| State | Spec |
-|---|---|
-| **Hover** | `transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1)`; Background-Shift OR `translateY(-1px)`. |
-| **Active/Press** | `translateY(1px)` ODER `scale(0.98)` — taktiles Feedback. |
-| **Focus-Ring** | 2px Champagne-Outline, `outline-offset: 3px` (Pflicht — Accessibility). |
-| **Loading** | Skeleton-Loader in Layout-Form, *nie* runde Spinner. |
-| **Empty** | komponiertes „Getting started"-Layout, kein leerer Bereich. |
-| **Error** | inline, unterhalb des Felds, Bordeaux-Indikator + Cabinet Grotesk Italic. |
+Alle respektieren `prefers-reduced-motion: reduce`.
 
 ---
 
-## 8. Bildwelt (brandkit · Image Direction)
+## 8. Bildwelt
 
-- **Architektur** vor **Personen**: Salzburger Altstadt, Festungsmauern, Innenräume.
-  Kein Hochglanz, eher Black-and-White-Reportage.
-- **Cineastischer Schnitt**: ⅔-Bilder, harte Kanten, viel negativer Raum für
-  Headlines (links oder rechts).
-- **Farbgebung**: leicht entsättigt mit warmer Lichtkante (Champagne).
-- **Stockverbot** (taste-skill): keine „diverse team"-Stockfotos, keine Drohnen-Standard.
-- **Platzhalter**: `https://picsum.photos/seed/dc-{slug}/1920/1080` — *nicht* Unsplash.
+- **Architektur** vor Personen: Salzburger Altstadt, Festungsmauern, Innenräume.
+- **Cineastischer Schnitt**: ⅔-Bilder, scharfe Kanten, viel Negativraum.
+- **Farbgebung**: leicht entsättigt (`grayscale(0.16) contrast(1.04)`), warmer Lichtkante.
+- **Stockverbot**: keine „diverse team"-Stockfotos, keine Drohnen-Aerials.
+- **Platzhalter** während Aufbau: `https://picsum.photos/seed/dc-{slug}/1200/800`.
 
 ---
 
-## 9. Tonalität (Copy)
+## 9. Tonalität (Wording)
 
-- **Knapp.** Wie ein Briefing in M's Office.
-- **Wir-Form**.
-- **Keine AI-Cliché-Verben** (`taste-skill` Forbidden List): kein „Elevate",
-  „Seamless", „Unleash", „Next-Gen", „Game-changer".
-- **Numerisch wo möglich**: Quadratmeter, Baujahr, Listing-Nr. statt Adjektiven.
-- **Keine Ausrufezeichen** in Success-Messages (`redesign-skill`).
-- **Aktiv statt passiv**.
-- **Sentence case in Headlines**, nicht Title Case.
+**Neu — natürlich, persönlich, ohne Geheimclub-Pose:**
+- *„Salzburger Immobilien jenseits der öffentlichen Auslage."*
+- *„Wir vermitteln Stadtpalais, Penthouses und Seevillen direkt zwischen Verkäufer und Käufer."*
+- *„Drei Salzburger. Zusammen über fünfundzwanzig Jahre Markterfahrung."*
+- *„Off-Market ist kein Geheimtuerei-Spiel. Es ist Respekt vor Eigentümern, die nicht wollen, dass ihr Wohnzimmer auf ImmoScout landet."*
 
-**Beispiel-Ton**:
-> *Acht Objekte. Salzburg-Stadt und Salzkammergut. Vom Stadtpalais bis zur Seevilla
-> — auf Anfrage, unter NDA, mit Voranmeldung.*
+**Vermeiden** (`taste-skill` Forbidden):
+- „Elevate", „Seamless", „Unleash", „Next-Gen", „Game-changer"
+- Ausrufezeichen in Erfolgsmeldungen
+- Lorem Ipsum, Title Case On Everything
+- Generic-Names („John Doe"), runde Fake-Zahlen (`99,9 %`)
 
 ---
 
 ## 10. Dateien
 
 ```
-deal-circle/brand/
-├── CORPORATE-DESIGN.md          ← dieses Dokument (Release 02)
-├── tokens.css                   ← CSS Custom Properties · skill-konform
-├── logo-monogram.svg            ← Hauptmarke
-├── logo-monogram-alt.svg        ← Alternative: Bond-Title-Cipher
-├── logo-pin.svg                 ← Reverspin
-├── logo-wordmark.svg            ← horizontaler Lockup
-└── preview.html                 ← Browser-Vorschau aller Assets
+deal-circle/
+├── DEPLOY.md                   ← Deployment-Anleitung (lokal + GH Action)
+├── deploy.sh                   ← Lokales Deploy-Skript
+├── brand/                      ← deployed nach /var/www/deal-circle/brand/
+│   ├── CORPORATE-DESIGN.md
+│   ├── tokens.css
+│   ├── logo-monogram.svg
+│   ├── logo-pin.svg
+│   ├── logo-wordmark.svg
+│   └── preview.html
+└── site/                       ← deployed nach /var/www/deal-circle/
+    ├── index.html
+    ├── styles.css
+    └── script.js
 ```
 
-**Schnellstart in der Site**:
-```html
-<link rel="stylesheet" href="/brand/tokens.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://api.fontshare.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,400,500,700&display=swap" rel="stylesheet">
+```
+.github/workflows/
+└── deal-circle-deploy.yml      ← Auto-Deploy bei Push
 ```
 
 ---
 
-*Release 02 — Mai 2026. Skill-konform. Änderungen über das Repo, nie direkt am Server.*
+*Release 03 — Mai 2026. Skill-konform. Pivotiert auf Silver/Pearl/Midnight + Compass-Mark.*

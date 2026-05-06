@@ -2,39 +2,31 @@
   <title>Deal Circle — Wordmark</title>
   <defs>
     <style>
-      .dc-ring     { fill: none; stroke: #C5A572; stroke-width: 1.4; }
-      .dc-mark     { fill: #C5A572; }
-      .dc-cipher {
-        font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
-        font-weight: 500;
-        font-size: 68px;
-        fill: #C5A572;
-      }
-      .dc-divider  { stroke: #C5A572; stroke-width: 0.4; opacity: 0.45; }
+      .dc-ring     { fill: none; stroke: #0E1A2B; stroke-width: 1.2; }
+      .dc-mark     { fill: #0E1A2B; }
+      .dc-divider  { stroke: #0E1A2B; stroke-width: 0.5; opacity: 0.4; }
       .dc-display {
         font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
         font-weight: 500;
         font-size: 52px;
         letter-spacing: 8px;
-        fill: #C5A572;
+        fill: #0E1A2B;
       }
       .dc-meta {
         font-family: 'Cabinet Grotesk', 'Satoshi', 'Geist', 'Helvetica Neue', Arial, sans-serif;
         font-weight: 500;
         font-size: 13px;
         letter-spacing: 7px;
-        fill: #C5A572;
-        opacity: 0.7;
+        fill: #0E1A2B;
+        opacity: 0.65;
       }
     </style>
   </defs>
 
   <g>
     <circle class="dc-ring" cx="100" cy="100" r="92"/>
-    <text class="dc-cipher" x="72"  y="123" text-anchor="middle">D</text>
-    <text class="dc-cipher" x="128" y="123" text-anchor="middle">C</text>
-    <rect class="dc-mark" x="98" y="98" width="4" height="4"
-          transform="rotate(45 100 100)"/>
+    <path class="dc-mark" d="M 100 18 L 110 90 L 182 100 L 110 110 L 100 182 L 90 110 L 18 100 L 90 90 Z"/>
+    <circle class="dc-mark" cx="100" cy="100" r="3.2"/>
   </g>
 
   <line class="dc-divider" x1="232" y1="56" x2="232" y2="144"/>

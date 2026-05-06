@@ -1,21 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Deal Circle Lapel Pin Mark">
-  <title>Deal Circle — Pin Cipher (kein Ring; der Pin ist der Kreis)</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Deal Circle Pin Mark">
+  <title>Deal Circle — Pin Mark (kein Ring; der Pin ist der Kreis)</title>
   <defs>
     <style>
-      .dc-mark   { fill: #C5A572; }
-      .dc-letter {
-        font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
-        font-weight: 500;
-        font-size: 100px;
-        letter-spacing: 0;
-        fill: #C5A572;
-      }
+      .dc-mark  { fill: #0E1A2B; }
+      .dc-pivot { fill: #0E1A2B; }
     </style>
   </defs>
 
-  <text class="dc-letter" x="58"  y="135" text-anchor="middle">D</text>
-  <text class="dc-letter" x="142" y="135" text-anchor="middle">C</text>
+  <path class="dc-mark" d="
+    M 100 12
+    L 112 88
+    L 188 100
+    L 112 112
+    L 100 188
+    L 88 112
+    L 12 100
+    L 88 88
+    Z
+  "/>
 
-  <rect class="dc-mark" x="96" y="96" width="8" height="8"
-        transform="rotate(45 100 100)"/>
+  <circle class="dc-pivot" cx="100" cy="100" r="4"/>
 </svg>

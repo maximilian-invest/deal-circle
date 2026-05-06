@@ -1,34 +1,31 @@
 /* ==========================================================================
-   Deal Circle — Design Tokens · Release 02
-   Skill-konform: taste-skill (Inter banned → Cabinet Grotesk),
-                  redesign-skill (kein #000, max 1 Akzent),
-                  brandkit (Luxury / Editorial Mode).
-   Verwendung: <link rel="stylesheet" href="brand/tokens.css">
-   Schriften: <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,400,500,700&display=swap" rel="stylesheet">
-              + Google Fonts (Cinzel, Cormorant Garamond, JetBrains Mono)
+   Deal Circle — Design Tokens · Release 03 · Silver / Pearl / Midnight
+   Mercedes-Anzug-Casino-Royale-Palette. Skill-konform.
    ========================================================================== */
 
 :root {
-  /* ----- Farben ----- */
-  --dc-onyx:           #0B0B0C;   /* Off-Black — kein #000 (taste-skill) */
-  --dc-tuxedo:         #141416;   /* Sekundärflächen */
-  --dc-charcoal:       #1C1C1E;   /* Card-Surfaces wenn nötig */
-  --dc-bone:           #F2EFE9;   /* Primärtext auf Dunkel / Hellmodus-BG */
-  --dc-bone-soft:      #C9C5BC;   /* Sekundärtext auf Dunkel */
-  --dc-champagne:      #C5A572;   /* EINZIGER Akzent (taste-skill: max 1) */
-  --dc-champagne-deep: #A88857;   /* Hover / Press */
-  --dc-champagne-soft: #E3D3AE;   /* sehr seltene Lichtkante */
-  --dc-smoke:          #6E6E70;   /* Meta / Captions */
-  --dc-hairline:       #2A2A2D;   /* 1px Trennlinien */
-  --dc-bordeaux:       #5C1A1B;   /* RESERVIERT — nur „Sold/Reserved"-Tags */
+  /* ----- Farben (Silver / Pearl / Midnight) ----- */
+  --dc-pearl:        #EEECE7;   /* Primärer Hellmodus-BG (cream-tinted white) */
+  --dc-pearl-deep:   #E2DED5;   /* Sekundärflächen hell */
+  --dc-platinum:     #D7D7D5;   /* Silber-Mark / Pin-Disc */
+  --dc-steel:        #A2A4A8;   /* Mittlere Akzente, Hairlines hell */
+  --dc-gunmetal:     #4A4D52;   /* Mid-dark, Captions */
+  --dc-charcoal:     #2C2C2E;   /* Dark-Mode-BG */
+  --dc-midnight:     #0E1A2B;   /* Tuxedo-Navy — Mark-Color, primärer Text */
+  --dc-midnight-deep:#080F1A;   /* tiefster Navy (Footer, Underlay) */
+  --dc-bone:         #F2EFE9;   /* Lightmode-Text auf Dunkel */
+  --dc-champagne:    #C5A572;   /* Akzent — VERY rare (CTA-Border, Sealed-Tag) */
+  --dc-bordeaux:     #5C1A1B;   /* RESERVIERT — nur „Sold/Reserved"-Tags */
+  --dc-hairline:     #D7D7D5;   /* helle Hairlines */
+  --dc-hairline-dark:#1B2434;   /* Hairlines auf Dunkel */
 
-  /* ----- Schriften (Stack) ----- */
+  /* ----- Schriften ----- */
   --dc-font-display:   'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
   --dc-font-editorial: 'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
   --dc-font-body:      'Cabinet Grotesk', 'Satoshi', 'Geist', 'Helvetica Neue', Arial, sans-serif;
   --dc-font-mono:      'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
 
-  /* ----- Skala (Modular Ratio 1.250) ----- */
+  /* ----- Skala ----- */
   --dc-fs-xs:    12px;
   --dc-fs-sm:    14px;
   --dc-fs-base:  16px;
@@ -41,48 +38,52 @@
   --dc-fs-hero:  96px;
 
   /* ----- Tracking ----- */
-  --dc-track-tighter: -0.02em;  /* Display Hero (taste-skill: tracking-tighter) */
+  --dc-track-tighter: -0.02em;
   --dc-track-tight:   -0.01em;
   --dc-track-normal:   0;
   --dc-track-wide:     0.06em;
   --dc-track-wider:    0.12em;
-  --dc-track-widest:   0.24em;  /* Eyebrows / Caps-Labels */
+  --dc-track-widest:   0.24em;
 
   /* ----- Line-Heights ----- */
-  --dc-lh-none:   1.0;    /* taste-skill: leading-none für Display */
+  --dc-lh-none:   1.0;
   --dc-lh-tight:  1.05;
   --dc-lh-snug:   1.25;
   --dc-lh-base:   1.6;
   --dc-lh-loose:  1.75;
 
   /* ----- Layout ----- */
-  --dc-content-max: 1400px;     /* taste-skill: max-w-[1400px] */
-  --dc-text-max:    65ch;       /* taste-skill: max-w-[65ch] */
+  --dc-content-max: 1400px;
+  --dc-text-max:    65ch;
   --dc-gutter:      40px;
-  --dc-radius:      0;          /* Kanten scharf — Bond/Editorial-Ästhetik */
-  --dc-border:      1px solid var(--dc-hairline);
+  --dc-radius:      0;
+  --dc-border:      1px solid var(--dc-steel);
 
-  /* ----- Bewegung (taste-skill: spring physics, no linear) ----- */
-  --dc-ease:        cubic-bezier(0.16, 1, 0.3, 1);   /* signature easing */
+  /* ----- Bewegung ----- */
+  --dc-ease:        cubic-bezier(0.16, 1, 0.3, 1);
   --dc-ease-spring: cubic-bezier(0.22, 0.61, 0.36, 1);
   --dc-dur-fast:    180ms;
-  --dc-dur-base:    300ms;
+  --dc-dur-base:    320ms;
   --dc-dur-slow:    640ms;
 
-  /* ----- Schatten (getönt, nicht generisch schwarz) ----- */
-  --dc-shadow-sm:   0 1px 0 rgba(197,165,114,0.06);
-  --dc-shadow-md:   0 12px 32px -16px rgba(0,0,0,0.55);
-  --dc-shadow-lg:   0 24px 48px -20px rgba(0,0,0,0.65);
-
-  /* ----- Body-Text-Constraint (taste-skill: max-w-[65ch]) ----- */
-  --dc-prose-max:   65ch;
+  /* ----- Schatten (getönt, weich, Mercedes-Auto-Brochure-Style) ----- */
+  --dc-shadow-sm:   0 1px 0 rgba(14,26,43,0.06);
+  --dc-shadow-md:   0 18px 36px -20px rgba(14,26,43,0.20);
+  --dc-shadow-lg:   0 32px 64px -28px rgba(14,26,43,0.28);
 }
 
+/* Default Light/Pearl Theme */
 html, body {
-  background: var(--dc-onyx);
-  color: var(--dc-bone);
+  background: var(--dc-pearl);
+  color: var(--dc-midnight);
   font-feature-settings: "ss01", "kern";
 }
 
-/* Für Datenkolonnen: Tabellenziffern (redesign-skill rule) */
 .dc-tabular { font-variant-numeric: tabular-nums; }
+
+/* Dark-Mode (für Hero / Sondersektionen) */
+.dc-dark {
+  background: var(--dc-charcoal);
+  color: var(--dc-bone);
+}
+.dc-dark a { color: var(--dc-platinum); }
