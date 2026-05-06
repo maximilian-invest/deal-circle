@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 200" role="img" aria-label="Deal Circle Wordmark">
+  <title>Deal Circle — Wordmark</title>
+  <defs>
+    <style>
+      .dc-ring     { fill: none; stroke: #C5A572; stroke-width: 1.6; }
+      .dc-hair     { fill: none; stroke: #C5A572; stroke-width: 0.4; opacity: 0.45; }
+      .dc-mark     { fill: #C5A572; }
+      .dc-cipher {
+        font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
+        font-weight: 500;
+        font-size: 64px;
+        fill: #C5A572;
+      }
+      .dc-divider  { stroke: #C5A572; stroke-width: 0.4; opacity: 0.45; }
+      .dc-display {
+        font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
+        font-weight: 500;
+        font-size: 52px;
+        letter-spacing: 8px;
+        fill: #C5A572;
+      }
+      .dc-meta {
+        font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+        font-weight: 500;
+        font-size: 13px;
+        letter-spacing: 7px;
+        fill: #C5A572;
+        opacity: 0.7;
+      }
+    </style>
+  </defs>
+
+  <g>
+    <circle class="dc-ring" cx="100" cy="100" r="92"/>
+    <circle class="dc-hair" cx="100" cy="100" r="84"/>
+    <text class="dc-cipher" x="73" y="122" text-anchor="middle">D</text>
+    <text class="dc-cipher" x="127" y="122" text-anchor="middle">C</text>
+    <rect class="dc-mark" x="97.5" y="97.5" width="5" height="5"
+          transform="rotate(45 100 100)"/>
+  </g>
+
+  <line class="dc-divider" x1="232" y1="56" x2="232" y2="144"/>
+
+  <g>
+    <text class="dc-display" x="266" y="106">DEAL CIRCLE</text>
+    <text class="dc-meta"    x="270" y="138">S A L Z B U R G</text>
+  </g>
+</svg>

@@ -1,0 +1,68 @@
+/* ==========================================================================
+   Deal Circle — Design Tokens
+   Verwendung: <link rel="stylesheet" href="brand/tokens.css">
+   ========================================================================== */
+
+:root {
+  /* ----- Farben ----- */
+  --dc-onyx:           #0B0B0C;   /* Primärer Hintergrund (Schwarz, leicht warm) */
+  --dc-tuxedo:         #141416;   /* Sekundärer Hintergrund / Cards */
+  --dc-bone:           #F2EFE9;   /* Primärer Text auf Dunkel */
+  --dc-bone-soft:      #C9C5BC;   /* Sekundärer Text auf Dunkel */
+  --dc-champagne:      #C5A572;   /* Akzent / Gold */
+  --dc-champagne-deep: #A88857;   /* Hover / Tiefer Goldton */
+  --dc-champagne-soft: #E3D3AE;   /* Heller Goldton (selten) */
+  --dc-smoke:          #6E6E70;   /* Mittelgrau */
+  --dc-hairline:       #2A2A2D;   /* Trennlinien, dezente Borders */
+  --dc-bordeaux:       #5C1A1B;   /* Akzent für Sonderfälle (sparsam) */
+
+  /* ----- Typografie ----- */
+  --dc-font-display:   'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
+  --dc-font-editorial: 'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
+  --dc-font-body:      'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --dc-font-mono:      'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Skala (modular ratio 1.250) */
+  --dc-fs-xs:    12px;
+  --dc-fs-sm:    14px;
+  --dc-fs-base:  16px;
+  --dc-fs-md:    20px;
+  --dc-fs-lg:    25px;
+  --dc-fs-xl:    32px;
+  --dc-fs-2xl:   42px;
+  --dc-fs-3xl:   56px;
+  --dc-fs-4xl:   72px;
+  --dc-fs-hero:  96px;
+
+  /* Tracking */
+  --dc-track-tight:  -0.01em;
+  --dc-track-normal:  0;
+  --dc-track-wide:    0.06em;
+  --dc-track-wider:   0.12em;
+  --dc-track-widest:  0.24em;   /* für SECTION-Labels, Eyebrows */
+
+  /* Line-Heights */
+  --dc-lh-tight:  1.05;   /* Display / Hero */
+  --dc-lh-snug:   1.25;   /* Headlines */
+  --dc-lh-base:   1.6;    /* Body */
+  --dc-lh-loose:  1.75;   /* Long-form */
+
+  /* ----- Layout ----- */
+  --dc-content-max: 1180px;
+  --dc-text-max:    640px;
+  --dc-gutter:      40px;
+  --dc-radius:      0;        /* Kanten bleiben scharf — Bond-Ästhetik */
+  --dc-border:      1px solid var(--dc-hairline);
+
+  /* ----- Bewegung ----- */
+  --dc-ease:        cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dc-dur-fast:    180ms;
+  --dc-dur-base:    320ms;
+  --dc-dur-slow:    640ms;
+}
+
+/* Optional: dunkles Theme als Default für die Site */
+html, body {
+  background: var(--dc-onyx);
+  color: var(--dc-bone);
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deal Circle — Corporate Design · Release 01</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./tokens.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--dc-onyx);
+      color: var(--dc-bone);
+      font-family: var(--dc-font-body);
+      font-weight: 300;
+      line-height: var(--dc-lh-base);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--dc-content-max);
+      margin: 0 auto;
+      padding: 80px 40px 120px;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 120px 0 80px;
+      border-bottom: 1px solid var(--dc-hairline);
+    }
+    .eyebrow {
+      font-family: var(--dc-font-body);
+      font-weight: 500;
+      font-size: var(--dc-fs-xs);
+      letter-spacing: var(--dc-track-widest);
+      color: var(--dc-champagne);
+      text-transform: uppercase;
+      margin: 0 0 24px;
+    }
+    .hero h1 {
+      font-family: var(--dc-font-display);
+      font-weight: 500;
+      font-size: clamp(56px, 9vw, var(--dc-fs-hero));
+      letter-spacing: var(--dc-track-wide);
+      line-height: var(--dc-lh-tight);
+      margin: 0 0 16px;
+    }
+    .hero .lede {
+      font-family: var(--dc-font-editorial);
+      font-style: italic;
+      font-weight: 400;
+      font-size: var(--dc-fs-md);
+      color: var(--dc-bone-soft);
+      max-width: 540px;
+      margin: 0;
+    }
+
+    /* SECTION */
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--dc-hairline);
+    }
+    .section h2 {
+      font-family: var(--dc-font-display);
+      font-weight: 500;
+      font-size: var(--dc-fs-xl);
+      letter-spacing: var(--dc-track-wide);
+      margin: 0 0 40px;
+    }
+    .section h3 {
+      font-family: var(--dc-font-editorial);
+      font-style: italic;
+      font-weight: 400;
+      font-size: var(--dc-fs-md);
+      color: var(--dc-champagne);
+      margin: 32px 0 12px;
+    }
+
+    /* LOGO STAGE */
+    .logo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--dc-hairline);
+      border: 1px solid var(--dc-hairline);
+    }
+    .logo-cell {
+      background: var(--dc-onyx);
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      min-height: 320px;
+    }
+    .logo-cell.light { background: var(--dc-bone); }
+    .logo-cell img { display: block; }
+    .logo-cell .label {
+      font-family: var(--dc-font-body);
+      font-size: var(--dc-fs-xs);
+      letter-spacing: var(--dc-track-widest);
+      text-transform: uppercase;
+      color: var(--dc-smoke);
+    }
+    .logo-cell.light .label { color: var(--dc-smoke); }
+
+    .wordmark-cell {
+      grid-column: 1 / -1;
+      background: var(--dc-onyx);
+      padding: 80px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    /* PIN MOCKUP */
+    .pin-stage {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+    }
+    .pin {
+      background: linear-gradient(135deg, #1a1a1c 0%, #0a0a0c 100%);
+      border: 1px solid var(--dc-hairline);
+      padding: 60px 40px 40px;
+      text-align: center;
+      position: relative;
+    }
+    .pin-disc {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow:
+        0 1px 2px rgba(0,0,0,0.6),
+        0 8px 24px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        inset 0 -1px 1px rgba(0,0,0,0.3);
+    }
+    .pin-disc.gold {
+      background: radial-gradient(circle at 35% 30%, #E3D3AE 0%, #C5A572 45%, #8C7142 100%);
+    }
+    .pin-disc.silver {
+      background: radial-gradient(circle at 35% 30%, #f4f4f4 0%, #c8c8c8 45%, #6e6e70 100%);
+    }
+    .pin-disc.onyx {
+      background: radial-gradient(circle at 35% 30%, #2a2a2d 0%, #141416 45%, #050506 100%);
+    }
+    .pin-disc img {
+      width: 88px;
+      height: 88px;
+    }
+    .pin-disc.silver img { filter: brightness(0) invert(0.15); }
+    .pin .label {
+      font-family: var(--dc-font-display);
+      font-weight: 500;
+      font-size: var(--dc-fs-xs);
+      letter-spacing: var(--dc-track-widest);
+      color: var(--dc-champagne);
+      text-transform: uppercase;
+    }
+    .pin .meta {
+      font-family: var(--dc-font-mono);
+      font-size: 11px;
+      color: var(--dc-smoke);
+      margin-top: 8px;
+    }
+
+    /* COLORS */
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--dc-hairline);
+      border: 1px solid var(--dc-hairline);
+    }
+    .swatch {
+      aspect-ratio: 4 / 3;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .swatch-name {
+      font-family: var(--dc-font-display);
+      font-weight: 500;
+      font-size: var(--dc-fs-sm);
+      letter-spacing: var(--dc-track-wider);
+      text-transform: uppercase;
+    }
+    .swatch-hex {
+      font-family: var(--dc-font-mono);
+      font-size: var(--dc-fs-xs);
+      opacity: 0.7;
+    }
+
+    /* TYPOGRAPHY */
+    .type-row {
+      padding: 32px 0;
+      border-top: 1px solid var(--dc-hairline);
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 32px;
+      align-items: baseline;
+    }
+    .type-row:last-child { border-bottom: 1px solid var(--dc-hairline); }
+    .type-meta {
+      font-family: var(--dc-font-mono);
+      font-size: var(--dc-fs-xs);
+      color: var(--dc-smoke);
+      line-height: 1.7;
+    }
+    .type-sample.cinzel {
+      font-family: var(--dc-font-display);
+      font-weight: 500;
+      letter-spacing: var(--dc-track-wide);
+    }
+    .type-sample.cormorant {
+      font-family: var(--dc-font-editorial);
+      font-weight: 400;
+    }
+    .type-sample.inter {
+      font-family: var(--dc-font-body);
+      font-weight: 400;
+    }
+    .type-sample.mono {
+      font-family: var(--dc-font-mono);
+      font-weight: 400;
+    }
+
+    /* MOCK HERO — wie es auf der Site aussehen würde */
+    .mock-hero {
+      background: var(--dc-onyx);
+      border: 1px solid var(--dc-hairline);
+      padding: 120px 60px;
+      margin-top: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mock-hero::before {
+      content: "";
+      position: absolute;
+      top: 24px; left: 24px; right: 24px;
+      height: 1px;
+      background: var(--dc-hairline);
+    }
+    .mock-hero .eyebrow { color: var(--dc-champagne); }
+    .mock-hero h2.mock {
+      font-family: var(--dc-font-display);
+      font-weight: 500;
+      font-size: clamp(40px, 6vw, 72px);
+      letter-spacing: var(--dc-track-wide);
+      line-height: var(--dc-lh-tight);
+      max-width: 14ch;
+      margin: 0 0 24px;
+    }
+    .mock-hero p {
+      font-family: var(--dc-font-editorial);
+      font-style: italic;
+      font-size: var(--dc-fs-md);
+      color: var(--dc-bone-soft);
+      max-width: 480px;
+      margin: 0 0 40px;
+    }
+    .cta {
+      display: inline-block;
+      padding: 16px 32px;
+      border: 1px solid var(--dc-champagne);
+      color: var(--dc-champagne);
+      font-family: var(--dc-font-body);
+      font-weight: 500;
+      font-size: var(--dc-fs-xs);
+      letter-spacing: var(--dc-track-widest);
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all var(--dc-dur-base) var(--dc-ease);
+    }
+    .cta:hover {
+      background: var(--dc-champagne);
+      color: var(--dc-onyx);
+    }
+
+    footer {
+      padding: 60px 0;
+      font-family: var(--dc-font-mono);
+      font-size: var(--dc-fs-xs);
+      color: var(--dc-smoke);
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .container { padding: 60px 24px 80px; }
+      .logo-grid { grid-template-columns: 1fr; }
+      .pin-stage { grid-template-columns: 1fr; }
+      .type-row { grid-template-columns: 1fr; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="hero">
+    <p class="eyebrow">Corporate Design — Release 01</p>
+    <h1>Deal Circle</h1>
+    <p class="lede">Bond-inspired identity für ein Salzburger Off-Market-Portfolio.<br>
+      Onyx, Champagner, Cinzel-Serife. Geschnitten, nicht poliert.</p>
+  </header>
+
+  <!-- 01 LOGO -->
+  <section class="section">
+    <p class="eyebrow">Section 01</p>
+    <h2>Logo</h2>
+    <p>Monogramm „D · C" mit Diamant-Trennzeichen, gerahmt von zwei haarfeinen Ringen.
+      Für den Reverspin entfällt der Ring — der Pin selbst übernimmt den Kreis.</p>
+
+    <div class="logo-grid">
+      <div class="logo-cell">
+        <img src="./logo-monogram.svg" alt="Monogramm — auf Onyx" width="180" height="180">
+        <span class="label">Monogramm · Onyx</span>
+      </div>
+      <div class="logo-cell light">
+        <img src="./logo-monogram.svg" alt="Monogramm — auf Bone" width="180" height="180">
+        <span class="label">Monogramm · Bone</span>
+      </div>
+      <div class="wordmark-cell">
+        <img src="./logo-wordmark.svg" alt="Wordmark" style="width:min(640px, 100%);">
+        <span class="label">Wordmark · Horizontal</span>
+      </div>
+    </div>
+
+    <h3>Reverspin · drei Ausführungen</h3>
+    <div class="pin-stage">
+      <div class="pin">
+        <div class="pin-disc gold">
+          <img src="./logo-pin.svg" alt="Pin Variante A">
+        </div>
+        <div class="label">Variante A</div>
+        <div class="meta">15 mm · Champagne / Onyx</div>
+      </div>
+      <div class="pin">
+        <div class="pin-disc silver">
+          <img src="./logo-pin.svg" alt="Pin Variante B">
+        </div>
+        <div class="label">Variante B</div>
+        <div class="meta">14 mm · Soft Silver</div>
+      </div>
+      <div class="pin">
+        <div class="pin-disc onyx">
+          <img src="./logo-pin.svg" alt="Pin Variante C">
+        </div>
+        <div class="label">Variante C</div>
+        <div class="meta">16 mm · Onyx / Champagne Inverse</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 COLOR -->
+  <section class="section">
+    <p class="eyebrow">Section 02</p>
+    <h2>Farbpalette</h2>
+    <p>60 % Onyx · 30 % Bone · 10 % Champagne. Bordeaux nur für Sondermarker.</p>
+
+    <div class="swatches">
+      <div class="swatch" style="background:#0B0B0C; color:#F2EFE9;">
+        <div class="swatch-name">Onyx</div>
+        <div class="swatch-hex">#0B0B0C</div>
+      </div>
+      <div class="swatch" style="background:#141416; color:#F2EFE9;">
+        <div class="swatch-name">Tuxedo</div>
+        <div class="swatch-hex">#141416</div>
+      </div>
+      <div class="swatch" style="background:#F2EFE9; color:#0B0B0C;">
+        <div class="swatch-name">Bone</div>
+        <div class="swatch-hex">#F2EFE9</div>
+      </div>
+      <div class="swatch" style="background:#C9C5BC; color:#0B0B0C;">
+        <div class="swatch-name">Bone Soft</div>
+        <div class="swatch-hex">#C9C5BC</div>
+      </div>
+      <div class="swatch" style="background:#C5A572; color:#0B0B0C;">
+        <div class="swatch-name">Champagne</div>
+        <div class="swatch-hex">#C5A572</div>
+      </div>
+      <div class="swatch" style="background:#A88857; color:#F2EFE9;">
+        <div class="swatch-name">Champagne Deep</div>
+        <div class="swatch-hex">#A88857</div>
+      </div>
+      <div class="swatch" style="background:#6E6E70; color:#F2EFE9;">
+        <div class="swatch-name">Smoke</div>
+        <div class="swatch-hex">#6E6E70</div>
+      </div>
+      <div class="swatch" style="background:#5C1A1B; color:#F2EFE9;">
+        <div class="swatch-name">Bordeaux</div>
+        <div class="swatch-hex">#5C1A1B</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 TYPOGRAPHY -->
+  <section class="section">
+    <p class="eyebrow">Section 03</p>
+    <h2>Typografie</h2>
+
+    <div class="type-row">
+      <div class="type-meta">
+        Cinzel<br>500 · 96 / 1.05<br>+0.06em
+      </div>
+      <div class="type-sample cinzel" style="font-size:72px; line-height:1.05;">Discretion is&nbsp;a&nbsp;currency.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        Cinzel<br>500 · 42 / 1.1<br>+0.06em
+      </div>
+      <div class="type-sample cinzel" style="font-size:42px; line-height:1.1;">Acht Objekte. Auf Anfrage.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        Cormorant Garamond<br>400 italic · 25 / 1.4<br>+0
+      </div>
+      <div class="type-sample cormorant" style="font-style:italic; font-size:25px; line-height:1.4;">Salzburg-Stadt und Salzkammergut — vom Stadtpalais bis zur Seevilla.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        Inter<br>400 · 16 / 1.6<br>+0
+      </div>
+      <div class="type-sample inter" style="font-size:16px; line-height:1.6; max-width:560px;">Wir kuratieren ein begrenztes Portfolio. Zugang erfolgt unter Voranmeldung,
+        nach Verifikation und unter Verschwiegenheitsvereinbarung. Keine öffentlichen Listings.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        JetBrains Mono<br>500 · 13<br>+0.12em
+      </div>
+      <div class="type-sample mono" style="font-size:13px; letter-spacing:0.12em;">DC-2026-074  ·  ALTSTADT-A  ·  ON&nbsp;REQUEST</div>
+    </div>
+  </section>
+
+  <!-- 04 LIVE MOCK -->
+  <section class="section">
+    <p class="eyebrow">Section 04</p>
+    <h2>Hero-Mock</h2>
+    <p>So liest sich die Startseite, wenn das System angewendet wird.</p>
+
+    <div class="mock-hero">
+      <p class="eyebrow">DC — SALZBURG · MAI 2026</p>
+      <h2 class="mock">Acht Adressen. Eine Liste.</h2>
+      <p>Kuratierte Off-Market-Objekte zwischen Altstadt, Aigen und Wolfgangsee. Zugang auf Voranmeldung.</p>
+      <a href="#" class="cta">Anfrage stellen</a>
+    </div>
+  </section>
+
+  <footer>
+    DEAL CIRCLE · CORPORATE DESIGN · RELEASE 01 · MAI 2026
+  </footer>
+
+</div>
+
+</body>
+</html>
