@@ -1,231 +1,229 @@
-# Deal Circle — Corporate Design
+# Deal Circle Salzburg — Corporate Design
 
-**Release 03 · Mercedes-Anzug-Casino-Royale · Salzburg**
-*Skill-konform: `taste-skill` / `redesign-skill` / `brandkit`
-(github.com/leonxlnx/taste-skill).*
+**Release 04 · Hourglass-Cut · Platinum / Onyx**
+*Konfidentiell. Kuratiert. Auf Einladung.*
 
 ---
 
-## 0. Brand-Strategie (brandkit-Framework)
+## 0. Was die Marke ist
+
+Deal Circle Salzburg ist ein geschlossener Kreis aus jungen Unternehmern,
+Gründern, Investoren und Family Offices, der sich sechsmal im Jahr in
+**Schloss Wiespach** in Oberalm bei Salzburg trifft. Format: **Diner ·
+Speaker · Drinks**. Pro Abend 30 Minuten Vortrag aus der Runde, drei
+Stunden Tisch, danach offen am Hof, am Kamin, an der Mauer — bis spät.
 
 | Dimension | Definition |
 |---|---|
-| **Kategorie** | Off-Market Real Estate · Salzburg-Stadt + Salzkammergut |
-| **Zielgruppe** | HNW-Privat, Family Offices, diskrete Verkäufer & Käufer |
-| **Persönlichkeit** | Klar · präzise · persönlich · zurückhaltend, nicht herablassend |
-| **Kernmetapher** | **Kompass** — Orientierung, Standort, Lage. Real Estate ist Lage. |
-| **Logo-Idee** | 4-Punkt-Kompass-Stern (Mercedes-Stern-Reduktion) — geometrisch, ownable, pin-tauglich |
-| **Versprechen** | *„Salzburger Immobilien jenseits der öffentlichen Auslage."* |
-| **Position** | Persönliche Vermittlung statt Plakatwand. Klein, kuratiert, kein Marketing-Brimborium. |
-| **Vermeidet** | Geheimclub-Sprech, Drohnenflüge, lachende Makler, Superlativ-Inflation. |
-
-**Visual Mode** (brandkit): Hybrid aus *Luxury / Beauty / Fashion*
-und *Light Editorial* — primär hell ausgespielt (Mercedes-Brochure-Look).
+| **Format** | Sechs Abende pro Jahr · 18 Plätze · Schloss Wiespach |
+| **Zugang** | Auf Einladung & Bewerbung. Kein Mitgliedsbeitrag. |
+| **Mitglieder** | Junge Unternehmer · Gründer · Investoren · Family Offices |
+| **Kernmetapher** | **Sanduhr** — Zeit unter wenigen, drei Stunden am Tisch |
+| **Tagline** | *„Wo Salzburg dealt."* |
+| **Estd.** | MMXXVI |
+| **Position** | Substanz statt Buzzwords. Anti-LinkedIn als Haltung. |
 
 ---
 
-## 1. Logo
+## 1. Logo · Hourglass-Cut
 
-### Mark · 4-Punkt-Kompass
+### Begründung
 
-Ein geometrisch reduzierter Kompass-Stern. Vier Spitzen (N · O · S · W),
-zentraler Pivot. Pin-tauglich ab 14 mm, weil reine Silhouette ohne
-filigrane Innendetails. Optional umrahmt von einem haarfeinen Ring (Web).
+Zwei Dreiecke, Spitze an Spitze. Die Sanduhr ohne Rahmen — nur der Sand.
+Drei Stunden am Tisch, sechs Mal im Jahr, der präzise Moment in dem
+eine Hälfte in die andere kippt. Die Spitzen sind scharf, der Schnitt
+dazwischen gerade. Kein weicher Übergang, kein Schmuck.
+
+Bei 14 mm bleibt eine einzige geometrische Silhouette: zwei Spitzen,
+ein Schnitt, ein Treffen, das stattgefunden hat.
+
+### Geometrie (200×200 viewBox)
+
+```
+Top-Triangle      Punkte:  36,28  · 164,28  · 100,94
+Bottom-Triangle   Punkte:  100,106 · 164,172 · 36,172
+Pinch-Akzent      Rect:    x 92, y 98, 16 × 4
+
+Gesamthöhe:       144 px
+Basisbreite:      128 px
+Spalt:            12 px (y 94 → 106)
+Pinch:            16 × 4 zentriert
+Achse:            x = 100
+Schutzraum:       0.4 × Gesamthöhe (≈ 58 px)
+Mindestgröße:     14 mm physisch · 22 px digital
+```
+
+### Varianten
 
 | Datei | Verwendung |
 |---|---|
-| `logo-monogram.svg` | **Primär** — Web, Print, Visitenkarten, Footer (mit Ring) |
-| `logo-pin.svg` | **Reverspin** — nur Stern, ohne Ring |
-| `logo-wordmark.svg` | Header, Briefbogen, Präsentationen — Stern + DEAL CIRCLE / SALZBURG |
-
-### Mindestgrößen
-- Mark: **20 px** digital · **6 mm** print
-- Wordmark: **120 px** digital · **30 mm** print
-- Pin (physisch): **14 – 18 mm** Durchmesser
-
-### Schutzraum
-Mindestabstand zu anderen Elementen = **Höhe des Pivot-Punkts** (X) auf
-allen vier Seiten.
+| `logo-monogram.svg` | Hauptmark — Web, Print, Visitenkarten, Footer |
+| `logo-pin.svg` | Reverspin — gleiche Silhouette, separate Datei für Druckerei |
+| `logo-wordmark.svg` | Horizontaler Lockup mit „DEAL CIRCLE / SALZBURG · ESTD MMXXVI" |
+| `hourglass.js` | DOM-Helper für die Live-Site (`window.DCMarkSVG(size, color)`) |
 
 ### Don'ts
-- Keine Schatten, kein Glow, kein Verlauf (`taste-skill`).
-- Niemals stauchen, drehen oder verzerren.
-- Niemals neufärben außer nach Farbtafel (§3).
+
+- Nicht drehen (kippt die Metapher).
+- Nicht in zwei Hälften trennen (verliert den Schnitt).
+- Nicht mit Verlauf füllen — flat oder mit dem definierten Silver-Gradient.
+- Nicht auf unruhigen Hintergründen ohne Tönungsfläche.
+- Nicht mit der Wortmarke vermischen außer im offiziellen Lockup.
 
 ---
 
-## 2. Skill-Compliance
-
-### `taste-skill` (DESIGN_VARIANCE 8 · MOTION_INTENSITY 7 · VISUAL_DENSITY 4)
-
-| Regel | Status |
-|---|---|
-| NO `#000000` | ✓ Midnight `#0E1A2B` als dunkelster Wert |
-| NO Inter | ✓ Cabinet Grotesk (Body) |
-| Max 1 Akzent < 80 % Sättigung | ✓ Champagne nur sehr selten, Bordeaux nur „Sold" |
-| NO Purple/Blue AI gradient | ✓ |
-| Spring Easing, kein Linear | ✓ `cubic-bezier(0.16, 1, 0.3, 1)` |
-| `min-h-[100dvh]`, nicht `h-screen` | ✓ Hero |
-| `max-w-[1400px]`, `max-w-[65ch]` | ✓ Tokens |
-| Tabular-Nums für Daten | ✓ `.dc-tabular` Klasse |
-| Magnetic CTA, Cursor Companion | ✓ in `script.js` |
-| Hardware-Accel: nur transform/opacity | ✓ alle Animationen |
-
-### `brandkit` Methoden
-- **Construction Geometry** ✓ — Stern aus 4 Achsen + Pivot
-- **Premium Detail Language** ✓ — Hairlines, Page-Tag, Mono-IDs
-- **Visual Mode**: Luxury / Editorial in Hellmodus
-
-### `redesign-skill` Fix-Priority — angewendet auf neue Site
-1. Font-Swap → Cinzel + Cabinet Grotesk + Cormorant ✓
-2. Color cleanup → Pearl/Platinum/Midnight ✓
-3. Hover/Active States → CTA, Cards, Nav-Links ✓
-4. Layout → Asymmetric Hero, Bento-Listings ✓
-5. Anti-Generic Components → keine 3-Spalten-Cards, kein Modal-Spam ✓
-6. Loading/Empty/Error → Form-Submit-Demo ✓
-7. Typography Polish → Display-Tracking, max-w-65ch ✓
-
----
-
-## 3. Farbpalette
+## 2. Farbpalette
 
 | Token | Hex | Rolle |
 |---|---|---|
-| Pearl | `#EEECE7` | **Primärer Hintergrund** (Hellmodus) |
-| Pearl Deep | `#E2DED5` | Sekundärflächen hell |
-| Platinum | `#D7D7D5` | Silber-Mark, Pin-Disc |
-| Steel | `#A2A4A8` | Hairlines auf hell, Captions |
-| Gunmetal | `#4A4D52` | Mid-dark Text, Captions |
-| Charcoal | `#2C2C2E` | Dark-Mode-Hintergrund (Galerie-Section) |
-| **Midnight** | `#0E1A2B` | **Mark-Color · Primär-Text · Tuxedo-Navy** |
-| Midnight Deep | `#080F1A` | Footer, tiefste Fläche |
-| Bone | `#F2EFE9` | Text auf Dunkel |
-| Champagne | `#C5A572` | Akzent — sehr selten (Reserved-Tag) |
-| Bordeaux | `#5C1A1B` | RESERVIERT — nur „Sold/Reserved" |
+| **Onyx** | `#050608` | **Primärer Hintergrund** — die Site lebt im Schwarz |
+| Onyx Deep | `#08090B` | Tiefster Schwarzwert (Footer, Pin-Hintergrund) |
+| Onyx Soft | `#0D1014` | Hero-Verlaufzentrum |
+| **Platinum** | `#C8CDD3` | **Mark-Color · Akzent** |
+| Silver | `#E8EBEE` | Highlight-Silber |
+| Silver Hot | `#F4F6F8` | Spotlight für Verläufe |
+| Steel | `#5A6068` | Sub-Labels, mid-grey |
+| Gunmetal | `#3A4048` | Tiefster Mid-Tone |
+| **Paper** | `#F2EFE8` | **Light-Sections** (Quote, Members) |
+| Paper Deep | `#E8E3D7` | Paper deeper für Akzente |
+| Ink | `#0A0B0D` | Text auf Paper |
+| Gold Trace | `#B8A978` | gilt accent — sehr sparsam (Stamp, Pulse-Indikator) |
+| Bordeaux | `#5C1A1B` | RESERVIERT — Sondermarker |
 
-**Verteilung** (ungefähr):
-- 55 % Pearl
-- 25 % Midnight (Type, Mark)
-- 15 % Steel/Gunmetal (Sekundär)
-- 5 % Champagne / Bordeaux / Charcoal kombiniert
+**Verteilung:** ~70 % Onyx · ~15 % Platinum/Silver · ~10 % Paper (für die zwei Light-Sections) · 5 % Gold-Trace.
 
 ---
 
-## 4. Typografie
+## 3. Typografie
 
-| Rolle | Schrift | Quelle |
-|---|---|---|
-| **Display** | Cinzel · 400 / 500 / 600 | Google Fonts |
-| **Editorial** | Cormorant Garamond · 300 / 400 / 500 / 600 (+ italic) | Google Fonts |
-| **Body** | **Cabinet Grotesk** · 300 / 400 / 500 / 700 | Fontshare |
-| **Mono** | JetBrains Mono · 400 / 500 | Google Fonts |
-
-### Tracking & Sizes
-```
-Hero        clamp(48px, 8vw, 104px)   Cinzel 500   tracking-tighter   leading-none
-H1          clamp(34px, 5vw, 56px)    Cinzel 500   tracking-tighter
-H2          clamp(20px, 1.8vw, 26px)  Cinzel 500   tracking-tight
-Lede        clamp(18px, 1.6vw, 22px)  Cormorant italic 400
-Body        16 / 1.6                  Cabinet Grotesk 400 · max-w-65ch
-Eyebrow     11 / 1                    Cabinet Grotesk 500 caps · +0.24em
-Mono        11 — 13                   JetBrains Mono · +0.12em
-```
-
----
-
-## 5. Reverspin
-
-| Variante | Material | Cipher | Größe |
+| Rolle | Schrift | Quelle | Einsatz |
 |---|---|---|---|
-| **A · Standard** | Vergoldetes Messing, gebürstet, oder Sterling Silber | Mark in Midnight-Hartemail | **15 mm** |
-| **B · Soft Silver** | Rhodiniertes Messing | Mark graviert | **14 mm** |
-| **C · Anzug-Schwarz** | Schwarz beschichtet | Mark in Champagne-Inlay | **16 mm** |
+| **Display** | Cinzel · 400 / 500 / 600 / 700 | Google Fonts | Hero-Wordmark, Section-Titles, Stats-Numbers |
+| **Editorial** | Cormorant Garamond · 300 / 400 / 500 (+ italic) | Google Fonts | Tagline, Lede, Manifesto, Quote |
+| **Body** | Cabinet Grotesk · 400 / 500 / 700 / 800 | Fontshare | Body, Buttons, Labels |
+| **Mono** | JetBrains Mono · 400 / 500 | Google Fonts | Page-Tag, Section-Eyebrows, Mono-Labels |
 
-Befestigung: Magnet (kein Stechen ins Sakko).
+**Inter ist nicht zu verwenden.** Cabinet Grotesk hat den editorialen Charakter, den die Marke braucht.
+
+### Skala (mobil → desktop)
+
+```
+Hero-Wordmark   clamp(64px, 14vw, 220px)   Cinzel 500   tracking 0.04em
+Manifesto       clamp(48px, 8.5vw, 144px)  Cormorant Italic 300
+Section-Title   clamp(40px, 5.6vw, 84px)   Cinzel 500   tracking 0.04em UPPER
+Quote           clamp(32px, 5vw, 72px)     Cormorant Italic 300
+Stats-Number    clamp(64px, 8vw, 124px)    Cinzel 400   gradient fill
+Lede            22px / 1.5                 Cormorant Italic 300
+Body            16.5px / 1.75              Cabinet Grotesk 400
+Eyebrow         11px caps, +0.3em tracking JetBrains Mono 500
+Page-Tag        10px caps, +0.3em tracking JetBrains Mono
+```
 
 ---
 
-## 6. Layoutprinzipien
+## 4. Reverspin
 
-1. **Asymmetrisch** — kein zentrierter Hero (`taste-skill` ANTI-CENTER).
-2. **Hairline-first** — 1 px Steel als Strukturmittel, nicht Cards.
-3. **Eyebrow + Section-Title** — jede Section beginnt mit kleinem Caps-Eyebrow + Cinzel-H2.
-4. **Bento-Grid** statt 3-Spalten-Reihen.
-5. **`min-h-[100dvh]`** im Hero.
-6. **Kanten scharf** — `border-radius: 0`.
-7. **Generöser Whitespace** — 120 px vertical Section-Padding.
-8. **Spring Easing** — alle Transitions `cubic-bezier(0.16, 1, 0.3, 1)`, 320 ms.
+| Variante | Material | Mark | Größe |
+|---|---|---|---|
+| **A · Sterling poliert** | Sterling Silver, hochglanzpoliert | Hourglass graviert in Anthrazit | **15 mm** |
+| **B · Platinum + Onyx-Email** | Brushed Platinum mit eingelegter Onyx-Email-Mitte | Hourglass in Platinum auf Onyx | **15 mm** |
+| **C · Anthrazit beschichtet** | Schwarz beschichtetes Messing | Hourglass in Platinum-Inlay | **15 mm** |
+
+Befestigung: Magnet (kein Stechen ins Sakko-Revers).
+
+Die Sandstrom-Animation der Live-Site ist die digitale Erweiterung der
+physischen Reverspin-Erfahrung — ein Mitglied trägt, was die Site zeigt.
 
 ---
 
-## 7. Animationen (taste-skill MOTION_INTENSITY 7)
+## 5. Bewegungs-System (Live-Site)
 
-| Effekt | Trigger | Mechanik |
+Die Hourglass ist nicht nur ein statisches Mark — sie ist die zentrale
+Animation der Site.
+
+| Gestaltungselement | Trigger | Mechanik |
 |---|---|---|
-| Reveal-on-scroll | `IntersectionObserver` | opacity + translate3d, 1 s spring |
-| Parallax-Hero | scroll | `transform: translate3d(0, scrollY * factor, 0)` per rAF |
-| Hero-Title-Stagger | section enter | 4 spans mit transition-delay 80/200/320/440 ms |
-| Magnetic-CTA | mousemove | cursor pulls button via translate3d, rAF-throttled |
-| Cursor-Companion | mousemove | dot folgt cursor mit 0.18 lerp, mix-blend-mode difference |
-| Compass slow rotate | always | 90 s pro Umdrehung, `mix-blend-mode: difference` |
-| Number-Counter | enter view | cubic ease, 1.4 s, `Intl.NumberFormat('de-AT')` |
-| Image-Zoom-on-hover | hover | scale 1.04, 1.4 s linear |
-| Sticky-Nav-State | scroll > 24 px | backdrop-filter blur(14px) saturate(140%) |
+| **Title-Sequence Intro** | Page-Load | Iris öffnet sich aus 200 px Radius, Mark fadet ein, „Estd. MMXXVI" |
+| **Pinned Hourglass** | Scroll im Hero | Sand fließt von oben nach unten als Funktion von `scrollY / docMax` |
+| **Hourglass-Rotation** | Scroll | Rotor dreht 0.5 Umdrehungen über die ganze Page-Höhe |
+| **Letter-Stagger** | Page-Load | Hero-Wordmark Buchstaben-für-Buchstabe (45 ms cascade) |
+| **Manifesto-Word-Reveal** | Section enter | Word-Lines mit `transform: translateY(110%)`, gestaffelt |
+| **Stat-Counter** | 60 % in viewport | requestAnimationFrame, cubic-out, 1.4 s |
+| **Custom Cursor** | always (hover-fähige Pointer) | 28 px Halo + 4 px Dot, lerp 0.18, mix-blend-mode difference |
+| **Topbar-Light-Flip** | Scroll über Light-Section | Klassen-Toggle `on-light`, BG + Text-Color invertiert |
+| **Format-Track** | Scroll innerhalb des Tracks | Wheel-deltaY → scrollLeft horizontal |
+| **Location-Stamp** | always | Rundtext-Stamp rotiert 360° in 24 s |
+| **Pulse-Gold** | Status „Nächster" | Gold-Dot pulsiert 1.6 s |
 
-Alle respektieren `prefers-reduced-motion: reduce`.
-
----
-
-## 8. Bildwelt
-
-- **Architektur** vor Personen: Salzburger Altstadt, Festungsmauern, Innenräume.
-- **Cineastischer Schnitt**: ⅔-Bilder, scharfe Kanten, viel Negativraum.
-- **Farbgebung**: leicht entsättigt (`grayscale(0.16) contrast(1.04)`), warmer Lichtkante.
-- **Stockverbot**: keine „diverse team"-Stockfotos, keine Drohnen-Aerials.
-- **Platzhalter** während Aufbau: `https://picsum.photos/seed/dc-{slug}/1200/800`.
+Alle Animationen respektieren `prefers-reduced-motion: reduce`.
 
 ---
 
-## 9. Tonalität (Wording)
+## 6. Tonalität · Wording-Inventar
 
-**Neu — natürlich, persönlich, ohne Geheimclub-Pose:**
-- *„Salzburger Immobilien jenseits der öffentlichen Auslage."*
-- *„Wir vermitteln Stadtpalais, Penthouses und Seevillen direkt zwischen Verkäufer und Käufer."*
-- *„Drei Salzburger. Zusammen über fünfundzwanzig Jahre Markterfahrung."*
-- *„Off-Market ist kein Geheimtuerei-Spiel. Es ist Respekt vor Eigentümern, die nicht wollen, dass ihr Wohnzimmer auf ImmoScout landet."*
+### Identitätssätze
+- *„Konfidentiell. Kuratiert. Auf Einladung."*
+- *„Sechs Abende. Achtzehn Plätze. Schloss Wiespach. Auf Einladung."*
+- *„Wo Salzburg dealt."*
+- *„Bond am Tresen, nicht in der Lobby."* (intern)
 
-**Vermeiden** (`taste-skill` Forbidden):
-- „Elevate", „Seamless", „Unleash", „Next-Gen", „Game-changer"
+### Format-Sprache
+- Diner · Speaker · Drinks · Excursio
+- Hof · Kamin · Mauer
+- „Whiskey, Wein, Wasser." (Drinks)
+- „Vier Gänge aus der Schlossküche."
+- „Wer sitzt, sitzt absichtlich."
+
+### Members-Prinzipien
+- *I — Auf Einladung & Bewerbung* — kein Mitgliedsbeitrag, kein Marktplatz.
+- *II — Substanz statt Buzzwords* — These statt Deck. Anti-LinkedIn als Haltung.
+- *III — Was am Tisch bleibt* — Vertrauen ist das, was wir in Wahrheit servieren.
+- *IV — Die Stunde reicht* — sechs Abende sind genug. Kein Slack, keine WhatsApp-Gruppe, kein Newsletter.
+
+### Vermeiden
+- „Networking", „Plattform", „Verein", „Premium-Community"
+- Buzzwords: Elevate · Seamless · Unleash · Next-Gen
 - Ausrufezeichen in Erfolgsmeldungen
-- Lorem Ipsum, Title Case On Everything
-- Generic-Names („John Doe"), runde Fake-Zahlen (`99,9 %`)
+- „Members" statt „Mitglieder" ist OK — als Markenwort etabliert.
+- Englisch-Deutsch-Mix sparsam (Members, Speaker, Excursio).
 
 ---
 
-## 10. Dateien
+## 7. Bildwelt
+
+- Schlossmauern bei Kerzenlicht — kein Hochglanz, eher Reportage
+- Innenhof mit Fackeln, Park nach dem Diner
+- Tische, Wein, Hände — niemals Gesichter ohne Zustimmung
+- Schloss-Stamp-Motiv (kreisförmiger Rundtext) als wiederkehrendes Detail
+- *Verboten*: Stockfotos, lachende Geschäftsleute, Drohnen-Aerials,
+  Handshake-Klischees
+
+---
+
+## 8. Dateien
 
 ```
 deal-circle/
-├── DEPLOY.md                   ← Deployment-Anleitung (lokal + GH Action)
-├── deploy.sh                   ← Lokales Deploy-Skript
-├── brand/                      ← deployed nach /var/www/deal-circle/brand/
-│   ├── CORPORATE-DESIGN.md
-│   ├── tokens.css
-│   ├── logo-monogram.svg
-│   ├── logo-pin.svg
-│   ├── logo-wordmark.svg
-│   └── preview.html
-└── site/                       ← deployed nach /var/www/deal-circle/
-    ├── index.html
-    ├── styles.css
-    └── script.js
+├── DEPLOY.md                     ← Deploy-Anleitung
+├── deploy.sh                     ← rsync-basiertes lokales Deploy-Skript
+└── site/                         ← deployed nach /var/www/deal-circle/
+    ├── index.html                ← die ganze Site (inline styles + script)
+    ├── brand.css                 ← shared tokens + .dc-btn
+    ├── hourglass.js              ← window.DCMark + window.DCMarkSVG
+    └── brand/                    ← Brand-Assets, kanonisch
+        ├── CORPORATE-DESIGN.md   ← dieses Dokument
+        ├── tokens.css            ← CSS-Custom-Properties
+        ├── preview.html          ← Browser-Vorschau aller Assets
+        ├── logo-monogram.svg     ← Hauptmark
+        ├── logo-pin.svg          ← Reverspin-Variante (gleiche Geometrie)
+        └── logo-wordmark.svg     ← horizontaler Lockup
 ```
 
 ```
 .github/workflows/
-└── deal-circle-deploy.yml      ← Auto-Deploy bei Push
+└── deal-circle-deploy.yml        ← Auto-Deploy bei Push
 ```
 
 ---
 
-*Release 03 — Mai 2026. Skill-konform. Pivotiert auf Silver/Pearl/Midnight + Compass-Mark.*
+*Release 04 — Mai 2026 · Hourglass-Cut, Platinum/Onyx, Sechs-Abende-Format.*

@@ -1,383 +1,1430 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Deal Circle Salzburg — wir vermitteln Salzburger Immobilien jenseits der öffentlichen Auslage. Stadtpalais, Penthouses, Seevillen. Diskret. Persönlich.">
-  <meta name="theme-color" content="#EEECE7">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deal Circle Salzburg</title>
 
-  <title>Deal Circle Salzburg — Immobilien jenseits der Auslage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,400,700,800&display=swap" rel="stylesheet" />
 
-  <link rel="icon" type="image/svg+xml" href="./brand/logo-pin.svg">
-  <link rel="apple-touch-icon" href="./brand/logo-pin.svg">
+  <link rel="stylesheet" href="brand.css" />
+  <script src="hourglass.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,400,500,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #FFFFFF;
+      --silver-hot: #F4F6F8;
+      --ivory: #F2EFE8;        /* warm paper */
+      --ivory-2: #E8E3D7;      /* paper deeper */
+      --ink: #0A0B0D;          /* text on ivory */
+      --gold-trace: #B8A978;   /* faint gilt accent */
+    }
 
-  <link rel="stylesheet" href="./brand/tokens.css">
-  <link rel="stylesheet" href="./styles.css">
+    body { background: #050608; cursor: none; overflow-x: hidden; }
+    @media (max-width: 900px) { body { cursor: auto; } .cursor-halo, .cursor-dot { display: none !important; } }
+    ::selection { background: var(--white); color: #050608; }
+
+    /* ── Cursor ─────────────────────────────────────────────── */
+    .cursor-halo {
+      position: fixed; top: 0; left: 0; width: 28px; height: 28px;
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width .25s ease, height .25s ease, border-color .25s ease, background .25s ease;
+      mix-blend-mode: difference;
+    }
+    .cursor-dot {
+      position: fixed; top: 0; left: 0; width: 4px; height: 4px;
+      background: #fff; border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%) rotate(45deg);
+      mix-blend-mode: difference;
+    }
+    .cursor-halo.hover { width: 72px; height: 72px; border-color: #fff; background: rgba(255,255,255,0.05); }
+
+    /* ── Grain ──────────────────────────────────────────────── */
+    .grain {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      opacity: 0.07; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+
+    /* ── Title-sequence intro (Bond gun-barrel-ish) ─────────── */
+    .intro {
+      position: fixed; inset: 0; z-index: 9000;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+    .intro.done { opacity: 0; visibility: hidden; }
+    .intro-stage {
+      position: relative; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    /* iris circle that opens */
+    .intro-iris {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 200px, #000 201px);
+      animation: iris-open 2.4s cubic-bezier(.7,0,.2,1) 0.2s forwards;
+    }
+    @keyframes iris-open {
+      0%   { background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 0px,    rgba(0,0,0,0) 0px,    #000 1px); }
+      40%  { background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 220px,  rgba(0,0,0,0) 220px,  #000 221px); }
+      100% { background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 1800px, rgba(0,0,0,0) 1800px, #000 1801px); }
+    }
+    .intro-mark {
+      width: 220px; height: 220px;
+      animation: intro-mark-in 1.6s cubic-bezier(.7,0,.2,1) 0.6s both;
+    }
+    @keyframes intro-mark-in {
+      from { opacity: 0; transform: scale(0.6); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .intro-text {
+      position: absolute; bottom: 12%; left: 0; right: 0; text-align: center;
+      font-family: 'Cinzel', serif; font-weight: 500;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      color: #fff; font-size: 14px;
+      opacity: 0; animation: fade-in 1s ease 1.6s forwards;
+    }
+    .intro-skip {
+      position: absolute; top: 24px; right: 24px;
+      background: transparent; border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; padding: 8px 14px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em;
+      text-transform: uppercase; cursor: pointer;
+      transition: background .25s ease;
+    }
+    .intro-skip:hover { background: rgba(255,255,255,0.1); }
+    @keyframes fade-in { to { opacity: 1; } }
+
+    /* ── Pinned hourglass (scroll-driven) ───────────────────── */
+    .pin-stage {
+      position: fixed; pointer-events: none;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 280px; height: 280px;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+    .pin-stage.active { opacity: 1; }
+    .pin-stage svg { width: 100%; height: 100%; }
+
+    /* ── Top progress bar ───────────────────────────────────── */
+    .scroll-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 1px;
+      background: transparent; z-index: 100;
+    }
+    .scroll-bar::after {
+      content: ''; display: block; height: 100%;
+      background: linear-gradient(90deg, #fff, #C8CDD3);
+      width: var(--p, 0%);
+      transition: width .1s linear;
+    }
+
+    /* ── Layout primitives ──────────────────────────────────── */
+    .wrap { max-width: 1320px; margin: 0 auto; padding: 0 56px; position: relative; z-index: 2; }
+    .wrap-tight { max-width: 980px; margin: 0 auto; padding: 0 56px; position: relative; z-index: 2; }
+    .wrap-wide { max-width: 1600px; margin: 0 auto; padding: 0 56px; position: relative; z-index: 2; }
+    @media (max-width: 720px) { .wrap, .wrap-tight, .wrap-wide { padding: 0 22px; } }
+
+    /* ── Top bar ────────────────────────────────────────────── */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+      transition: background .4s ease, color .4s ease, border-color .4s ease;
+      background: transparent;
+    }
+    .topbar.has-bg { background: rgba(5,6,8,0.88); backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%); border-bottom: 1px solid var(--hairline); }
+    .topbar.on-light { background: rgba(242,239,232,0.92); border-bottom: 1px solid rgba(10,11,13,0.1); }
+    .topbar.on-light .topbar-mark, .topbar.on-light .topbar-mark .name { color: var(--ink); }
+    .topbar.on-light .topbar-nav a { color: rgba(10,11,13,0.65); }
+    .topbar.on-light .topbar-nav a:hover { color: var(--ink); }
+    .topbar.on-light .topbar-mark .mark-svg path,
+    .topbar.on-light .topbar-mark .mark-svg polygon,
+    .topbar.on-light .topbar-mark .mark-svg rect { fill: var(--ink) !important; stroke: var(--ink) !important; }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px 56px; }
+    .topbar-mark { display: flex; align-items: center; gap: 14px; text-decoration: none; color: #fff; transition: color .4s ease; }
+    .topbar-mark .name { font-family: 'Cinzel', serif; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; font-size: 13px; }
+    .topbar-nav { display: flex; gap: 34px; align-items: center; }
+    .topbar-nav a { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .25s ease; position: relative; }
+    .topbar-nav a.nav-link::after { content: ''; position: absolute; left: 0; right: 0; bottom: -8px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
+    .topbar-nav a.nav-link:hover { color: #fff; }
+    .topbar.on-light .topbar-nav a.nav-link:hover { color: var(--ink); }
+    .topbar-nav a.nav-link:hover::after { transform: scaleX(1); }
+    .topbar-nav .dc-btn { padding: 10px 18px; font-size: 11px; }
+    .topbar.on-light .topbar-nav .dc-btn--ghost { color: var(--ink); border-color: rgba(10,11,13,0.3); }
+    .topbar.on-light .topbar-nav .dc-btn--ghost:hover { background: var(--ink); color: var(--ivory); }
+    @media (max-width: 720px) {
+      .topbar-inner { padding: 12px 22px; }
+      .topbar-nav { gap: 12px; }
+      .topbar-nav .nav-link { display: none; }
+    }
+
+    /* ── ACT 1 · Hero (onyx) ────────────────────────────────── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; padding: 120px 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 35%, #0e1014 0%, #050608 70%);
+    }
+    .hero-corner { position: absolute; width: 56px; height: 56px; border-color: rgba(255,255,255,0.5); border-style: solid; border-width: 0; opacity: 0; animation: corner-in 1.8s ease 0.4s forwards; }
+    .hero-corner.tl { top: 80px; left: 56px; border-top-width: 1px; border-left-width: 1px; }
+    .hero-corner.tr { top: 80px; right: 56px; border-top-width: 1px; border-right-width: 1px; }
+    .hero-corner.bl { bottom: 80px; left: 56px; border-bottom-width: 1px; border-left-width: 1px; }
+    .hero-corner.br { bottom: 80px; right: 56px; border-bottom-width: 1px; border-right-width: 1px; }
+    @keyframes corner-in { to { opacity: 1; } }
+
+    .hero-meta {
+      position: absolute; top: 100px; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 18px; align-items: center;
+      opacity: 0; animation: rise 1s ease 1.2s forwards;
+    }
+    .hero-meta .dot { width: 4px; height: 4px; background: rgba(255,255,255,0.4); transform: rotate(45deg); }
+    .hero-meta span { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+
+    .hero-inner { position: relative; z-index: 4; text-align: center; }
+
+    /* Massive split wordmark — letters animate in from above/below */
+    .hero-wordmark {
+      font-family: 'Cinzel', serif; font-weight: 500;
+      font-size: clamp(64px, 14vw, 220px);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      line-height: 0.9; margin: 0;
+      color: #fff;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.05em;
+    }
+    .hero-wordmark .word { display: inline-flex; }
+    .hero-wordmark .letter {
+      display: inline-block;
+      opacity: 0; transform: translateY(80px) skewY(6deg);
+      animation: letter-in 1.2s cubic-bezier(.7,0,.2,1) forwards;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F4F6F8 40%, #C8CDD3 100%);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 4px 24px rgba(255,255,255,0.06));
+    }
+    @keyframes letter-in {
+      to { opacity: 1; transform: translateY(0) skewY(0); }
+    }
+
+    .hero-tagline {
+      margin-top: 36px;
+      font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(22px, 2.6vw, 38px);
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.02em;
+      opacity: 0; animation: rise 1.4s ease 1.8s forwards;
+    }
+    .hero-tagline .amp { color: var(--gold-trace); font-style: normal; padding: 0 0.2em; }
+
+    .hero-actions {
+      margin-top: 52px;
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      opacity: 0; animation: rise 1.4s ease 2.2s forwards;
+    }
+    .hero-cta-line {
+      display: flex; align-items: center; gap: 18px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.4); text-transform: uppercase;
+      opacity: 0; animation: rise 1.4s ease 2.4s forwards;
+      margin-top: 28px;
+    }
+    .hero-cta-line .h-line { width: 60px; height: 1px; background: rgba(255,255,255,0.3); }
+
+    .hero-scroll-cue {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.4em;
+      color: rgba(255,255,255,0.5); text-transform: uppercase;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      opacity: 0; animation: fade-in 1.2s ease 2.6s forwards;
+    }
+    .hero-scroll-cue .vline { width: 1px; height: 56px; background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0)); animation: trickle 2s ease-in-out infinite; }
+    @keyframes trickle {
+      0%, 100% { transform: scaleY(1); transform-origin: top; opacity: 0.5; }
+      50%      { transform: scaleY(0.3); transform-origin: top; opacity: 1; }
+    }
+    @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+    /* The hero hourglass is the FIRST stage of the pinned scrub */
+    .hero-mark-anchor {
+      width: 220px; height: 220px;
+      margin: 0 auto 36px;
+      visibility: hidden; /* the pinned svg sits where this is */
+    }
+
+    /* ── ACT 2 · Manifesto wipe (BIG TYPE on onyx) ──────────── */
+    .manifesto {
+      padding: 200px 0;
+      background: #050608;
+      border-top: 1px solid var(--hairline);
+      overflow: hidden;
+      position: relative;
+    }
+    .manifesto h2 {
+      font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(48px, 8.5vw, 144px);
+      line-height: 1.05; margin: 0;
+      color: rgba(255,255,255,0.96);
+      max-width: 16ch;
+      letter-spacing: -0.005em;
+    }
+    .manifesto h2 .grad {
+      background: linear-gradient(90deg, #fff 0%, #C8CDD3 50%, #7A8088 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .manifesto .word-line {
+      overflow: hidden; display: block;
+    }
+    .manifesto .word-line span {
+      display: inline-block;
+      transform: translateY(110%);
+      transition: transform 1.2s cubic-bezier(.7,0,.2,1);
+    }
+    .manifesto.in .word-line span { transform: translateY(0); }
+    .manifesto.in .word-line:nth-child(2) span { transition-delay: .15s; }
+    .manifesto.in .word-line:nth-child(3) span { transition-delay: .3s; }
+    .manifesto.in .word-line:nth-child(4) span { transition-delay: .45s; }
+    .manifesto-side {
+      position: absolute; right: 56px; top: 200px;
+      width: 280px;
+      font-family: 'Cabinet Grotesk', sans-serif; font-size: 14px; line-height: 1.7;
+      color: rgba(255,255,255,0.6);
+    }
+    .manifesto-side::before { content: ''; display: block; width: 40px; height: 1px; background: var(--gold-trace); margin-bottom: 18px; }
+    @media (max-width: 1100px) { .manifesto-side { position: static; margin-top: 64px; width: 100%; max-width: 480px; } }
+
+    /* ── ACT 3 · Stats ribbon (huge numbers, light-on-dark) ─── */
+    .stats-act {
+      background: #050608;
+      border-top: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+      padding: 0;
+      position: relative;
+    }
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      align-items: stretch;
+    }
+    .stat {
+      padding: 80px 32px; border-right: 1px solid var(--hairline);
+      display: flex; flex-direction: column; gap: 14px;
+      transition: background .5s ease;
+      position: relative; overflow: hidden;
+    }
+    .stat:last-child { border-right: 0; }
+    .stat:hover { background: rgba(255,255,255,0.02); }
+    .stat::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
+      background: var(--gold-trace); transform: scaleY(0); transform-origin: bottom;
+      transition: transform .6s ease;
+    }
+    .stat:hover::before { transform: scaleY(1); }
+    .stat .num {
+      font-family: 'Cinzel', serif; font-weight: 400;
+      font-size: clamp(64px, 8vw, 124px); line-height: 1;
+      background: linear-gradient(180deg, #fff 0%, #C8CDD3 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .stat .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .stat .note { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255,255,255,0.7); font-size: 16px; }
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat { border-right: 0; border-bottom: 1px solid var(--hairline); padding: 40px 22px; }
+      .stat:nth-child(odd) { border-right: 1px solid var(--hairline); }
+    }
+
+    /* ── ACT 4 · Format / horizontal scroll ─────────────────── */
+    .format-act {
+      background: #050608;
+      padding: 200px 0 200px;
+      border-bottom: 1px solid var(--hairline);
+      position: relative;
+    }
+    .section-head {
+      display: grid; grid-template-columns: 1fr 2fr; gap: 64px;
+      align-items: baseline; margin-bottom: 80px;
+    }
+    .section-eyebrow {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.5); text-transform: uppercase;
+      display: flex; gap: 12px; align-items: center;
+    }
+    .section-eyebrow .num { color: #fff; font-weight: 500; }
+    .section-eyebrow::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.2); max-width: 80px; }
+    .section-title {
+      font-family: 'Cinzel', serif; font-weight: 500;
+      font-size: clamp(40px, 5.6vw, 84px);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      margin: 0; line-height: 1.05;
+      color: #fff;
+    }
+    .section-title em { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; text-transform: none; letter-spacing: 0.01em; color: rgba(255,255,255,0.7); }
+    .section-lede {
+      font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300;
+      font-size: 22px; line-height: 1.5;
+      color: rgba(255,255,255,0.7);
+      max-width: 580px; margin-top: 22px;
+    }
+    @media (max-width: 720px) { .section-head { grid-template-columns: 1fr; gap: 18px; margin-bottom: 48px; } }
+
+    /* horizontal track for Format */
+    .h-track-wrap { position: relative; }
+    .h-track {
+      display: flex; gap: 32px;
+      padding: 0 56px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .h-track::-webkit-scrollbar { display: none; }
+    .h-card {
+      flex: 0 0 460px;
+      scroll-snap-align: start;
+      min-height: 580px;
+      padding: 48px 40px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 60%);
+      display: flex; flex-direction: column;
+      position: relative;
+      transition: transform .6s ease, border-color .4s ease, background .4s ease;
+    }
+    .h-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.4); background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 60%); }
+    .h-card .roman {
+      font-family: 'Cinzel', serif; font-weight: 400;
+      font-size: 64px; color: rgba(255,255,255,0.18);
+      letter-spacing: 0.04em; line-height: 1;
+      margin-bottom: 24px;
+    }
+    .h-card .step { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+    .h-card h3 {
+      font-family: 'Cinzel', serif; font-weight: 500;
+      font-size: 48px; letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 16px 0 24px;
+      color: #fff;
+    }
+    .h-card p { font-size: 16px; line-height: 1.65; color: rgba(255,255,255,0.7); max-width: 36ch; }
+    .h-card .duration {
+      margin-top: auto; padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      color: rgba(255,255,255,0.5); font-size: 22px;
+    }
+    .h-card .roman-grad {
+      background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.05) 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .h-cue {
+      display: flex; gap: 16px; align-items: center; padding: 28px 56px 0;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.5); text-transform: uppercase;
+    }
+    .h-cue .h-line { flex: 0 0 60px; height: 1px; background: rgba(255,255,255,0.3); }
+
+    /* ── ACT 5 · QUOTE on IVORY (LIGHT SECTION!) ────────────── */
+    .quote-light {
+      background: var(--ivory);
+      color: var(--ink);
+      padding: 200px 0;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .quote-light::before {
+      content: ''; position: absolute; inset: 0;
+      background: 
+        radial-gradient(ellipse 60% 40% at 50% 30%, rgba(184,169,120,0.2) 0%, rgba(242,239,232,0) 70%),
+        repeating-linear-gradient(0deg, rgba(10,11,13,0.025) 0, rgba(10,11,13,0.025) 1px, transparent 1px, transparent 56px);
+      pointer-events: none;
+      z-index: -1;
+    }
+    /* faint giant Q */
+    .quote-light .ghost-Q {
+      position: absolute; left: -60px; top: 50%; transform: translateY(-50%);
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 720px; line-height: 1; color: rgba(10,11,13,0.04);
+      pointer-events: none;
+    }
+    .quote-light blockquote {
+      margin: 0 auto; max-width: 1000px;
+      font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(32px, 5vw, 72px);
+      line-height: 1.2; color: var(--ink);
+      letter-spacing: -0.005em;
+      text-align: center;
+      position: relative;
+    }
+    .quote-light blockquote .or { color: var(--gold-trace); }
+    .quote-light cite {
+      display: block; margin-top: 40px; text-align: center;
+      font-family: 'Cinzel', serif; font-weight: 500;
+      font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase;
+      color: rgba(10,11,13,0.55); font-style: normal;
+    }
+    .quote-light cite::before { content: '— '; }
+    .quote-light cite::after { content: ' —'; }
+
+    /* ── ACT 6 · CALENDAR (onyx, with split-text reveals) ───── */
+    .abende-act {
+      background: #050608;
+      padding: 200px 0;
+      border-top: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+      position: relative;
+    }
+    .abende {
+      border-top: 1px solid rgba(255,255,255,0.25);
+    }
+    .abend-row {
+      display: grid;
+      grid-template-columns: 90px 200px 1fr 180px 120px;
+      gap: 24px;
+      padding: 36px 0;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      transition: padding-left .4s ease, background .4s ease;
+      position: relative; overflow: hidden;
+      cursor: pointer;
+    }
+    @media (max-width: 1180px) {
+      .abend-row { grid-template-columns: 80px 170px 1fr 140px 100px; gap: 20px; }
+      .abend-date { font-size: 22px !important; }
+      .abend-topic { font-size: 20px !important; }
+    }
+    .abend-row::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 0; background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+      transition: width .5s ease;
+    }
+    .abend-row:hover { padding-left: 24px; }
+    .abend-row:hover::before { width: 100%; }
+    .abend-row .marker {
+      position: absolute; left: 0; top: 50%; transform: translateY(-50%) rotate(45deg);
+      width: 8px; height: 8px; background: #fff;
+      opacity: 0; transition: opacity .4s ease;
+    }
+    .abend-row:hover .marker { opacity: 1; }
+    .abend-num    { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); }
+    .abend-date   { font-family: 'Cinzel', serif; font-weight: 500; font-size: 28px; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; }
+    .abend-topic  { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 24px; color: rgba(255,255,255,0.85); line-height: 1.3; }
+    .abend-speaker { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .abend-status { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; text-align: right; }
+    .status-passed { color: rgba(255,255,255,0.3); }
+    .status-passed::before { content: '✕  '; }
+    .status-next   { color: #fff; }
+    .status-next::before { content: '●  '; color: var(--gold-trace); animation: pulse-gold 1.6s ease-in-out infinite; }
+    @keyframes pulse-gold {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.3; }
+    }
+    .status-open   { color: rgba(255,255,255,0.55); }
+    .status-open::before { content: '○  '; }
+    @media (max-width: 900px) {
+      .abend-row { grid-template-columns: 1fr; gap: 6px; padding: 26px 0; }
+      .abend-status { text-align: left; }
+    }
+
+    /* ── ACT 7 · LOCATION (parallax photo placeholder) ──────── */
+    .location-act {
+      background: #050608;
+      padding: 200px 0;
+      border-bottom: 1px solid var(--hairline);
+      position: relative; overflow: hidden;
+    }
+    .location-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 80px; align-items: center; }
+    .location-art {
+      aspect-ratio: 4 / 5;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(184,169,120,0.16) 0%, rgba(5,6,8,0) 60%),
+        radial-gradient(ellipse 100% 60% at 50% 100%, rgba(255,255,255,0.06) 0%, rgba(5,6,8,0) 70%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 24px),
+        #0d0e11;
+      border: 1px solid rgba(255,255,255,0.18);
+      position: relative; display: flex; align-items: flex-end; padding: 28px;
+      overflow: hidden;
+    }
+    .location-art::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 0%, transparent 60%, rgba(5,6,8,0.85) 100%);
+    }
+    .location-art .art-stamp {
+      position: absolute; top: 28px; right: 28px;
+      width: 90px; height: 90px; border-radius: 50%;
+      border: 1px solid var(--gold-trace);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em;
+      color: var(--gold-trace); text-transform: uppercase;
+      animation: rotate-stamp 24s linear infinite;
+    }
+    @keyframes rotate-stamp {
+      from { transform: rotate(0); }
+      to   { transform: rotate(360deg); }
+    }
+    .location-art .label {
+      position: relative; z-index: 1;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.5); text-transform: uppercase;
+    }
+    .location-text h3 {
+      font-family: 'Cinzel', serif; font-weight: 500;
+      font-size: clamp(36px, 4.6vw, 60px); letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 0 0 28px;
+      line-height: 1.05; color: #fff;
+    }
+    .location-text h3 em { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; text-transform: none; color: rgba(255,255,255,0.7); }
+    .location-text p { font-size: 16.5px; line-height: 1.75; color: rgba(255,255,255,0.7); margin: 0 0 18px; }
+    .location-meta {
+      margin-top: 36px; padding-top: 28px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px 32px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5);
+    }
+    .location-meta .v { color: #fff; }
+    @media (max-width: 900px) { .location-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+    /* ── ACT 8 · MEMBERS / PRINCIPLES on IVORY (LIGHT) ──────── */
+    .members-light {
+      background: var(--ivory);
+      color: var(--ink);
+      padding: 200px 0;
+      position: relative;
+    }
+    .members-light .section-eyebrow { color: rgba(10,11,13,0.55); }
+    .members-light .section-eyebrow .num { color: var(--ink); }
+    .members-light .section-eyebrow::after { background: rgba(10,11,13,0.2); }
+    .members-light .section-title { color: var(--ink); }
+    .members-light .section-title em { color: rgba(10,11,13,0.55); }
+    .members-light .section-lede { color: rgba(10,11,13,0.65); }
+
+    .principles {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 0;
+      border-top: 1px solid rgba(10,11,13,0.2);
+    }
+    .principle {
+      padding: 56px 48px 64px;
+      border-bottom: 1px solid rgba(10,11,13,0.15);
+      border-right: 1px solid rgba(10,11,13,0.15);
+      display: flex; flex-direction: column; gap: 18px;
+      position: relative;
+      transition: background .5s ease;
+      overflow: hidden;
+    }
+    .principle:nth-child(2n) { border-right: 0; }
+    .principle::after {
+      content: ''; position: absolute; left: 0; bottom: 0; height: 1px; width: 0;
+      background: var(--ink); transition: width .8s cubic-bezier(.7,0,.2,1);
+    }
+    .principle:hover::after { width: 100%; }
+    .principle:hover { background: rgba(10,11,13,0.025); }
+    .principle .ord { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: var(--gold-trace); text-transform: uppercase; }
+    .principle h4 {
+      font-family: 'Cinzel', serif; font-weight: 500;
+      font-size: 28px; letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 0;
+      color: var(--ink);
+    }
+    .principle p { font-size: 16px; line-height: 1.7; color: rgba(10,11,13,0.7); margin: 0; }
+    .principle .ornament {
+      position: absolute; right: 32px; top: 32px;
+      font-family: 'Cinzel', serif; font-size: 56px; color: rgba(10,11,13,0.06);
+      line-height: 1;
+    }
+    @media (max-width: 720px) { .principles { grid-template-columns: 1fr; } .principle { border-right: 0; } }
+
+    /* ── ACT 9 · APPLY ──────────────────────────────────────── */
+    .apply {
+      background: #050608;
+      padding: 180px 0;
+      border-bottom: 1px solid var(--hairline);
+      position: relative; overflow: hidden;
+    }
+    .apply::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 80% 20%, rgba(184,169,120,0.08) 0%, rgba(5,6,8,0) 60%);
+      pointer-events: none;
+    }
+    .apply-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 96px; align-items: start; position: relative; }
+    .apply-side h2 {
+      font-family: 'Cinzel', serif; font-weight: 500;
+      font-size: clamp(40px, 5.2vw, 64px); letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 16px 0 24px; line-height: 1.05;
+      color: #fff;
+    }
+    .apply-side h2 em { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; text-transform: none; color: rgba(255,255,255,0.7); }
+    .apply-side p { font-size: 16.5px; line-height: 1.75; color: rgba(255,255,255,0.75); margin: 0 0 18px; }
+    .apply-meta {
+      margin-top: 36px; padding-top: 28px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px 32px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5);
+    }
+    .apply-meta .v { color: #fff; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; position: relative; }
+    .field label {
+      font-family: 'Cabinet Grotesk', sans-serif; font-weight: 500;
+      font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      transition: color .3s ease;
+    }
+    .field input, .field textarea {
+      width: 100%; background: transparent; border: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      padding: 12px 0;
+      font-family: 'Cabinet Grotesk', sans-serif; font-size: 16px;
+      color: #fff; outline: none;
+      transition: border-color .3s ease;
+    }
+    .field input:focus, .field textarea:focus { border-bottom-color: #fff; }
+    .field input:focus + .field-line, .field textarea:focus + .field-line { transform: scaleX(1); }
+    .field textarea { resize: vertical; min-height: 92px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    @media (max-width: 720px) {
+      .apply-grid { grid-template-columns: 1fr; gap: 48px; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+
+    /* ── ACT 10 · CLOSING (huge tagline, slow drain) ────────── */
+    .closing {
+      background: #050608;
+      padding: 220px 0;
+      text-align: center;
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .closing-tagline {
+      font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(40px, 9vw, 160px);
+      line-height: 1; margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .closing-tagline .grad {
+      background: linear-gradient(180deg, #fff 0%, #C8CDD3 60%, #5A6068 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .closing-glyph {
+      margin-top: 56px;
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.5em;
+      color: var(--gold-trace); text-transform: uppercase;
+      display: flex; gap: 18px; justify-content: center; align-items: center;
+    }
+    .closing-glyph .h-line { width: 60px; height: 1px; background: var(--gold-trace); }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    footer.foot { padding: 100px 0 56px; background: #050608; }
+    .foot-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 64px;
+      align-items: start; padding-bottom: 56px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .foot-mark { display: flex; flex-direction: column; gap: 18px; }
+    .foot-mark .word { font-family: 'Cinzel', serif; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; font-size: 14px; color: #fff; }
+    .foot-mark .tag { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255,255,255,0.6); font-size: 17px; }
+    .foot-col h5 { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin: 0 0 18px; }
+    .foot-col a { display: block; font-family: 'Cabinet Grotesk', sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); text-decoration: none; margin-bottom: 12px; transition: color .25s ease, padding-left .3s ease; }
+    .foot-col a:hover { color: #fff; padding-left: 8px; }
+    .foot-fine {
+      padding-top: 32px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.4); text-transform: uppercase;
+    }
+    @media (max-width: 720px) {
+      .foot-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .foot-fine { flex-direction: column; gap: 14px; align-items: flex-start; }
+    }
+
+    /* generic reveal helpers */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s ease, transform .9s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal-stagger > * { opacity: 0; transform: translateY(20px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal-stagger.in > * { opacity: 1; transform: translateY(0); }
+    .reveal-stagger.in > *:nth-child(1) { transition-delay: .05s; }
+    .reveal-stagger.in > *:nth-child(2) { transition-delay: .15s; }
+    .reveal-stagger.in > *:nth-child(3) { transition-delay: .25s; }
+    .reveal-stagger.in > *:nth-child(4) { transition-delay: .35s; }
+    .reveal-stagger.in > *:nth-child(5) { transition-delay: .45s; }
+    .reveal-stagger.in > *:nth-child(6) { transition-delay: .55s; }
+
+    /* ── Section divider that wipes between dark/light ──────── */
+    .wipe { height: 1px; background: var(--gold-trace); transform-origin: left; transform: scaleX(0); transition: transform 1.4s cubic-bezier(.7,0,.2,1); }
+    .wipe.in { transform: scaleX(1); }
+
+    /* dc-btn hover override (white fill on dark) */
+    .dc-btn { background: #fff; color: var(--ink); border-color: #fff; position: relative; overflow: hidden; transition: transform .3s ease; }
+    .dc-btn:hover { background: var(--ivory); border-color: var(--ivory); transform: translateY(-2px); }
+    .dc-btn--ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,0.3); }
+    .dc-btn--ghost:hover { background: rgba(255,255,255,0.06); border-color: #fff; transform: translateY(-2px); }
+
+    /* utility */
+    .gold { color: var(--gold-trace); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
+      .reveal, .reveal-stagger > *, .manifesto .word-line span { opacity: 1 !important; transform: none !important; }
+      .intro { display: none; }
+    }
+  </style>
 </head>
-<body>
+<body data-screen-label="Website">
 
-  <!-- Cursor Companion -->
-  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="grain"></div>
+  <div class="cursor-halo"></div>
+  <div class="cursor-dot"></div>
 
-  <!-- Top Page-Tag -->
-  <div class="page-tag" aria-hidden="true">
-    <span>DC</span><span class="dot">·</span><span>Salzburg</span><span class="dot">·</span><span data-clock>Mai 2026</span>
+  <!-- ── Title sequence intro ───────────────────────────────── -->
+  <div class="intro" id="intro">
+    <div class="intro-stage">
+      <div class="intro-iris"></div>
+      <div class="intro-mark" id="intro-mark"></div>
+      <div class="intro-text">Deal Circle Salzburg · Estd. MMXXVI</div>
+      <button class="intro-skip" onclick="document.getElementById('intro').classList.add('done')">Skip</button>
+    </div>
   </div>
 
-  <!-- Navigation -->
-  <header class="nav" role="banner">
-    <a href="#hero" class="nav__brand" aria-label="Deal Circle Startseite">
-      <img src="./brand/logo-pin.svg" alt="" width="24" height="24" class="nav__mark">
-      <span class="nav__wordmark">DEAL CIRCLE</span>
-    </a>
-    <nav class="nav__links" aria-label="Hauptnavigation">
-      <a href="#objekte">Objekte</a>
-      <a href="#galerie">Galerie</a>
-      <a href="#wir">Wir</a>
-      <a href="#kontakt">Kontakt</a>
-    </nav>
-    <a href="#kontakt" class="nav__cta">Anfrage</a>
+  <!-- ── Scroll progress ────────────────────────────────────── -->
+  <div class="scroll-bar" id="scroll-bar"></div>
+
+  <!-- ── Pinned hourglass overlay (scroll-driven) ───────────── -->
+  <div class="pin-stage" id="pin-stage">
+    <svg viewBox="0 0 200 200" id="pin-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="silver-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#FFFFFF"/>
+          <stop offset="60%" stop-color="#C8CDD3"/>
+          <stop offset="100%" stop-color="#7A8088"/>
+        </linearGradient>
+        <linearGradient id="gold-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#D4C28A"/>
+          <stop offset="100%" stop-color="#8A7B4B"/>
+        </linearGradient>
+        <clipPath id="top-tri-pin"><polygon points="36,28 164,28 100,94"/></clipPath>
+        <clipPath id="bot-tri-pin"><polygon points="100,106 164,172 36,172"/></clipPath>
+      </defs>
+      <g id="pin-rotor" style="transform-origin: 100px 100px;">
+        <g fill="none" stroke="url(#silver-grad)" stroke-width="1" opacity="0.7">
+          <polygon points="36,28 164,28 100,94"/>
+          <polygon points="100,106 164,172 36,172"/>
+        </g>
+        <g clip-path="url(#top-tri-pin)">
+          <rect id="pin-top-fill" x="36" y="28" width="128" height="66" fill="url(#silver-grad)"/>
+        </g>
+        <g clip-path="url(#bot-tri-pin)">
+          <rect id="pin-bot-fill" x="36" y="172" width="128" height="0" fill="url(#silver-grad)" style="transform-origin: 100px 172px;"/>
+        </g>
+        <rect id="pin-stream" x="99" y="94" width="2" height="14" fill="#fff"/>
+        <rect x="92" y="98" width="16" height="4" fill="url(#gold-grad)"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ── Top bar ────────────────────────────────────────────── -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <a href="#" class="topbar-mark" data-cursor="hover">
+        <span id="topbar-mark"></span>
+        <span class="name">Deal Circle Salzburg</span>
+      </a>
+      <nav class="topbar-nav">
+        <a class="nav-link" href="#format" data-cursor="hover">Format</a>
+        <a class="nav-link" href="#abende" data-cursor="hover">Abende</a>
+        <a class="nav-link" href="#members" data-cursor="hover">Members</a>
+        <a class="nav-link" href="#ort" data-cursor="hover">Ort</a>
+        <a class="dc-btn dc-btn--ghost" href="#bewerbung" data-cursor="hover"><span>Bewerbung</span></a>
+      </nav>
+    </div>
   </header>
 
-  <!-- HERO -->
-  <section id="hero" class="hero" data-reveal>
-    <div class="hero__layout">
-      <div class="hero__content">
-        <p class="eyebrow"><span class="eyebrow__line"></span><span>Salzburg · Off-Market · seit 2018</span></p>
+  <!-- ── ACT 1 · HERO ───────────────────────────────────────── -->
+  <section class="hero" data-screen-label="01 Hero">
+    <div class="hero-corner tl"></div>
+    <div class="hero-corner tr"></div>
+    <div class="hero-corner bl"></div>
+    <div class="hero-corner br"></div>
 
-        <h1 class="hero__title" data-stagger>
-          <span>Salzburger</span>
-          <span>Immobilien</span>
-          <span>jenseits der</span>
-          <span><em>Auslage.</em></span>
-        </h1>
+    <div class="hero-meta">
+      <span>Members only</span>
+      <span class="dot"></span>
+      <span>Auf Einladung &amp; Bewerbung</span>
+      <span class="dot"></span>
+      <span>Estd. MMXXVI</span>
+      <span class="dot"></span>
+      <span class="gold">Salzburg</span>
+    </div>
 
-        <p class="hero__lede">
-          Wir vermitteln Stadtpalais, Penthouses und Seevillen direkt
-          zwischen Verkäufer und Käufer — ohne Schaufenster, ohne
-          Drohnenflüge, ohne Plakatwände.
-        </p>
-
-        <div class="hero__actions">
-          <a href="#kontakt" class="cta cta--primary" data-magnetic>
-            <span>Anfrage stellen</span>
-            <svg class="cta__arrow" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-            </svg>
-          </a>
-          <a href="#objekte" class="cta cta--ghost">Aktuelle Objekte ansehen</a>
-        </div>
-
-        <dl class="hero__facts">
-          <div><dt>Aktuell vermittelt</dt><dd><span data-count="8" class="dc-tabular">8</span></dd></div>
-          <div><dt>Objekte seit 2018</dt><dd><span data-count="142" class="dc-tabular">142</span></dd></div>
-          <div><dt>Volumen Ø p. a.</dt><dd>€<span data-count="38" class="dc-tabular">38</span> M</dd></div>
-        </dl>
+    <div class="wrap hero-inner">
+      <div class="hero-mark-anchor" id="hero-anchor"></div>
+      <h1 class="hero-wordmark">
+        <span class="word" data-word="Deal"></span>
+        <span class="word" data-word="Circle"></span>
+      </h1>
+      <p class="hero-tagline">Ein privater Kreis aus Unternehmern, Investoren <span class="amp">&amp;</span> Family Offices.</p>
+      <div class="hero-actions">
+        <a href="#bewerbung" class="dc-btn" data-cursor="hover"><span>Bewerbung einreichen</span> <span class="dc-arrow">→</span></a>
+        <a href="#format" class="dc-btn dc-btn--ghost" data-cursor="hover"><span>Format ansehen</span></a>
       </div>
-
-      <aside class="hero__visual" aria-hidden="true">
-        <div class="hero__compass" data-parallax="0.4">
-          <img src="./brand/logo-monogram.svg" alt="" width="280" height="280">
-        </div>
-        <div class="hero__photo" data-parallax="0.15">
-          <img src="https://picsum.photos/seed/dc-salzburg-festung-04/900/1300"
-               alt="" width="900" height="1300" loading="eager" fetchpriority="high">
-        </div>
-        <div class="hero__caption">Festung Hohensalzburg · 06:42</div>
-      </aside>
-    </div>
-
-    <a href="#objekte" class="hero__scroll" aria-label="Weiter scrollen">
-      <span></span>
-    </a>
-  </section>
-
-  <!-- OBJEKTE / LISTINGS -->
-  <section id="objekte" class="section section--listings" data-reveal>
-    <header class="section__head">
-      <p class="eyebrow"><span class="eyebrow__line"></span><span>Section 01 — Aktuelle Objekte</span></p>
-      <h2 class="section__title">Acht Adressen, derzeit auf unserer Liste.</h2>
-      <p class="section__lede">
-        Stand Mai 2026. Alle Objekte werden ausschließlich auf Voranmeldung
-        und nach Bonitätsprüfung gezeigt. Bilder und Exposés versenden wir
-        nach unterzeichneter Verschwiegenheitsvereinbarung.
-      </p>
-    </header>
-
-    <div class="listings">
-
-      <article class="listing listing--wide">
-        <a class="listing__media" href="#kontakt" aria-label="Anfrage zu DC-074">
-          <img src="https://picsum.photos/seed/dc-074/1200/800" alt="" loading="lazy" width="1200" height="800">
-          <span class="listing__id">DC-074</span>
-        </a>
-        <div class="listing__body">
-          <p class="listing__type">Stadtpalais · Altstadt</p>
-          <h3 class="listing__name">Bürgerhaus an der Getreidegasse</h3>
-          <dl class="listing__meta dc-tabular">
-            <div><dt>Wohnfläche</dt><dd>418 m²</dd></div>
-            <div><dt>Baujahr</dt><dd>1684</dd></div>
-            <div><dt>Zimmer</dt><dd>11</dd></div>
-            <div><dt>Status</dt><dd><span class="badge">Auf Anfrage</span></dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <article class="listing">
-        <a class="listing__media" href="#kontakt">
-          <img src="https://picsum.photos/seed/dc-068/900/700" alt="" loading="lazy" width="900" height="700">
-          <span class="listing__id">DC-068</span>
-        </a>
-        <div class="listing__body">
-          <p class="listing__type">Seevilla · Wolfgangsee</p>
-          <h3 class="listing__name">Direktlage St. Gilgen</h3>
-          <dl class="listing__meta dc-tabular">
-            <div><dt>Grund</dt><dd>2.840 m²</dd></div>
-            <div><dt>Status</dt><dd><span class="badge badge--reserved">Reserviert</span></dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <article class="listing">
-        <a class="listing__media" href="#kontakt">
-          <img src="https://picsum.photos/seed/dc-061/900/700" alt="" loading="lazy" width="900" height="700">
-          <span class="listing__id">DC-061</span>
-        </a>
-        <div class="listing__body">
-          <p class="listing__type">Penthouse · Aigen</p>
-          <h3 class="listing__name">Dachgeschoss Aigner Hauptstraße</h3>
-          <dl class="listing__meta dc-tabular">
-            <div><dt>Wohnfläche</dt><dd>196 m²</dd></div>
-            <div><dt>Status</dt><dd><span class="badge">Auf Anfrage</span></dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <article class="listing">
-        <a class="listing__media" href="#kontakt">
-          <img src="https://picsum.photos/seed/dc-059/900/700" alt="" loading="lazy" width="900" height="700">
-          <span class="listing__id">DC-059</span>
-        </a>
-        <div class="listing__body">
-          <p class="listing__type">Landgut · Salzkammergut</p>
-          <h3 class="listing__name">Vierseithof bei Mondsee</h3>
-          <dl class="listing__meta dc-tabular">
-            <div><dt>Grund</dt><dd>1,4 ha</dd></div>
-            <div><dt>Status</dt><dd><span class="badge">Auf Anfrage</span></dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <article class="listing">
-        <a class="listing__media" href="#kontakt">
-          <img src="https://picsum.photos/seed/dc-052/900/700" alt="" loading="lazy" width="900" height="700">
-          <span class="listing__id">DC-052</span>
-        </a>
-        <div class="listing__body">
-          <p class="listing__type">Stadtwohnung · Riedenburg</p>
-          <h3 class="listing__name">Altbau-Beletage mit Park</h3>
-          <dl class="listing__meta dc-tabular">
-            <div><dt>Wohnfläche</dt><dd>164 m²</dd></div>
-            <div><dt>Status</dt><dd><span class="badge badge--sold">Verkauft</span></dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <article class="listing listing--wide">
-        <a class="listing__media" href="#kontakt">
-          <img src="https://picsum.photos/seed/dc-049/1200/800" alt="" loading="lazy" width="1200" height="800">
-          <span class="listing__id">DC-049</span>
-        </a>
-        <div class="listing__body">
-          <p class="listing__type">Schloss · Tennengau</p>
-          <h3 class="listing__name">Wasserschloss aus dem 17. Jh.</h3>
-          <dl class="listing__meta dc-tabular">
-            <div><dt>Grund</dt><dd>4,2 ha</dd></div>
-            <div><dt>Wohnfläche</dt><dd>820 m²</dd></div>
-            <div><dt>Status</dt><dd><span class="badge">Auf Anfrage</span></dd></div>
-          </dl>
-        </div>
-      </article>
-
-    </div>
-
-    <p class="section__more">
-      Zwei weitere Objekte in Vorbereitung —
-      <a href="#kontakt">in unsere Liste eintragen</a>.
-    </p>
-  </section>
-
-  <!-- GALERIE -->
-  <section id="galerie" class="section section--gallery dc-dark" data-reveal>
-    <header class="section__head section__head--inverse">
-      <p class="eyebrow"><span class="eyebrow__line"></span><span>Section 02 — Galerie</span></p>
-      <h2 class="section__title">Bilder, die wir zeigen dürfen.</h2>
-      <p class="section__lede">
-        Aus Diskretion zeigen wir Innenräume aktiver Objekte ausschließlich
-        nach Verschwiegenheitsvereinbarung. Diese Auswahl stammt aus
-        bereits abgeschlossenen Vermittlungen.
-      </p>
-    </header>
-
-    <div class="gallery">
-      <figure class="gallery__tile gallery__tile--tall">
-        <img src="https://picsum.photos/seed/dc-g-01/800/1100" alt="" loading="lazy" width="800" height="1100">
-        <figcaption>Stiegenhaus · Stadtpalais Altstadt · DC-038</figcaption>
-      </figure>
-      <figure class="gallery__tile">
-        <img src="https://picsum.photos/seed/dc-g-02/900/700" alt="" loading="lazy" width="900" height="700">
-        <figcaption>Bibliothek · Gutshof Flachgau · DC-031</figcaption>
-      </figure>
-      <figure class="gallery__tile">
-        <img src="https://picsum.photos/seed/dc-g-03/900/700" alt="" loading="lazy" width="900" height="700">
-        <figcaption>Empfangshalle · Penthouse Mülln · DC-027</figcaption>
-      </figure>
-      <figure class="gallery__tile gallery__tile--wide">
-        <img src="https://picsum.photos/seed/dc-g-04/1400/700" alt="" loading="lazy" width="1400" height="700">
-        <figcaption>Seeufer · Villa Wolfgangsee · DC-022</figcaption>
-      </figure>
-      <figure class="gallery__tile">
-        <img src="https://picsum.photos/seed/dc-g-05/900/900" alt="" loading="lazy" width="900" height="900">
-        <figcaption>Innenhof · Bürgerhaus Linzergasse · DC-019</figcaption>
-      </figure>
-      <figure class="gallery__tile gallery__tile--tall">
-        <img src="https://picsum.photos/seed/dc-g-06/800/1100" alt="" loading="lazy" width="800" height="1100">
-        <figcaption>Fensterfront · Altbau Riedenburg · DC-052</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- WIR / ABOUT -->
-  <section id="wir" class="section section--about" data-reveal>
-    <div class="about">
-      <header class="about__head">
-        <p class="eyebrow"><span class="eyebrow__line"></span><span>Section 03 — Wer wir sind</span></p>
-        <h2 class="section__title">Drei Salzburger.<br>Zusammen über fünfundzwanzig Jahre Markterfahrung.</h2>
-      </header>
-
-      <div class="about__body">
-        <p class="about__text">
-          Wir kennen die Häuser persönlich, weil wir mit ihren Eigentümern
-          aufgewachsen sind. Wir wissen, welche Familien gerade darüber
-          nachdenken zu verkaufen, bevor es jemand anders erfährt — und wir
-          wissen, welche Käufer ernsthaft sind.
-        </p>
-        <p class="about__text">
-          Unser Modell ist einfach: Wir vermitteln nur Objekte, die
-          ausdrücklich nicht öffentlich angeboten werden. Dafür arbeiten
-          wir auf Empfehlung, mit kleinem Team, ohne Marketing-Brimborium.
-          Und mit dem Versprechen, dass Sie als Käufer oder Verkäufer
-          nicht zur Nummer werden.
-        </p>
-
-        <blockquote class="about__quote">
-          <p>„Off-Market ist kein Geheimtuerei-Spiel. Es ist Respekt vor
-          Eigentümern, die nicht wollen, dass ihr Wohnzimmer auf ImmoScout
-          landet."</p>
-          <footer>— Maximilian R., Gründer</footer>
-        </blockquote>
+      <div class="hero-cta-line">
+        <span class="h-line"></span><span>Sechs Abende im Jahr · 18 Plätze · Schloss Wiespach</span><span class="h-line"></span>
       </div>
+    </div>
 
-      <aside class="about__facts">
-        <div><span class="about__num dc-tabular" data-count="2018">2018</span><p>gegründet</p></div>
-        <div><span class="about__num dc-tabular" data-count="142">142</span><p>Vermittlungen</p></div>
-        <div><span class="about__num dc-tabular" data-count="3">3</span><p>Makler im Team</p></div>
-        <div><span class="about__num dc-tabular" data-count="0">0</span><p>Außenwerbung</p></div>
-      </aside>
+    <div class="hero-scroll-cue">
+      <span>Scroll</span>
+      <span class="vline"></span>
     </div>
   </section>
 
-  <!-- KONTAKT -->
-  <section id="kontakt" class="section section--contact" data-reveal>
-    <div class="contact">
-      <header class="contact__head">
-        <p class="eyebrow"><span class="eyebrow__line"></span><span>Section 04 — Kontakt</span></p>
-        <h2 class="section__title">Sie wollen verkaufen oder kaufen.<br>Schreiben Sie uns kurz.</h2>
-        <p class="contact__lede">
-          Wir antworten innerhalb eines Werktages. Erstgespräche per Telefon
-          oder bei einem Espresso in der Altstadt — ohne Vermittlungspflicht.
-        </p>
-      </header>
+  <!-- ── Wipe ───────────────────────────────────────────────── -->
+  <div class="wipe"></div>
 
-      <form class="form" action="#" method="post" novalidate>
-        <div class="form__row">
-          <label class="field">
-            <span>Name</span>
-            <input type="text" name="name" required autocomplete="name">
-          </label>
-          <label class="field">
-            <span>E-Mail</span>
-            <input type="email" name="email" required autocomplete="email">
-          </label>
-        </div>
-        <label class="field">
-          <span>Anliegen</span>
-          <select name="topic" required>
-            <option value="">— bitte wählen —</option>
-            <option>Ich möchte ein Objekt anbieten</option>
-            <option>Ich suche ein Objekt</option>
-            <option>Ich möchte mich vorab beraten lassen</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Nachricht</span>
-          <textarea name="message" rows="5" placeholder="Stadtteil, Größenrahmen, Zeithorizont — so konkret wie es geht."></textarea>
-        </label>
-        <div class="form__foot">
-          <p class="form__note">
-            Mit Absenden stimmen Sie unserer
-            <a href="#datenschutz">Datenschutzerklärung</a> zu.
-            Wir verwenden Ihre Daten ausschließlich zur Bearbeitung Ihrer Anfrage.
+  <!-- ── ACT 2 · MANIFESTO ──────────────────────────────────── -->
+  <section class="manifesto" data-screen-label="02 Manifesto">
+    <div class="wrap">
+      <h2>
+        <span class="word-line"><span>Sechs Abende.</span></span>
+        <span class="word-line"><span>Achtzehn Plätze.</span></span>
+        <span class="word-line"><span class="grad">Schloss Wiespach.</span></span>
+        <span class="word-line"><span style="font-style: italic; opacity: 0.85;">Auf Einladung.</span></span>
+      </h2>
+      <div class="manifesto-side">
+        <p>Kein Verein. Kein Netzwerk. Keine Plattform.</p>
+        <p>Eine Runde junger Unternehmer, Gründer und Family Offices, die sich sechsmal im Jahr in Schloss Wiespach trifft — am Tisch, beim Wein, im Gespräch.</p>
+        <p>Konfidentiell. Kuratiert. Auf Einladung.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ACT 3 · STATS ──────────────────────────────────────── -->
+  <section class="stats-act" data-screen-label="03 Stats">
+    <div class="stats reveal-stagger">
+      <div class="stat">
+        <div class="num" data-counter="6">0</div>
+        <div class="label">Abende pro Jahr</div>
+        <div class="note">Frühjahr bis Winter</div>
+      </div>
+      <div class="stat">
+        <div class="num" data-counter="18">0</div>
+        <div class="label">Plätze am Tisch</div>
+        <div class="note">kuratierte Sitzordnung</div>
+      </div>
+      <div class="stat">
+        <div class="num" data-counter="30">0</div>
+        <div class="label">Minuten Vortrag</div>
+        <div class="note">aus der Runde, monatlich</div>
+      </div>
+      <div class="stat">
+        <div class="num">∞</div>
+        <div class="label">Stunden danach</div>
+        <div class="note">am Hof, am Kamin, bis spät</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ACT 4 · FORMAT (horizontal scroll) ─────────────────── -->
+  <section class="format-act" id="format" data-screen-label="04 Format">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="section-eyebrow"><span class="num">01</span> Format</div>
+        <div>
+          <h2 class="section-title">Wie ein <em>Abend abläuft.</em></h2>
+          <p class="section-lede">
+            Keine Bühne, keine Panels, kein Networking-Pflichtteil. Diner,
+            ein Vortrag aus der Runde, danach offen.
           </p>
-          <button type="submit" class="cta cta--primary" data-magnetic>
-            <span>Anfrage senden</span>
-            <svg class="cta__arrow" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-            </svg>
-          </button>
         </div>
-      </form>
+      </div>
+    </div>
 
-      <aside class="contact__aside">
-        <div>
-          <p class="contact__label">Büro</p>
-          <p>Getreidegasse 17/3<br>5020 Salzburg<br>Österreich</p>
+    <div class="h-track-wrap">
+      <div class="h-track" id="h-track">
+        <div class="h-card" data-cursor="hover">
+          <div class="roman roman-grad">I</div>
+          <span class="step">Empfang</span>
+          <h3>Diner</h3>
+          <p>
+            Vier Gänge aus der Schlossküche, abgestimmt mit Wein, der die
+            Runde überdauert. Wer sitzt, sitzt absichtlich.
+          </p>
+          <div class="duration">vier Gänge</div>
         </div>
-        <div>
-          <p class="contact__label">Direkt</p>
-          <p><a href="tel:+43662000000">+43 662 000 000</a><br>
-             <a href="mailto:hallo@deal-circle.at">hallo@deal-circle.at</a></p>
+        <div class="h-card" data-cursor="hover">
+          <div class="roman roman-grad">II</div>
+          <span class="step">Vortrag</span>
+          <h3>Speaker</h3>
+          <p>
+            Ein Mitglied spricht 30 Minuten. Kein Pitch, kein Deck — eine
+            These, ein Fall, eine offene Frage. Danach Q&amp;A am Tisch,
+            so lang sie trägt.
+          </p>
+          <div class="duration">aus der Runde + Diskussion</div>
         </div>
-        <div>
-          <p class="contact__label">Termine</p>
-          <p>Mo – Fr · 09:00 – 18:00<br>Sa · auf Anfrage</p>
+        <div class="h-card" data-cursor="hover">
+          <div class="roman roman-grad">III</div>
+          <span class="step">Hof &amp; Kamin</span>
+          <h3>Drinks</h3>
+          <p>
+            Im Hof, am Kamin, an der Mauer. Whiskey, Wein, Wasser. Hier
+            entstehen die Gespräche, die das Diner nur angeschnitten hat.
+            Bis spät.
+          </p>
+          <div class="duration">offen · bis spät</div>
         </div>
-      </aside>
+        <div class="h-card" data-cursor="hover">
+          <div class="roman roman-grad">IV</div>
+          <span class="step">Optional · zweimal jährlich</span>
+          <h3>Excursio</h3>
+          <p>
+            Eine kleine Reise, ein Tag bei einem Member-Unternehmen, ein
+            Abend in einer fremden Stadt. Kein Programm, keine Pressetour
+            — eine private Einladung.
+          </p>
+          <div class="duration">privat</div>
+        </div>
+      </div>
+      <div class="wrap h-cue"><span class="h-line"></span><span>Seitlich scrollen → · Vier Akte</span></div>
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="footer dc-dark" role="contentinfo">
-    <div class="footer__inner">
-      <a href="#hero" class="footer__brand">
-        <img src="./brand/logo-monogram.svg" alt="" width="36" height="36">
-        <span>DEAL CIRCLE · SALZBURG</span>
-      </a>
-      <nav class="footer__links" aria-label="Sekundärnavigation">
-        <a href="#impressum">Impressum</a>
-        <a href="#datenschutz">Datenschutz</a>
-        <a href="mailto:hallo@deal-circle.at">hallo@deal-circle.at</a>
-      </nav>
-      <p class="footer__legal">© <span data-clock-year>2026</span> Deal Circle Salzburg · Konzession §94 Z 35 GewO</p>
+  <!-- ── ACT 5 · QUOTE on IVORY ─────────────────────────────── -->
+  <section class="quote-light" data-screen-label="05 Tagline">
+    <div class="ghost-Q">"</div>
+    <div class="wrap-tight">
+      <blockquote>
+        Die besten Deals entstehen nicht im Pitch.<br />
+        <span class="or">Sondern beim Wein, mit Leuten, die man kennt.</span>
+      </blockquote>
+      <cite>Deal Circle Salzburg</cite>
+    </div>
+  </section>
+
+  <!-- ── ACT 6 · ABENDE ─────────────────────────────────────── -->
+  <section class="abende-act" id="abende" data-screen-label="06 Abende">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="section-eyebrow"><span class="num">02</span> Kalender · MMXXVI</div>
+        <div>
+          <h2 class="section-title">Sechs Abende. <em>Achtzehn Plätze.</em></h2>
+          <p class="section-lede">
+            Schloss Wiespach, Oberalm. Die Runde tagt sechsmal im Jahr —
+            mehr, wenn ein Anlass es verlangt. Nicht-Members lesen mit.
+          </p>
+        </div>
+      </div>
+
+      <div class="abende reveal-stagger">
+        <div class="abend-row" data-cursor="hover">
+          <div class="marker"></div>
+          <div class="abend-num">№ I · MMXXVI</div>
+          <div class="abend-date">23. Januar</div>
+          <div class="abend-topic">„Was eine Beteiligung wirklich kostet — wenn man die Zeit dazurechnet."</div>
+          <div class="abend-speaker">F. Reiter · Family Office</div>
+          <div class="abend-status status-passed">Vergangen</div>
+        </div>
+        <div class="abend-row" data-cursor="hover">
+          <div class="marker"></div>
+          <div class="abend-num">№ II · MMXXVI</div>
+          <div class="abend-date">14. März</div>
+          <div class="abend-topic">„Drei Exits, drei Lehren — und warum die mittlere die teuerste war."</div>
+          <div class="abend-speaker">M. Brunner · Founder, exited</div>
+          <div class="abend-status status-passed">Vergangen</div>
+        </div>
+        <div class="abend-row" data-cursor="hover">
+          <div class="marker"></div>
+          <div class="abend-num">№ III · MMXXVI</div>
+          <div class="abend-date">06. Juni</div>
+          <div class="abend-topic">„Stiftungen, die ihre Namen ernst nehmen — Kapital im Generationen­blick."</div>
+          <div class="abend-speaker">Dr. v. Lindeck · Stiftungsrat</div>
+          <div class="abend-status status-next">Nächster</div>
+        </div>
+        <div class="abend-row" data-cursor="hover">
+          <div class="marker"></div>
+          <div class="abend-num">№ IV · MMXXVI</div>
+          <div class="abend-date">12. September</div>
+          <div class="abend-topic">„Late-Stage in einem stillen Markt — wer kauft, wenn niemand spricht."</div>
+          <div class="abend-speaker">tbd · Investor</div>
+          <div class="abend-status status-open">Offen</div>
+        </div>
+        <div class="abend-row" data-cursor="hover">
+          <div class="marker"></div>
+          <div class="abend-num">№ V · MMXXVI</div>
+          <div class="abend-date">07. November</div>
+          <div class="abend-topic">„Der Deal, den wir ablehnen — eine Anatomie aus drei Family Offices."</div>
+          <div class="abend-speaker">Runde · kollektiv</div>
+          <div class="abend-status status-open">Offen</div>
+        </div>
+        <div class="abend-row" data-cursor="hover">
+          <div class="marker"></div>
+          <div class="abend-num">№ VI · MMXXVI</div>
+          <div class="abend-date">12. Dezember</div>
+          <div class="abend-topic">„Jahresrückblick aus der Runde — was wir gelernt haben, was wir lassen."</div>
+          <div class="abend-speaker">tbd</div>
+          <div class="abend-status status-open">Offen</div>
+        </div>
+      </div>
+
+      <div style="margin-top:32px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.24em; color: rgba(255,255,255,0.5); text-transform: uppercase;">
+        + zwei kleine Abende (Apertif &amp; Kaminrunde) auf Einladung — Daten diskret
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ACT 7 · LOCATION ───────────────────────────────────── -->
+  <section class="location-act" id="ort" data-screen-label="07 Ort">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="section-eyebrow"><span class="num">03</span> Ort</div>
+        <div>
+          <h2 class="section-title">Schloss <em>Wiespach.</em></h2>
+          <p class="section-lede">
+            Oberalm bei Salzburg. Sechzehntes Jahrhundert, kein Hotel,
+            kein Eventlocation-Katalog. Privater Empfang.
+          </p>
+        </div>
+      </div>
+
+      <div class="location-grid reveal">
+        <div class="location-art" data-cursor="hover">
+          <div class="art-stamp" id="loc-stamp">★ Schloss · Wiespach · MDXVI ★ </div>
+          <div class="label">Innenhof bei Kerzen­licht — Platzhalter</div>
+        </div>
+        <div class="location-text">
+          <h3>Schlossmauern, Kerzen,<br /><em>Wein, Gespräche bis spät.</em></h3>
+          <p>
+            Das Schloss steht seit gut 400 Jahren. Drei Säle, ein
+            Innenhof, ein Kamin, der schon viele Abende überdauert hat.
+            Wir buchen es ganz, sechsmal im Jahr. Kein Personal außer
+            der Schlossküche, kein Service mit Mikrofon. Wer ankommt,
+            parkt im Hof und wird an der Tür empfangen.
+          </p>
+          <div class="location-meta">
+            <div>Adresse</div>      <div class="v">5411 Oberalm, Salzburg</div>
+            <div>Anreise</div>      <div class="v">15 Min. ex Stadt</div>
+            <div>Empfang</div>      <div class="v">privat, im Hof</div>
+            <div>Kapazität</div>    <div class="v">18 am Tisch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ACT 8 · MEMBERS · IVORY ────────────────────────────── -->
+  <section class="members-light" id="members" data-screen-label="08 Members">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="section-eyebrow"><span class="num">04</span> Members</div>
+        <div>
+          <h2 class="section-title">Wer am Tisch <em>sitzt.</em></h2>
+          <p class="section-lede">
+            Junge Unternehmer, Gründer, Investoren, Family Offices.
+            Substanz statt Titel. Bewerbung statt Mitgliedsbeitrag.
+          </p>
+        </div>
+      </div>
+
+      <div class="principles reveal-stagger">
+        <div class="principle" data-cursor="hover">
+          <span class="ornament">I</span>
+          <span class="ord">Prinzip I</span>
+          <h4>Auf Einladung &amp; Bewerbung</h4>
+          <p>
+            Man kommt nicht in den Deal Circle, indem man bezahlt.
+            Jedes Member empfiehlt höchstens eine Person pro Jahr.
+            Eine kleine Aufnahmekommission entscheidet still.
+          </p>
+        </div>
+        <div class="principle" data-cursor="hover">
+          <span class="ornament">II</span>
+          <span class="ord">Prinzip II</span>
+          <h4>Substanz statt Buzzwords</h4>
+          <p>
+            Wer einen Vortrag hält, bringt eine These mit, nicht ein
+            Deck. Wer eine Frage hat, stellt sie konkret. Anti-LinkedIn
+            ist eine Haltung, kein Style.
+          </p>
+        </div>
+        <div class="principle" data-cursor="hover">
+          <span class="ornament">III</span>
+          <span class="ord">Prinzip III</span>
+          <h4>Was am Tisch bleibt</h4>
+          <p>
+            Was in der Runde besprochen wird, verlässt sie nicht.
+            Keine Aufnahmen, keine Posts, keine Pressetexte. Vertrauen
+            ist das, was wir in Wahrheit servieren.
+          </p>
+        </div>
+        <div class="principle" data-cursor="hover">
+          <span class="ornament">IV</span>
+          <span class="ord">Prinzip IV</span>
+          <h4>Die Stunde reicht</h4>
+          <p>
+            Sechs Abende im Jahr sind genug. Kein Slack, keine
+            WhatsApp-Gruppe, keine Newsletter-Kadenz. Die Sanduhr
+            wird gewendet, wenn sie gewendet werden muss.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ACT 9 · APPLY ──────────────────────────────────────── -->
+  <section class="apply" id="bewerbung" data-screen-label="09 Bewerbung">
+    <div class="wrap">
+      <div class="apply-grid reveal">
+        <div class="apply-side">
+          <div class="section-eyebrow"><span class="num">05</span> Bewerbung</div>
+          <h2>Eine Seite <em>reicht.</em></h2>
+          <p>
+            Wir lesen jede Bewerbung. Wir antworten auf jede — innerhalb
+            von vier Wochen, manchmal mit Ja, oft mit „nicht jetzt", nie
+            mit Form­brief. Sechs Felder. Eine Person pro Bewerbung.
+          </p>
+          <p>
+            Wer eingeladen ist, bekommt einen Reverspin und die Daten
+            für das Jahr. Mehr nicht.
+          </p>
+          <div class="apply-meta">
+            <div>Antwort</div>           <div class="v">≤ 4 Wochen</div>
+            <div>Aufnahmegebühr</div>    <div class="v">keine</div>
+            <div>Mitgliedsbeitrag</div>  <div class="v">à la carte</div>
+            <div>Empfehlung nötig</div>  <div class="v">nein, hilft</div>
+          </div>
+        </div>
+
+        <form class="apply-form" onsubmit="event.preventDefault(); this.style.opacity='0.5'; setTimeout(()=>alert('Vielen Dank. Wir melden uns innerhalb von vier Wochen.'),300);">
+          <div class="field-row">
+            <div class="field"><label>Vorname</label><input type="text" required data-cursor="hover"/></div>
+            <div class="field"><label>Nachname</label><input type="text" required data-cursor="hover"/></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>E-Mail</label><input type="email" required data-cursor="hover"/></div>
+            <div class="field"><label>Rolle</label><input type="text" placeholder="Founder · Investor · Family Office · …" required data-cursor="hover"/></div>
+          </div>
+          <div class="field"><label>Unternehmen / Mandat</label><input type="text" required data-cursor="hover"/></div>
+          <div class="field"><label>Was bringen Sie an den Tisch?</label><textarea rows="4" placeholder="Drei Sätze. Konkret." required data-cursor="hover"></textarea></div>
+          <div class="field"><label>Empfehlung (optional)</label><input type="text" placeholder="Name eines Members" data-cursor="hover"/></div>
+          <button type="submit" class="dc-btn" style="margin-top:8px" data-cursor="hover">
+            <span>Bewerbung absenden</span> <span class="dc-arrow">→</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ACT 10 · CLOSING ───────────────────────────────────── -->
+  <section class="closing" data-screen-label="10 Closing">
+    <p class="closing-tagline reveal"><span class="grad">Konfidentiell. Kuratiert. Auf Einladung.</span></p>
+    <div class="closing-glyph reveal">
+      <span class="h-line"></span><span>Estd. MMXXVI</span><span class="h-line"></span>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────────────────── -->
+  <footer class="foot" data-screen-label="11 Footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-mark">
+          <div style="display:flex;align-items:center;gap:14px">
+            <span id="foot-mark"></span>
+            <span class="word">Deal Circle Salzburg</span>
+          </div>
+          <div class="tag">Konfidentiell. Kuratiert. Auf Einladung.</div>
+          <div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.24em;color:var(--gold-trace);text-transform:uppercase">Estd. MMXXVI · Schloss Wiespach</div>
+        </div>
+        <div class="foot-col">
+          <h5>Format</h5>
+          <a href="#format" data-cursor="hover">Ablauf</a>
+          <a href="#abende" data-cursor="hover">Kalender</a>
+          <a href="#ort" data-cursor="hover">Ort</a>
+        </div>
+        <div class="foot-col">
+          <h5>Members</h5>
+          <a href="#members" data-cursor="hover">Prinzipien</a>
+          <a href="#bewerbung" data-cursor="hover">Bewerbung</a>
+          <a href="#" data-cursor="hover">Member-Login</a>
+        </div>
+        <div class="foot-col">
+          <h5>Kontakt</h5>
+          <a href="mailto:hello@deal-circle.at" data-cursor="hover">hello@deal-circle.at</a>
+          <a href="#" data-cursor="hover">Impressum</a>
+          <a href="#" data-cursor="hover">Datenschutz</a>
+        </div>
+      </div>
+      <div class="foot-fine">
+        <div>© MMXXVI Deal Circle Salzburg. Auf Einladung &amp; Bewerbung.</div>
+        <div>Schloss Wiespach · Oberalm · AT</div>
+      </div>
     </div>
   </footer>
 
-  <script src="./script.js" defer></script>
+  <script>
+    // ── Marks ───────────────────────────────────────────────
+    document.getElementById('topbar-mark').innerHTML = window.DCMarkSVG(22, '#FFFFFF');
+    document.getElementById('foot-mark').innerHTML   = window.DCMarkSVG(22, '#FFFFFF');
+    document.getElementById('intro-mark').innerHTML  = window.DCMarkSVG(220, '#FFFFFF');
+
+    // mark elements get class for color-flip on light topbar
+    document.querySelector('#topbar-mark svg')?.classList.add('mark-svg');
+
+    // ── Letter-by-letter hero wordmark ──────────────────────
+    document.querySelectorAll('.hero-wordmark .word').forEach((w, wi) => {
+      const text = w.dataset.word;
+      [...text].forEach((ch, i) => {
+        const s = document.createElement('span');
+        s.className = 'letter';
+        s.textContent = ch;
+        s.style.animationDelay = (0.6 + (wi * text.length + i) * 0.045) + 's';
+        w.appendChild(s);
+      });
+    });
+
+    // ── Intro auto-dismiss ──────────────────────────────────
+    setTimeout(() => document.getElementById('intro').classList.add('done'), 3400);
+
+    // ── Cursor ──────────────────────────────────────────────
+    const halo = document.querySelector('.cursor-halo');
+    const dot  = document.querySelector('.cursor-dot');
+    let mx = innerWidth / 2, my = innerHeight / 2, hx = mx, hy = my;
+    addEventListener('pointermove', (e) => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px, ${my}px) rotate(45deg)`;
+    });
+    (function tick() {
+      hx += (mx - hx) * 0.18; hy += (my - hy) * 0.18;
+      halo.style.transform = `translate(${hx}px, ${hy}px)`;
+      requestAnimationFrame(tick);
+    })();
+    document.querySelectorAll('[data-cursor="hover"]').forEach((el) => {
+      el.addEventListener('pointerenter', () => halo.classList.add('hover'));
+      el.addEventListener('pointerleave', () => halo.classList.remove('hover'));
+    });
+
+    // ── Topbar appearance based on section under it ─────────
+    const tb = document.getElementById('topbar');
+    const lightSelectors = ['.quote-light', '.members-light'];
+    const lightSections = lightSelectors.flatMap(s => [...document.querySelectorAll(s)]);
+    function updateTopbar() {
+      const y = scrollY;
+      tb.classList.toggle('has-bg', y > 60);
+      // detect if topbar is over a light section
+      const tbRect = { top: 0, bottom: 70 };
+      let onLight = false;
+      lightSections.forEach((sec) => {
+        const r = sec.getBoundingClientRect();
+        if (r.top < tbRect.bottom && r.bottom > tbRect.top) onLight = true;
+      });
+      tb.classList.toggle('on-light', onLight);
+    }
+    addEventListener('scroll', updateTopbar, { passive: true });
+    updateTopbar();
+
+    // ── Scroll progress bar ─────────────────────────────────
+    const scrollBar = document.getElementById('scroll-bar');
+    function updateScrollBar() {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const p = Math.max(0, Math.min(1, scrollY / max));
+      scrollBar.style.setProperty('--p', (p * 100) + '%');
+    }
+    addEventListener('scroll', updateScrollBar, { passive: true });
+    updateScrollBar();
+
+    // ── PINNED HOURGLASS that scrubs with scroll ────────────
+    const pin = document.getElementById('pin-stage');
+    const pinRotor = document.getElementById('pin-rotor');
+    const pinTopFill = document.getElementById('pin-top-fill');
+    const pinBotFill = document.getElementById('pin-bot-fill');
+    const pinStream = document.getElementById('pin-stream');
+    const heroAnchor = document.getElementById('hero-anchor');
+
+    function updatePin() {
+      const anchorRect = heroAnchor.getBoundingClientRect();
+      const winH = innerHeight;
+      const docMax = document.documentElement.scrollHeight - winH;
+      const sy = scrollY;
+
+      // Only show inside the hero (anchored to the hero mark slot).
+      const heroRect = document.querySelector('.hero').getBoundingClientRect();
+      const inHero = heroRect.bottom > winH * 0.4;
+      pin.classList.toggle('active', inHero);
+
+      // Scrub rotation + drain only while in hero so the motion still feels alive.
+      const p = Math.max(0, Math.min(1, sy / docMax));
+      const turns = p * 0.5;
+      pinRotor.style.transform = `rotate(${turns * 360}deg)`;
+      const drain = Math.min(1, p * 1.4);
+      pinTopFill.setAttribute('transform', `translate(100 28) scale(1 ${1 - drain * 0.95}) translate(-100 -28)`);
+      pinBotFill.setAttribute('transform', `translate(100 172) scale(1 ${drain * 0.95}) translate(-100 -172)`);
+      pinStream.style.opacity = (drain > 0.02 && drain < 0.97) ? '1' : '0';
+
+      if (inHero && anchorRect.width > 0) {
+        const cx = anchorRect.left + anchorRect.width / 2;
+        const cy = anchorRect.top + anchorRect.height / 2;
+        pin.style.left = '0';
+        pin.style.top = '0';
+        pin.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+      }
+    }
+    addEventListener('scroll', updatePin, { passive: true });
+    addEventListener('resize', updatePin);
+    updatePin();
+
+    // ── IntersectionObserver-based reveals ──────────────────
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal, .reveal-stagger, .manifesto, .wipe').forEach((el) => io.observe(el));
+
+    // ── Stat counters ───────────────────────────────────────
+    const counterIO = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = +el.dataset.counter;
+        const dur = 1400;
+        const t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(eased * target);
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        counterIO.unobserve(el);
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('[data-counter]').forEach((el) => counterIO.observe(el));
+
+    // ── Format track: vertical scroll → horizontal scroll ──
+    const track = document.getElementById('h-track');
+    const formatAct = document.querySelector('.format-act');
+    let trackBound = false;
+    function bindHorizontal() {
+      // simple wheel-to-x within the track when hovered
+      track.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+        track.scrollLeft += e.deltaY;
+        e.preventDefault();
+      }, { passive: false });
+    }
+    bindHorizontal();
+
+    // ── Location stamp orbit text (SVG textPath would be nicer; CSS approximation) ──
+    // already rotating via CSS
+
+    // ── Hero anchor sizing for pin alignment ────────────────
+    function syncAnchor() {
+      const w = Math.min(280, innerWidth * 0.4);
+      heroAnchor.style.width = heroAnchor.style.height = w + 'px';
+      pin.style.width = pin.style.height = w + 'px';
+    }
+    syncAnchor();
+    addEventListener('resize', syncAnchor);
+  </script>
 </body>
 </html>

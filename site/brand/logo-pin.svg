@@ -1,23 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Deal Circle Pin Mark">
-  <title>Deal Circle — Pin Mark (kein Ring; der Pin ist der Kreis)</title>
-  <defs>
-    <style>
-      .dc-mark  { fill: #0E1A2B; }
-      .dc-pivot { fill: #0E1A2B; }
-    </style>
-  </defs>
-
-  <path class="dc-mark" d="
-    M 100 12
-    L 112 88
-    L 188 100
-    L 112 112
-    L 100 188
-    L 88 112
-    L 12 100
-    L 88 88
-    Z
-  "/>
-
-  <circle class="dc-pivot" cx="100" cy="100" r="4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Deal Circle — Pin Mark">
+  <title>Deal Circle Salzburg — Reverspin Mark</title>
+  <g fill="#C8CDD3">
+    <polygon points="36,28 164,28 100,94"/>
+    <polygon points="100,106 164,172 36,172"/>
+    <rect x="92" y="98" width="16" height="4"/>
+  </g>
 </svg>

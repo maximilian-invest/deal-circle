@@ -3,77 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Deal Circle — CD Release 03 · Compass · Silver</title>
+  <title>Deal Circle — CD Release 04 · Hourglass-Cut</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://api.fontshare.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./tokens.css">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--dc-pearl);
-      color: var(--dc-midnight);
+      background: var(--dc-onyx);
+      color: var(--dc-silver);
       font-family: var(--dc-font-body);
       font-weight: 400;
-      line-height: var(--dc-lh-base);
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
     .container { max-width: var(--dc-content-max); margin: 0 auto; padding: 80px 40px 120px; }
-    .page-tag { position: fixed; top: 24px; right: 32px; font-family: var(--dc-font-mono); font-size: 11px; letter-spacing: var(--dc-track-widest); color: var(--dc-gunmetal); text-transform: uppercase; z-index: 50; }
+    .page-tag {
+      position: fixed; top: 24px; right: 32px; font-family: var(--dc-font-mono);
+      font-size: 11px; letter-spacing: var(--dc-track-widest);
+      color: var(--dc-steel); text-transform: uppercase; z-index: 50;
+    }
 
-    .hero { padding: 100px 0 80px; border-bottom: 1px solid var(--dc-steel); display: grid; grid-template-columns: 2fr 1fr; gap: 80px; align-items: end; }
-    .meta { font-family: var(--dc-font-mono); font-size: 11px; letter-spacing: var(--dc-track-widest); color: var(--dc-gunmetal); text-transform: uppercase; line-height: 2; }
-    .eyebrow { font-family: var(--dc-font-body); font-weight: 500; font-size: 12px; letter-spacing: var(--dc-track-widest); color: var(--dc-gunmetal); text-transform: uppercase; margin: 0 0 24px; }
-    h1 { font-family: var(--dc-font-display); font-weight: 500; font-size: clamp(56px, 9vw, var(--dc-fs-hero)); letter-spacing: var(--dc-track-tighter); line-height: var(--dc-lh-none); margin: 0 0 24px; }
-    .lede { font-family: var(--dc-font-editorial); font-style: italic; font-size: var(--dc-fs-md); color: var(--dc-gunmetal); max-width: 540px; margin: 0; line-height: 1.4; }
+    .hero { padding: 100px 0 80px; border-bottom: 1px solid var(--dc-hairline); display: grid; grid-template-columns: 2fr 1fr; gap: 80px; align-items: end; }
+    .meta { font-family: var(--dc-font-mono); font-size: 11px; letter-spacing: var(--dc-track-widest); color: var(--dc-steel); text-transform: uppercase; line-height: 2; }
+    .eyebrow { font-family: var(--dc-font-mono); font-weight: 500; font-size: 11px; letter-spacing: var(--dc-track-widest); color: var(--dc-platinum); text-transform: uppercase; margin: 0 0 24px; }
+    h1 { font-family: var(--dc-font-display); font-weight: 500; font-size: clamp(56px, 9vw, 96px); letter-spacing: var(--dc-track-wide); line-height: 1.0; margin: 0 0 24px; color: #fff; }
+    .lede { font-family: var(--dc-font-editorial); font-style: italic; font-weight: 300; font-size: 22px; color: rgba(255,255,255,0.7); max-width: 540px; margin: 0; line-height: 1.4; }
 
-    .section { padding: 80px 0; border-bottom: 1px solid var(--dc-steel); }
+    .section { padding: 80px 0; border-bottom: 1px solid var(--dc-hairline); }
     .section-head { display: grid; grid-template-columns: 1fr 2fr; gap: 80px; margin-bottom: 56px; align-items: end; }
-    .section h2 { font-family: var(--dc-font-display); font-weight: 500; font-size: var(--dc-fs-xl); letter-spacing: var(--dc-track-wide); margin: 0; line-height: 1; }
-    .desc { font-family: var(--dc-font-editorial); font-style: italic; font-size: var(--dc-fs-md); color: var(--dc-gunmetal); margin: 0; max-width: 65ch; }
+    .section h2 { font-family: var(--dc-font-display); font-weight: 500; font-size: 32px; letter-spacing: var(--dc-track-wide); margin: 0; line-height: 1; color: #fff; }
+    .desc { font-family: var(--dc-font-editorial); font-style: italic; font-weight: 300; font-size: 20px; color: rgba(255,255,255,0.7); margin: 0; max-width: 65ch; }
 
-    .logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--dc-steel); border: 1px solid var(--dc-steel); }
-    .logo-cell { background: var(--dc-pearl); padding: 80px 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; min-height: 360px; }
-    .logo-cell.dark { background: var(--dc-charcoal); color: var(--dc-bone); }
-    .logo-cell.dark img { filter: invert(1); }
-    .logo-cell.deep { background: var(--dc-midnight); color: var(--dc-bone); }
-    .logo-cell.deep img { filter: invert(1) hue-rotate(180deg); }
-    .logo-cell .label { font-family: var(--dc-font-body); font-size: 11px; letter-spacing: var(--dc-track-widest); text-transform: uppercase; color: var(--dc-gunmetal); }
-    .logo-cell.dark .label, .logo-cell.deep .label { color: var(--dc-platinum); }
-    .wordmark-cell { grid-column: 1 / -1; background: var(--dc-pearl); padding: 100px 60px; display: flex; flex-direction: column; align-items: center; gap: 32px; }
+    .logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--dc-hairline); border: 1px solid var(--dc-hairline); }
+    .logo-cell { background: var(--dc-onyx); padding: 80px 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; min-height: 380px; }
+    .logo-cell.paper { background: var(--dc-paper); color: var(--dc-ink); }
+    .logo-cell.paper svg g { fill: var(--dc-ink) !important; }
+    .logo-cell .label { font-family: var(--dc-font-mono); font-size: 11px; letter-spacing: var(--dc-track-widest); text-transform: uppercase; color: var(--dc-steel); }
+    .logo-cell.paper .label { color: rgba(10,11,13,0.55); }
 
-    .pin-stage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--dc-steel); border: 1px solid var(--dc-steel); margin-top: 32px; }
-    .pin { background: var(--dc-pearl-deep); padding: 80px 40px 40px; text-align: center; }
-    .pin-disc { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 12px 28px rgba(14,26,43,0.32), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 1px rgba(0,0,0,0.18); }
-    .pin-disc.silver { background: radial-gradient(circle at 32% 28%, #f5f5f4 0%, #d7d7d5 50%, #8a8b8e 100%); }
-    .pin-disc.gold { background: radial-gradient(circle at 32% 28%, #E3D3AE 0%, #C5A572 50%, #8C7142 100%); }
-    .pin-disc.onyx { background: radial-gradient(circle at 32% 28%, #2c2c2e 0%, #1c1c1e 50%, #050506 100%); }
-    .pin-disc img { width: 92px; height: 92px; }
-    .pin-disc.silver img { filter: brightness(0); opacity: 0.85; }
-    .pin-disc.gold img { filter: brightness(0); opacity: 0.85; }
-    .pin-disc.onyx img { filter: invert(1) sepia(0.4) saturate(2) hue-rotate(15deg) brightness(0.95); }
-    .pin .label { font-family: var(--dc-font-display); font-weight: 500; font-size: 12px; letter-spacing: var(--dc-track-widest); color: var(--dc-midnight); text-transform: uppercase; }
-    .pin .pin-meta { font-family: var(--dc-font-mono); font-size: 11px; color: var(--dc-gunmetal); margin-top: 8px; }
+    .wordmark-cell { grid-column: 1 / -1; background: var(--dc-onyx); padding: 100px 60px; display: flex; flex-direction: column; align-items: center; gap: 32px; }
 
-    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1px; background: var(--dc-steel); border: 1px solid var(--dc-steel); }
+    .pin-stage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--dc-hairline); border: 1px solid var(--dc-hairline); margin-top: 32px; }
+    .pin { background: var(--dc-onyx-deep); padding: 80px 40px 40px; text-align: center; }
+    .pin-disc { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 12px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -2px 4px rgba(0,0,0,0.3); }
+    .pin-disc.silver { background: radial-gradient(circle at 32% 28%, #f6f4ee 0%, #c8c5be 35%, #8a8680 70%, #4a4843 100%); }
+    .pin-disc.platinum { background: radial-gradient(circle at 32% 28%, #f4f6f8 0%, #c8cdd3 40%, #6a7079 80%, #2a2e34 100%); }
+    .pin-disc.platinum .inner { width: 92px; height: 92px; border-radius: 50%; background: var(--dc-onyx-deep); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 6px rgba(0,0,0,0.8); }
+    .pin-disc.anthracite { background: radial-gradient(circle at 32% 28%, #4a4540 0%, #2a2723 40%, #14110e 100%); }
+    .pin-disc img, .pin-disc svg { width: 70px; height: 70px; }
+    .pin-disc.platinum .inner svg { width: 56px; height: 56px; }
+    .pin .label { font-family: var(--dc-font-display); font-weight: 500; font-size: 13px; letter-spacing: var(--dc-track-widest); color: var(--dc-platinum); text-transform: uppercase; }
+    .pin .pin-meta { font-family: var(--dc-font-mono); font-size: 11px; color: var(--dc-steel); margin-top: 8px; }
+
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1px; background: var(--dc-hairline); border: 1px solid var(--dc-hairline); }
     .swatch { aspect-ratio: 4 / 3; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
     .swatch-name { font-family: var(--dc-font-display); font-weight: 500; font-size: 14px; letter-spacing: var(--dc-track-wider); text-transform: uppercase; }
     .swatch-hex { font-family: var(--dc-font-mono); font-size: 12px; opacity: 0.7; }
 
-    .type-row { padding: 32px 0; border-top: 1px solid var(--dc-steel); display: grid; grid-template-columns: 220px 1fr; gap: 48px; align-items: baseline; }
-    .type-row:last-of-type { border-bottom: 1px solid var(--dc-steel); }
-    .type-meta { font-family: var(--dc-font-mono); font-size: 12px; color: var(--dc-gunmetal); line-height: 1.7; }
-    .type-sample.cinzel { font-family: var(--dc-font-display); font-weight: 500; letter-spacing: var(--dc-track-tighter); }
-    .type-sample.cormorant { font-family: var(--dc-font-editorial); font-weight: 400; }
-    .type-sample.cabinet { font-family: var(--dc-font-body); font-weight: 400; }
-    .type-sample.mono { font-family: var(--dc-font-mono); font-weight: 400; }
+    .type-row { padding: 32px 0; border-top: 1px solid var(--dc-hairline); display: grid; grid-template-columns: 220px 1fr; gap: 48px; align-items: baseline; }
+    .type-row:last-of-type { border-bottom: 1px solid var(--dc-hairline); }
+    .type-meta { font-family: var(--dc-font-mono); font-size: 12px; color: var(--dc-steel); line-height: 1.7; }
+    .type-sample.cinzel { font-family: var(--dc-font-display); font-weight: 500; letter-spacing: var(--dc-track-wide); color: #fff; }
+    .type-sample.cormorant { font-family: var(--dc-font-editorial); font-weight: 300; color: rgba(255,255,255,0.85); }
+    .type-sample.cabinet { font-family: var(--dc-font-body); font-weight: 400; color: rgba(255,255,255,0.85); }
+    .type-sample.mono { font-family: var(--dc-font-mono); font-weight: 400; color: var(--dc-platinum); }
 
-    footer { padding: 60px 0 0; font-family: var(--dc-font-mono); font-size: 12px; color: var(--dc-gunmetal); text-align: center; letter-spacing: var(--dc-track-wider); }
+    footer { padding: 60px 0 0; font-family: var(--dc-font-mono); font-size: 12px; color: var(--dc-steel); text-align: center; letter-spacing: var(--dc-track-wider); }
 
     @media (max-width: 720px) {
       .container { padding: 60px 24px 80px; }
@@ -84,57 +86,68 @@
 </head>
 <body>
 
-<div class="page-tag">DC — CD · 03 / Mai 2026</div>
+<div class="page-tag">DC — CD · 04 / Hourglass-Cut</div>
 
 <div class="container">
 
   <header class="hero">
     <div>
-      <p class="eyebrow">Corporate Design — Release 03</p>
+      <p class="eyebrow">Corporate Design — Release 04</p>
       <h1>Deal Circle</h1>
-      <p class="lede">Mercedes-Anzug-Casino-Royale für ein Salzburger Off-Market-Portfolio.<br>
-        Pearl · Platinum · Midnight Navy. Geometrisch, hell, scharf.</p>
+      <p class="lede">Sanduhr ohne Rahmen — nur der Sand.<br>
+        Drei Stunden am Tisch, sechs Mal im Jahr.<br>
+        Bond am Tresen, nicht in der Lobby.</p>
     </div>
     <div class="meta">
-      Salzburg<br>
-      Mai 2026<br>
-      Release 03<br>
-      taste-skill · brandkit · redesign-skill
+      Salzburg · Oberalm<br>
+      Estd. MMXXVI<br>
+      Release 04<br>
+      Hourglass-Cut
     </div>
   </header>
 
   <section class="section">
     <div class="section-head">
       <div><p class="eyebrow">Section 01</p><h2>Logo</h2></div>
-      <p class="desc">4-Punkt-Kompass-Stern. Geometrisch wie ein Mercedes-Stern, distinkt durch
-        haarfeinen Außenring und Pivot-Punkt. Pin-tauglich ab 14 mm.</p>
+      <p class="desc">Hourglass-Cut — zwei Dreiecke, Spitze an Spitze, Pinch dazwischen.
+        200×200 viewBox · Top y 28→94 · Bottom y 106→172 · Pinch 16×4.</p>
     </div>
 
     <div class="logo-grid">
-      <div class="logo-cell"><img src="./logo-monogram.svg" alt="" width="240" height="240"><span class="label">Pearl · Mark Primary</span></div>
-      <div class="logo-cell deep"><img src="./logo-monogram.svg" alt="" width="240" height="240"><span class="label">Midnight · Mark Inverse</span></div>
+      <div class="logo-cell"><img src="./logo-monogram.svg" alt="" width="220" height="220"><span class="label">Platinum on Onyx · Primary</span></div>
+      <div class="logo-cell paper"><img src="./logo-monogram.svg" alt="" width="220" height="220"><span class="label">Ink on Paper · Print</span></div>
       <div class="wordmark-cell">
         <img src="./logo-wordmark.svg" alt="" style="width:min(680px, 100%);">
         <span class="label">Wordmark · Horizontal Lockup</span>
       </div>
     </div>
 
-    <h3 style="font-family:var(--dc-font-editorial); font-style:italic; font-weight:400; font-size:var(--dc-fs-md); color:var(--dc-gunmetal); margin:48px 0 16px;">Reverspin · drei Ausführungen</h3>
+    <h3 style="font-family:var(--dc-font-editorial); font-style:italic; font-weight:300; font-size:24px; color:rgba(255,255,255,0.85); margin:48px 0 16px;">Reverspin · drei Ausführungen</h3>
     <div class="pin-stage">
       <div class="pin">
-        <div class="pin-disc silver"><img src="./logo-pin.svg" alt=""></div>
+        <div class="pin-disc silver">
+          <svg viewBox="0 0 200 200" width="70" height="70" xmlns="http://www.w3.org/2000/svg">
+            <g fill="#2a2723">
+              <polygon points="36,28 164,28 100,94"/>
+              <polygon points="100,106 164,172 36,172"/>
+              <rect x="92" y="98" width="16" height="4"/>
+            </g>
+          </svg>
+        </div>
         <div class="label">Variante A</div>
-        <div class="pin-meta">15 mm · Soft Silver</div>
+        <div class="pin-meta">15 mm · Sterling · graviert</div>
       </div>
       <div class="pin">
-        <div class="pin-disc gold"><img src="./logo-pin.svg" alt=""></div>
+        <div class="pin-disc platinum">
+          <div class="inner"><img src="./logo-pin.svg" alt=""></div>
+        </div>
         <div class="label">Variante B</div>
-        <div class="pin-meta">14 mm · Champagne</div>
+        <div class="pin-meta">15 mm · Platinum + Onyx-Email</div>
       </div>
       <div class="pin">
-        <div class="pin-disc onyx"><img src="./logo-pin.svg" alt=""></div>
+        <div class="pin-disc anthracite"><img src="./logo-pin.svg" alt=""></div>
         <div class="label">Variante C</div>
-        <div class="pin-meta">16 mm · Anzug-Schwarz</div>
+        <div class="pin-meta">15 mm · Anthrazit + Platin-Inlay</div>
       </div>
     </div>
   </section>
@@ -142,42 +155,44 @@
   <section class="section">
     <div class="section-head">
       <div><p class="eyebrow">Section 02</p><h2>Farbpalette</h2></div>
-      <p class="desc">55 % Pearl · 25 % Midnight · 15 % Steel/Gunmetal · 5 % Akzente.
-        Mercedes-Brochure-Verteilung.</p>
+      <p class="desc">~70 % Onyx · ~15 % Platinum/Silver · ~10 % Paper · 5 % Gold-Trace.
+        Bond-am-Tresen, nicht in der Lobby.</p>
     </div>
     <div class="swatches">
-      <div class="swatch" style="background:#EEECE7; color:#0E1A2B;"><div class="swatch-name">Pearl</div><div class="swatch-hex">#EEECE7</div></div>
-      <div class="swatch" style="background:#E2DED5; color:#0E1A2B;"><div class="swatch-name">Pearl Deep</div><div class="swatch-hex">#E2DED5</div></div>
-      <div class="swatch" style="background:#D7D7D5; color:#0E1A2B;"><div class="swatch-name">Platinum</div><div class="swatch-hex">#D7D7D5</div></div>
-      <div class="swatch" style="background:#A2A4A8; color:#0E1A2B;"><div class="swatch-name">Steel</div><div class="swatch-hex">#A2A4A8</div></div>
-      <div class="swatch" style="background:#4A4D52; color:#EEECE7;"><div class="swatch-name">Gunmetal</div><div class="swatch-hex">#4A4D52</div></div>
-      <div class="swatch" style="background:#2C2C2E; color:#EEECE7;"><div class="swatch-name">Charcoal</div><div class="swatch-hex">#2C2C2E</div></div>
-      <div class="swatch" style="background:#0E1A2B; color:#EEECE7;"><div class="swatch-name">Midnight</div><div class="swatch-hex">#0E1A2B</div></div>
-      <div class="swatch" style="background:#080F1A; color:#EEECE7;"><div class="swatch-name">Midnight Deep</div><div class="swatch-hex">#080F1A</div></div>
-      <div class="swatch" style="background:#C5A572; color:#0E1A2B;"><div class="swatch-name">Champagne</div><div class="swatch-hex">#C5A572</div></div>
-      <div class="swatch" style="background:#5C1A1B; color:#EEECE7;"><div class="swatch-name">Bordeaux<br><small style="font-family:var(--dc-font-mono); font-size:9px; letter-spacing:0.12em; opacity:0.7;">RESERVED-MARKER</small></div><div class="swatch-hex">#5C1A1B</div></div>
+      <div class="swatch" style="background:#050608; color:#E8EBEE;"><div class="swatch-name">Onyx</div><div class="swatch-hex">#050608</div></div>
+      <div class="swatch" style="background:#08090B; color:#E8EBEE;"><div class="swatch-name">Onyx Deep</div><div class="swatch-hex">#08090B</div></div>
+      <div class="swatch" style="background:#C8CDD3; color:#0A0B0D;"><div class="swatch-name">Platinum</div><div class="swatch-hex">#C8CDD3</div></div>
+      <div class="swatch" style="background:#E8EBEE; color:#0A0B0D;"><div class="swatch-name">Silver</div><div class="swatch-hex">#E8EBEE</div></div>
+      <div class="swatch" style="background:#F4F6F8; color:#0A0B0D;"><div class="swatch-name">Silver Hot</div><div class="swatch-hex">#F4F6F8</div></div>
+      <div class="swatch" style="background:#5A6068; color:#E8EBEE;"><div class="swatch-name">Steel</div><div class="swatch-hex">#5A6068</div></div>
+      <div class="swatch" style="background:#3A4048; color:#E8EBEE;"><div class="swatch-name">Gunmetal</div><div class="swatch-hex">#3A4048</div></div>
+      <div class="swatch" style="background:#F2EFE8; color:#0A0B0D;"><div class="swatch-name">Paper</div><div class="swatch-hex">#F2EFE8</div></div>
+      <div class="swatch" style="background:#B8A978; color:#0A0B0D;"><div class="swatch-name">Gold Trace</div><div class="swatch-hex">#B8A978</div></div>
+      <div class="swatch" style="background:#5C1A1B; color:#E8EBEE;"><div class="swatch-name">Bordeaux<br><small style="font-family:var(--dc-font-mono); font-size:9px; letter-spacing:0.12em; opacity:0.7;">RESERVED-MARKER</small></div><div class="swatch-hex">#5C1A1B</div></div>
     </div>
   </section>
 
   <section class="section">
     <div class="section-head">
       <div><p class="eyebrow">Section 03</p><h2>Typografie</h2></div>
-      <p class="desc">Cinzel führt Display, Cormorant editorial, Cabinet Grotesk Body.
-        Inter ist gebannt (taste-skill).</p>
+      <p class="desc">Cinzel führt Display, Cormorant Italic editorial, Cabinet Grotesk Body.
+        Inter ist nicht zu verwenden.</p>
     </div>
-    <div class="type-row"><div class="type-meta">Cinzel<br>500 · Hero<br>72 / 1.0<br>tracking-tighter</div>
-      <div class="type-sample cinzel" style="font-size:72px; line-height:1.0;">Salzburg jenseits der&nbsp;Auslage.</div></div>
-    <div class="type-row"><div class="type-meta">Cinzel<br>500 · H2<br>32 / 1.05</div>
-      <div class="type-sample cinzel" style="font-size:32px; line-height:1.05;">Acht Adressen, derzeit auf unserer Liste.</div></div>
-    <div class="type-row"><div class="type-meta">Cormorant Garamond<br>400 italic · Lede<br>22 / 1.5</div>
-      <div class="type-sample cormorant" style="font-style:italic; font-size:22px; line-height:1.5;">Wir vermitteln Stadtpalais, Penthouses und Seevillen direkt zwischen Verkäufer und Käufer.</div></div>
-    <div class="type-row"><div class="type-meta">Cabinet Grotesk<br>400 · Body<br>16 / 1.6 · max-w 65ch</div>
-      <div class="type-sample cabinet" style="font-size:16px; line-height:1.6; max-width:65ch;">Wir kennen die Häuser persönlich, weil wir mit ihren Eigentümern aufgewachsen sind. Unser Modell ist einfach: Vermittlung nur auf Empfehlung, mit kleinem Team, ohne Marketing-Brimborium.</div></div>
-    <div class="type-row"><div class="type-meta">JetBrains Mono<br>500 · Listing-ID<br>13 · +0.12em</div>
-      <div class="type-sample mono" style="font-size:13px; letter-spacing:0.12em;">DC-2026-074  ·  ALTSTADT  ·  AUF&nbsp;ANFRAGE</div></div>
+    <div class="type-row"><div class="type-meta">Cinzel<br>500 · Hero<br>96 / 1.0<br>tracking 0.04em</div>
+      <div class="type-sample cinzel" style="font-size:96px; line-height:1.0; letter-spacing:0.04em;">DEAL CIRCLE</div></div>
+    <div class="type-row"><div class="type-meta">Cormorant Garamond<br>300 italic · Manifesto<br>72 / 1.05</div>
+      <div class="type-sample cormorant" style="font-style:italic; font-weight:300; font-size:72px; line-height:1.05;">Sechs Abende. Achtzehn Plätze.</div></div>
+    <div class="type-row"><div class="type-meta">Cinzel<br>500 · Section-Title<br>48 caps · tracking 0.04em</div>
+      <div class="type-sample cinzel" style="font-size:48px; letter-spacing:0.04em; text-transform:uppercase;">Wie ein Abend abläuft</div></div>
+    <div class="type-row"><div class="type-meta">Cormorant Garamond<br>300 italic · Lede<br>22 / 1.5</div>
+      <div class="type-sample cormorant" style="font-style:italic; font-weight:300; font-size:22px; line-height:1.5;">Keine Bühne, keine Panels, kein Networking-Pflichtteil. Diner, ein Vortrag aus der Runde, danach offen.</div></div>
+    <div class="type-row"><div class="type-meta">Cabinet Grotesk<br>400 · Body<br>16.5 / 1.75</div>
+      <div class="type-sample cabinet" style="font-size:16.5px; line-height:1.75; max-width:65ch;">Vier Gänge aus der Schlossküche, abgestimmt mit Wein, der die Runde überdauert. Wer sitzt, sitzt absichtlich. Im Hof, am Kamin, an der Mauer. Whiskey, Wein, Wasser.</div></div>
+    <div class="type-row"><div class="type-meta">JetBrains Mono<br>500 · Eyebrow<br>11 · tracking 0.3em</div>
+      <div class="type-sample mono" style="font-size:11px; letter-spacing:0.3em; text-transform:uppercase;">№ III · MMXXVI · 06. Juni · Dr. v. Lindeck · Stiftungsrat</div></div>
   </section>
 
-  <footer>Deal Circle · CD Release 03 · Compass · Silver · Mai 2026</footer>
+  <footer>Deal Circle · CD Release 04 · Hourglass-Cut · Estd MMXXVI</footer>
 </div>
 
 </body>

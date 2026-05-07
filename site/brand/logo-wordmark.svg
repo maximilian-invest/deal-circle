@@ -1,38 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 200" role="img" aria-label="Deal Circle Wordmark">
-  <title>Deal Circle — Wordmark</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 200" role="img" aria-label="Deal Circle Salzburg Wordmark">
+  <title>Deal Circle Salzburg — Horizontal Lockup</title>
   <defs>
     <style>
-      .dc-ring     { fill: none; stroke: #0E1A2B; stroke-width: 1.2; }
-      .dc-mark     { fill: #0E1A2B; }
-      .dc-divider  { stroke: #0E1A2B; stroke-width: 0.5; opacity: 0.4; }
+      .dc-mark   { fill: #C8CDD3; }
+      .dc-divider { stroke: #C8CDD3; stroke-width: 0.6; opacity: 0.4; }
       .dc-display {
         font-family: 'Cinzel', 'Trajan Pro', 'Cormorant Garamond', 'Times New Roman', serif;
         font-weight: 500;
         font-size: 52px;
         letter-spacing: 8px;
-        fill: #0E1A2B;
+        fill: #C8CDD3;
       }
       .dc-meta {
-        font-family: 'Cabinet Grotesk', 'Satoshi', 'Geist', 'Helvetica Neue', Arial, sans-serif;
+        font-family: 'Cabinet Grotesk', 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
         font-weight: 500;
-        font-size: 13px;
-        letter-spacing: 7px;
-        fill: #0E1A2B;
-        opacity: 0.65;
+        font-size: 12px;
+        letter-spacing: 6px;
+        fill: #9DA3AB;
       }
     </style>
   </defs>
 
-  <g>
-    <circle class="dc-ring" cx="100" cy="100" r="92"/>
-    <path class="dc-mark" d="M 100 18 L 110 90 L 182 100 L 110 110 L 100 182 L 90 110 L 18 100 L 90 90 Z"/>
-    <circle class="dc-mark" cx="100" cy="100" r="3.2"/>
+  <!-- Hourglass -->
+  <g class="dc-mark" transform="translate(20,20) scale(0.8)">
+    <polygon points="36,28 164,28 100,94"/>
+    <polygon points="100,106 164,172 36,172"/>
+    <rect x="92" y="98" width="16" height="4"/>
   </g>
 
-  <line class="dc-divider" x1="232" y1="56" x2="232" y2="144"/>
+  <!-- Divider -->
+  <line class="dc-divider" x1="216" y1="56" x2="216" y2="144"/>
 
+  <!-- Wordmark -->
   <g>
-    <text class="dc-display" x="266" y="106">DEAL CIRCLE</text>
-    <text class="dc-meta"    x="270" y="138">S A L Z B U R G</text>
+    <text class="dc-display" x="248" y="106">DEAL CIRCLE</text>
+    <text class="dc-meta"    x="252" y="138">SALZBURG · ESTD MMXXVI</text>
   </g>
 </svg>
