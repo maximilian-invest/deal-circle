@@ -43,10 +43,11 @@
   letter-spacing: 0.24em;
   text-transform: uppercase;
   text-decoration: none;
-  border: 1px solid currentColor;
-  background: transparent;
-  color: inherit;
-  cursor: none;
+  /* Lesbarer Default (heller Button auf dunkler Site).
+     Inline-styles in index.html können beliebig überschreiben. */
+  background: #FFFFFF;
+  color: #0A0B0D;
+  border: 1px solid #FFFFFF;
   transition:
     background var(--dc-dur-base) var(--dc-ease),
     color var(--dc-dur-base) var(--dc-ease),
@@ -57,8 +58,15 @@
   isolation: isolate;
 }
 
-@media (max-width: 900px) {
-  .dc-btn { cursor: pointer; }
+/* Ghost-Variante — transparent, weißer Border + Text. */
+.dc-btn--ghost {
+  background: transparent;
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.dc-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #FFFFFF;
 }
 
 .dc-btn:focus-visible {

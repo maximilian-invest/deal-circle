@@ -767,8 +767,13 @@
     .gold { color: var(--gold-trace); }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
-      .reveal, .reveal-stagger > *, .manifesto .word-line span { opacity: 1 !important; transform: none !important; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      .reveal, .reveal-stagger > *, .manifesto .word-line span,
+      .hero-corner, .hero-meta, .hero-wordmark .letter, .hero-tagline,
+      .hero-actions, .hero-cta-line, .hero-scroll-cue {
+        opacity: 1 !important;
+        transform: none !important;
+      }
       .intro { display: none; }
     }
   </style>
@@ -784,7 +789,7 @@
     <div class="intro-stage">
       <div class="intro-iris"></div>
       <div class="intro-mark" id="intro-mark"></div>
-      <div class="intro-text">Deal Circle Salzburg · Estd. MMXXVI</div>
+      <div class="intro-text">Deal Circle Salzburg</div>
       <button class="intro-skip" onclick="document.getElementById('intro').classList.add('done')">Skip</button>
     </div>
   </div>
@@ -833,11 +838,10 @@
         <span class="name">Deal Circle Salzburg</span>
       </a>
       <nav class="topbar-nav">
-        <a class="nav-link" href="#format" data-cursor="hover">Format</a>
-        <a class="nav-link" href="#abende" data-cursor="hover">Abende</a>
-        <a class="nav-link" href="#members" data-cursor="hover">Members</a>
+        <a class="nav-link" href="#format" data-cursor="hover">Ablauf</a>
         <a class="nav-link" href="#ort" data-cursor="hover">Ort</a>
-        <a class="dc-btn dc-btn--ghost" href="#bewerbung" data-cursor="hover"><span>Bewerbung</span></a>
+        <a class="nav-link" href="#members" data-cursor="hover">Wer kommt</a>
+        <a class="dc-btn dc-btn--ghost" href="#bewerbung" data-cursor="hover"><span>Hi sagen</span></a>
       </nav>
     </div>
   </header>
@@ -850,11 +854,9 @@
     <div class="hero-corner br"></div>
 
     <div class="hero-meta">
-      <span>Members only</span>
+      <span>Networking</span>
       <span class="dot"></span>
-      <span>Auf Einladung &amp; Bewerbung</span>
-      <span class="dot"></span>
-      <span>Estd. MMXXVI</span>
+      <span>Speaker aus der Runde</span>
       <span class="dot"></span>
       <span class="gold">Salzburg</span>
     </div>
@@ -865,10 +867,10 @@
         <span class="word" data-word="Deal"></span>
         <span class="word" data-word="Circle"></span>
       </h1>
-      <p class="hero-tagline">Ein privater Kreis aus Unternehmern, Investoren <span class="amp">&amp;</span> Family Offices.</p>
+      <p class="hero-tagline">Ein Netzwerktreffen mit Unternehmern, Gründern <span class="amp">&amp;</span> Family Offices. Im Schloss Wiespach.</p>
       <div class="hero-actions">
-        <a href="#bewerbung" class="dc-btn" data-cursor="hover"><span>Bewerbung einreichen</span> <span class="dc-arrow">→</span></a>
-        <a href="#format" class="dc-btn dc-btn--ghost" data-cursor="hover"><span>Format ansehen</span></a>
+        <a href="#bewerbung" class="dc-btn" data-cursor="hover"><span>Dabei sein</span> <span class="dc-arrow">→</span></a>
+        <a href="#format" class="dc-btn dc-btn--ghost" data-cursor="hover"><span>Ablauf ansehen</span></a>
       </div>
     </div>
 
@@ -885,41 +887,15 @@
   <section class="manifesto" data-screen-label="02 Manifesto">
     <div class="wrap">
       <h2>
-        <span class="word-line"><span>Sechs Abende.</span></span>
-        <span class="word-line"><span>Achtzehn Plätze.</span></span>
+        <span class="word-line"><span>Gute Leute.</span></span>
+        <span class="word-line"><span>Echte Themen.</span></span>
         <span class="word-line"><span class="grad">Schloss Wiespach.</span></span>
-        <span class="word-line"><span style="font-style: italic; opacity: 0.85;">Auf Einladung.</span></span>
+        <span class="word-line"><span style="font-style: italic; opacity: 0.85;">In Salzburg.</span></span>
       </h2>
       <div class="manifesto-side">
-        <p>Kein Verein. Kein Netzwerk. Keine Plattform.</p>
-        <p>Eine Runde junger Unternehmer, Gründer und Family Offices, die sich sechsmal im Jahr in Schloss Wiespach trifft — am Tisch, beim Wein, im Gespräch.</p>
-        <p>Konfidentiell. Kuratiert. Auf Einladung.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── ACT 3 · STATS ──────────────────────────────────────── -->
-  <section class="stats-act" data-screen-label="03 Stats">
-    <div class="stats reveal-stagger">
-      <div class="stat">
-        <div class="num" data-counter="6">0</div>
-        <div class="label">Abende pro Jahr</div>
-        <div class="note">Frühjahr bis Winter</div>
-      </div>
-      <div class="stat">
-        <div class="num" data-counter="18">0</div>
-        <div class="label">Plätze am Tisch</div>
-        <div class="note">kuratierte Sitzordnung</div>
-      </div>
-      <div class="stat">
-        <div class="num" data-counter="30">0</div>
-        <div class="label">Minuten Vortrag</div>
-        <div class="note">aus der Runde, monatlich</div>
-      </div>
-      <div class="stat">
-        <div class="num">∞</div>
-        <div class="label">Stunden danach</div>
-        <div class="note">am Hof, am Kamin, bis spät</div>
+        <p>Ein Netzwerktreffen für Unternehmer, Gründer, Investoren und Family Offices.</p>
+        <p>Mit Speaker aus der Runde, gutem Essen und genug Zeit, sich richtig zu unterhalten — am Tisch, beim Wein, im Gespräch.</p>
+        <p>Mehr nicht.</p>
       </div>
     </div>
   </section>
@@ -928,12 +904,12 @@
   <section class="format-act" id="format" data-screen-label="04 Format">
     <div class="wrap">
       <div class="section-head reveal">
-        <div class="section-eyebrow"><span class="num">01</span> Format</div>
+        <div class="section-eyebrow"><span class="num">01</span> Ablauf</div>
         <div>
-          <h2 class="section-title">Wie ein <em>Abend abläuft.</em></h2>
+          <h2 class="section-title">Der nächste <em>Stammtisch.</em></h2>
           <p class="section-lede">
-            Keine Bühne, keine Panels, kein Networking-Pflichtteil. Diner,
-            ein Vortrag aus der Runde, danach offen.
+            So läuft der Abend ab — vom Get Together am späten Nachmittag
+            bis Open Networking.
           </p>
         </div>
       </div>
@@ -942,50 +918,62 @@
     <div class="h-track-wrap">
       <div class="h-track" id="h-track">
         <div class="h-card" data-cursor="hover">
-          <div class="roman roman-grad">I</div>
-          <span class="step">Empfang</span>
-          <h3>Diner</h3>
+          <div class="roman roman-grad">16:00</div>
+          <span class="step">Get Together</span>
+          <h3>Kaffee &amp;<br/>Champagner</h3>
           <p>
-            Vier Gänge aus der Schlossküche, abgestimmt mit Wein, der die
-            Runde überdauert. Wer sitzt, sitzt absichtlich.
+            Ankommen, erste Gespräche, Warm-up.
           </p>
-          <div class="duration">vier Gänge</div>
+          <div class="duration">offener Beginn</div>
         </div>
         <div class="h-card" data-cursor="hover">
-          <div class="roman roman-grad">II</div>
-          <span class="step">Vortrag</span>
-          <h3>Speaker</h3>
+          <div class="roman roman-grad">17:00</div>
+          <span class="step">Offizieller Start</span>
+          <h3>Begrüßung</h3>
           <p>
-            Ein Mitglied spricht 30 Minuten. Kein Pitch, kein Deck — eine
-            These, ein Fall, eine offene Frage. Danach Q&amp;A am Tisch,
-            so lang sie trägt.
+            Begrüßung &amp; kurzer Rahmen.
           </p>
-          <div class="duration">aus der Runde + Diskussion</div>
+          <div class="duration">kurz &amp; knapp</div>
         </div>
         <div class="h-card" data-cursor="hover">
-          <div class="roman roman-grad">III</div>
-          <span class="step">Hof &amp; Kamin</span>
-          <h3>Drinks</h3>
+          <div class="roman roman-grad">17:30</div>
+          <span class="step">Deal Slot 1 · Markus Mair</span>
+          <h3>Beteiligungen</h3>
           <p>
-            Im Hof, am Kamin, an der Mauer. Whiskey, Wein, Wasser. Hier
-            entstehen die Gespräche, die das Diner nur angeschnitten hat.
-            Bis spät.
+            Unternehmensbeteiligungen, Private Equity, Deal-Strukturen.
+          </p>
+          <div class="duration">45 Min Input + 15 Min Q&amp;A</div>
+        </div>
+        <div class="h-card" data-cursor="hover">
+          <div class="roman roman-grad">18:30</div>
+          <span class="step">Abendbuffet</span>
+          <h3>Essen &amp;<br/>Wein</h3>
+          <p>
+            Essen und lockerer Austausch.
+          </p>
+          <div class="duration">45 Min</div>
+        </div>
+        <div class="h-card" data-cursor="hover">
+          <div class="roman roman-grad">19:15</div>
+          <span class="step">Slot 2 · Lisa Rettenbacher <em style="opacity:0.6">tbc</em></span>
+          <h3>Bildsprache</h3>
+          <p>
+            Immobilienfotografie — Positionierung, Wirkung, Verkauf.
+          </p>
+          <div class="duration">25 Min</div>
+        </div>
+        <div class="h-card" data-cursor="hover">
+          <div class="roman roman-grad">19:45</div>
+          <span class="step">Open Networking</span>
+          <h3>Frei am Hof</h3>
+          <p>
+            Freier Austausch — Gespräche vertiefen, Kontakte
+            nutzen, Deals machen.
           </p>
           <div class="duration">offen · bis spät</div>
         </div>
-        <div class="h-card" data-cursor="hover">
-          <div class="roman roman-grad">IV</div>
-          <span class="step">Optional · zweimal jährlich</span>
-          <h3>Excursio</h3>
-          <p>
-            Eine kleine Reise, ein Tag bei einem Member-Unternehmen, ein
-            Abend in einer fremden Stadt. Kein Programm, keine Pressetour
-            — eine private Einladung.
-          </p>
-          <div class="duration">privat</div>
-        </div>
       </div>
-      <div class="wrap h-cue"><span class="h-line"></span><span>Seitlich scrollen → · Vier Akte</span></div>
+      <div class="wrap h-cue"><span class="h-line"></span><span>Seitlich scrollen → · 16:00 bis spät</span></div>
     </div>
   </section>
 
@@ -998,77 +986,6 @@
         <span class="or">Sondern beim Wein, mit Leuten, die man kennt.</span>
       </blockquote>
       <cite>Deal Circle Salzburg</cite>
-    </div>
-  </section>
-
-  <!-- ── ACT 6 · ABENDE ─────────────────────────────────────── -->
-  <section class="abende-act" id="abende" data-screen-label="06 Abende">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <div class="section-eyebrow"><span class="num">02</span> Kalender · MMXXVI</div>
-        <div>
-          <h2 class="section-title">Sechs Abende. <em>Achtzehn Plätze.</em></h2>
-          <p class="section-lede">
-            Schloss Wiespach, Oberalm. Die Runde tagt sechsmal im Jahr —
-            mehr, wenn ein Anlass es verlangt. Nicht-Members lesen mit.
-          </p>
-        </div>
-      </div>
-
-      <div class="abende reveal-stagger">
-        <div class="abend-row" data-cursor="hover">
-          <div class="marker"></div>
-          <div class="abend-num">№ I · MMXXVI</div>
-          <div class="abend-date">23. Januar</div>
-          <div class="abend-topic">„Was eine Beteiligung wirklich kostet — wenn man die Zeit dazurechnet."</div>
-          <div class="abend-speaker">F. Reiter · Family Office</div>
-          <div class="abend-status status-passed">Vergangen</div>
-        </div>
-        <div class="abend-row" data-cursor="hover">
-          <div class="marker"></div>
-          <div class="abend-num">№ II · MMXXVI</div>
-          <div class="abend-date">14. März</div>
-          <div class="abend-topic">„Drei Exits, drei Lehren — und warum die mittlere die teuerste war."</div>
-          <div class="abend-speaker">M. Brunner · Founder, exited</div>
-          <div class="abend-status status-passed">Vergangen</div>
-        </div>
-        <div class="abend-row" data-cursor="hover">
-          <div class="marker"></div>
-          <div class="abend-num">№ III · MMXXVI</div>
-          <div class="abend-date">06. Juni</div>
-          <div class="abend-topic">„Stiftungen, die ihre Namen ernst nehmen — Kapital im Generationen­blick."</div>
-          <div class="abend-speaker">Dr. v. Lindeck · Stiftungsrat</div>
-          <div class="abend-status status-next">Nächster</div>
-        </div>
-        <div class="abend-row" data-cursor="hover">
-          <div class="marker"></div>
-          <div class="abend-num">№ IV · MMXXVI</div>
-          <div class="abend-date">12. September</div>
-          <div class="abend-topic">„Late-Stage in einem stillen Markt — wer kauft, wenn niemand spricht."</div>
-          <div class="abend-speaker">tbd · Investor</div>
-          <div class="abend-status status-open">Offen</div>
-        </div>
-        <div class="abend-row" data-cursor="hover">
-          <div class="marker"></div>
-          <div class="abend-num">№ V · MMXXVI</div>
-          <div class="abend-date">07. November</div>
-          <div class="abend-topic">„Der Deal, den wir ablehnen — eine Anatomie aus drei Family Offices."</div>
-          <div class="abend-speaker">Runde · kollektiv</div>
-          <div class="abend-status status-open">Offen</div>
-        </div>
-        <div class="abend-row" data-cursor="hover">
-          <div class="marker"></div>
-          <div class="abend-num">№ VI · MMXXVI</div>
-          <div class="abend-date">12. Dezember</div>
-          <div class="abend-topic">„Jahresrückblick aus der Runde — was wir gelernt haben, was wir lassen."</div>
-          <div class="abend-speaker">tbd</div>
-          <div class="abend-status status-open">Offen</div>
-        </div>
-      </div>
-
-      <div style="margin-top:32px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.24em; color: rgba(255,255,255,0.5); text-transform: uppercase;">
-        + zwei kleine Abende (Apertif &amp; Kaminrunde) auf Einladung — Daten diskret
-      </div>
     </div>
   </section>
 
@@ -1088,23 +1005,22 @@
 
       <div class="location-grid reveal">
         <div class="location-art" data-cursor="hover">
-          <div class="art-stamp" id="loc-stamp">★ Schloss · Wiespach · MDXVI ★ </div>
+          <div class="art-stamp" id="loc-stamp">★ Schloss · Wiespach · Salzburg ★ </div>
           <div class="label">Innenhof bei Kerzen­licht — Platzhalter</div>
         </div>
         <div class="location-text">
           <h3>Schlossmauern, Kerzen,<br /><em>Wein, Gespräche bis spät.</em></h3>
           <p>
-            Das Schloss steht seit gut 400 Jahren. Drei Säle, ein
-            Innenhof, ein Kamin, der schon viele Abende überdauert hat.
-            Wir buchen es ganz, sechsmal im Jahr. Kein Personal außer
-            der Schlossküche, kein Service mit Mikrofon. Wer ankommt,
-            parkt im Hof und wird an der Tür empfangen.
+            Drei Säle, ein Innenhof, ein Kamin. Wir haben das Schloss
+            für den Abend für uns — kein Service mit Mikrofon, kein
+            Eventlocation-Standardprogramm. Wer ankommt, parkt im Hof
+            und wird an der Tür empfangen.
           </p>
           <div class="location-meta">
             <div>Adresse</div>      <div class="v">5411 Oberalm, Salzburg</div>
             <div>Anreise</div>      <div class="v">15 Min. ex Stadt</div>
             <div>Empfang</div>      <div class="v">privat, im Hof</div>
-            <div>Kapazität</div>    <div class="v">18 am Tisch</div>
+            <div>Stimmung</div>     <div class="v">entspannt</div>
           </div>
         </div>
       </div>
@@ -1115,12 +1031,12 @@
   <section class="members-light" id="members" data-screen-label="08 Members">
     <div class="wrap">
       <div class="section-head reveal">
-        <div class="section-eyebrow"><span class="num">04</span> Members</div>
+        <div class="section-eyebrow"><span class="num">03</span> Wer kommt</div>
         <div>
           <h2 class="section-title">Wer am Tisch <em>sitzt.</em></h2>
           <p class="section-lede">
-            Junge Unternehmer, Gründer, Investoren, Family Offices.
-            Substanz statt Titel. Bewerbung statt Mitgliedsbeitrag.
+            Unternehmer, Gründer, Investoren, Family Offices.
+            Coole Leute aus der Region — und ein paar von weiter weg.
           </p>
         </div>
       </div>
@@ -1128,42 +1044,42 @@
       <div class="principles reveal-stagger">
         <div class="principle" data-cursor="hover">
           <span class="ornament">I</span>
-          <span class="ord">Prinzip I</span>
-          <h4>Auf Einladung &amp; Bewerbung</h4>
+          <span class="ord">So läuft's</span>
+          <h4>Sag uns Bescheid</h4>
           <p>
-            Man kommt nicht in den Deal Circle, indem man bezahlt.
-            Jedes Member empfiehlt höchstens eine Person pro Jahr.
-            Eine kleine Aufnahmekommission entscheidet still.
+            Wenn der Abend interessant klingt, schreib uns kurz.
+            Wir antworten und schauen ob's passt. Kein Mitgliedsbeitrag,
+            keine Aufnahmegebühr.
           </p>
         </div>
         <div class="principle" data-cursor="hover">
           <span class="ornament">II</span>
-          <span class="ord">Prinzip II</span>
-          <h4>Substanz statt Buzzwords</h4>
+          <span class="ord">Was zählt</span>
+          <h4>Substanz, kein Pitch</h4>
           <p>
-            Wer einen Vortrag hält, bringt eine These mit, nicht ein
-            Deck. Wer eine Frage hat, stellt sie konkret. Anti-LinkedIn
-            ist eine Haltung, kein Style.
+            Wer einen Vortrag hält, bringt was Echtes mit — eine
+            These, einen Fall, eine offene Frage. Kein Deck, keine
+            Buzzwords.
           </p>
         </div>
         <div class="principle" data-cursor="hover">
           <span class="ornament">III</span>
-          <span class="ord">Prinzip III</span>
+          <span class="ord">Vertrauen</span>
           <h4>Was am Tisch bleibt</h4>
           <p>
-            Was in der Runde besprochen wird, verlässt sie nicht.
-            Keine Aufnahmen, keine Posts, keine Pressetexte. Vertrauen
-            ist das, was wir in Wahrheit servieren.
+            Was in der Runde gesprochen wird, bleibt in der Runde.
+            Keine Aufnahmen, keine Posts, kein Marketing. Damit man
+            wirklich reden kann.
           </p>
         </div>
         <div class="principle" data-cursor="hover">
           <span class="ornament">IV</span>
-          <span class="ord">Prinzip IV</span>
-          <h4>Die Stunde reicht</h4>
+          <span class="ord">Locker bleiben</span>
+          <h4>Kein Pflichtprogramm</h4>
           <p>
-            Sechs Abende im Jahr sind genug. Kein Slack, keine
-            WhatsApp-Gruppe, keine Newsletter-Kadenz. Die Sanduhr
-            wird gewendet, wenn sie gewendet werden muss.
+            Komm wenn's passt, lass aus wenn's nicht passt. Kein Slack,
+            keine WhatsApp-Gruppe, kein Newsletter-Spam. Wir melden
+            uns, wenn's wieder soweit ist.
           </p>
         </div>
       </div>
@@ -1175,39 +1091,37 @@
     <div class="wrap">
       <div class="apply-grid reveal">
         <div class="apply-side">
-          <div class="section-eyebrow"><span class="num">05</span> Bewerbung</div>
-          <h2>Eine Seite <em>reicht.</em></h2>
+          <div class="section-eyebrow"><span class="num">04</span> Hi sagen</div>
+          <h2>Schreib uns <em>kurz.</em></h2>
           <p>
-            Wir lesen jede Bewerbung. Wir antworten auf jede — innerhalb
-            von vier Wochen, manchmal mit Ja, oft mit „nicht jetzt", nie
-            mit Form­brief. Sechs Felder. Eine Person pro Bewerbung.
+            Wenn du beim nächsten Abend dabei sein willst — sag
+            Bescheid. Ganz unverbindlich. Wir antworten in ein paar
+            Tagen und schauen ob's passt.
           </p>
           <p>
-            Wer eingeladen ist, bekommt einen Reverspin und die Daten
-            für das Jahr. Mehr nicht.
+            Kein Bewerbungsformular, keine Pflichtfelder. Drei Zeilen
+            reichen.
           </p>
           <div class="apply-meta">
-            <div>Antwort</div>           <div class="v">≤ 4 Wochen</div>
+            <div>Antwort</div>           <div class="v">in ein paar Tagen</div>
             <div>Aufnahmegebühr</div>    <div class="v">keine</div>
-            <div>Mitgliedsbeitrag</div>  <div class="v">à la carte</div>
-            <div>Empfehlung nötig</div>  <div class="v">nein, hilft</div>
+            <div>Mitgliedsbeitrag</div>  <div class="v">keiner</div>
+            <div>Verbindlichkeit</div>   <div class="v">null</div>
           </div>
         </div>
 
-        <form class="apply-form" onsubmit="event.preventDefault(); this.style.opacity='0.5'; setTimeout(()=>alert('Vielen Dank. Wir melden uns innerhalb von vier Wochen.'),300);">
+        <form class="apply-form" onsubmit="event.preventDefault(); this.style.opacity='0.5'; setTimeout(()=>alert('Danke — wir melden uns in ein paar Tagen.'),300);">
           <div class="field-row">
             <div class="field"><label>Vorname</label><input type="text" required data-cursor="hover"/></div>
             <div class="field"><label>Nachname</label><input type="text" required data-cursor="hover"/></div>
           </div>
           <div class="field-row">
             <div class="field"><label>E-Mail</label><input type="email" required data-cursor="hover"/></div>
-            <div class="field"><label>Rolle</label><input type="text" placeholder="Founder · Investor · Family Office · …" required data-cursor="hover"/></div>
+            <div class="field"><label>Was machst du?</label><input type="text" placeholder="Founder · Investor · …" required data-cursor="hover"/></div>
           </div>
-          <div class="field"><label>Unternehmen / Mandat</label><input type="text" required data-cursor="hover"/></div>
-          <div class="field"><label>Was bringen Sie an den Tisch?</label><textarea rows="4" placeholder="Drei Sätze. Konkret." required data-cursor="hover"></textarea></div>
-          <div class="field"><label>Empfehlung (optional)</label><input type="text" placeholder="Name eines Members" data-cursor="hover"/></div>
+          <div class="field"><label>Kurz zu dir</label><textarea rows="4" placeholder="Drei Zeilen reichen." data-cursor="hover"></textarea></div>
           <button type="submit" class="dc-btn" style="margin-top:8px" data-cursor="hover">
-            <span>Bewerbung absenden</span> <span class="dc-arrow">→</span>
+            <span>Abschicken</span> <span class="dc-arrow">→</span>
           </button>
         </form>
       </div>
@@ -1216,9 +1130,9 @@
 
   <!-- ── ACT 10 · CLOSING ───────────────────────────────────── -->
   <section class="closing" data-screen-label="10 Closing">
-    <p class="closing-tagline reveal"><span class="grad">Konfidentiell. Kuratiert. Auf Einladung.</span></p>
+    <p class="closing-tagline reveal"><span class="grad">Gute Leute. Echte Themen. Lange Abende.</span></p>
     <div class="closing-glyph reveal">
-      <span class="h-line"></span><span>Estd. MMXXVI</span><span class="h-line"></span>
+      <span class="h-line"></span><span>Schloss Wiespach · Salzburg</span><span class="h-line"></span>
     </div>
   </section>
 
@@ -1231,20 +1145,18 @@
             <span id="foot-mark"></span>
             <span class="word">Deal Circle Salzburg</span>
           </div>
-          <div class="tag">Konfidentiell. Kuratiert. Auf Einladung.</div>
-          <div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.24em;color:var(--gold-trace);text-transform:uppercase">Estd. MMXXVI · Schloss Wiespach</div>
+          <div class="tag">Ein Netzwerktreffen mit guten Leuten und Speakern. In Salzburg.</div>
+          <div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.24em;color:var(--gold-trace);text-transform:uppercase">Schloss Wiespach · Oberalm</div>
         </div>
         <div class="foot-col">
-          <h5>Format</h5>
+          <h5>Abend</h5>
           <a href="#format" data-cursor="hover">Ablauf</a>
-          <a href="#abende" data-cursor="hover">Kalender</a>
           <a href="#ort" data-cursor="hover">Ort</a>
         </div>
         <div class="foot-col">
-          <h5>Members</h5>
-          <a href="#members" data-cursor="hover">Prinzipien</a>
-          <a href="#bewerbung" data-cursor="hover">Bewerbung</a>
-          <a href="#" data-cursor="hover">Member-Login</a>
+          <h5>Mitmachen</h5>
+          <a href="#members" data-cursor="hover">Wer kommt</a>
+          <a href="#bewerbung" data-cursor="hover">Hi sagen</a>
         </div>
         <div class="foot-col">
           <h5>Kontakt</h5>
@@ -1254,7 +1166,7 @@
         </div>
       </div>
       <div class="foot-fine">
-        <div>© MMXXVI Deal Circle Salzburg. Auf Einladung &amp; Bewerbung.</div>
+        <div>© 2026 Deal Circle Salzburg.</div>
         <div>Schloss Wiespach · Oberalm · AT</div>
       </div>
     </div>
@@ -1397,19 +1309,34 @@
     }, { threshold: 0.6 });
     document.querySelectorAll('[data-counter]').forEach((el) => counterIO.observe(el));
 
-    // ── Format track: vertical scroll → horizontal scroll ──
+    // ── Format track: drag-to-scroll (Maus), Trackpad swipt nativ.
+    // Wheel-Hijack ist absichtlich raus — das blockierte vertikales Scrollen.
     const track = document.getElementById('h-track');
-    const formatAct = document.querySelector('.format-act');
-    let trackBound = false;
-    function bindHorizontal() {
-      // simple wheel-to-x within the track when hovered
-      track.addEventListener('wheel', (e) => {
-        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-        track.scrollLeft += e.deltaY;
-        e.preventDefault();
-      }, { passive: false });
+    if (track) {
+      let isDown = false, startX = 0, startScroll = 0;
+      track.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch') return; // Touch nutzt natives Scrollen
+        isDown = true;
+        startX = e.clientX;
+        startScroll = track.scrollLeft;
+        track.style.cursor = 'grabbing';
+        track.setPointerCapture(e.pointerId);
+      });
+      track.addEventListener('pointermove', (e) => {
+        if (!isDown) return;
+        track.scrollLeft = startScroll - (e.clientX - startX);
+      });
+      const release = (e) => {
+        isDown = false;
+        track.style.cursor = '';
+        if (e?.pointerId !== undefined) {
+          try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+      };
+      track.addEventListener('pointerup', release);
+      track.addEventListener('pointercancel', release);
+      track.addEventListener('pointerleave', release);
     }
-    bindHorizontal();
 
     // ── Location stamp orbit text (SVG textPath would be nicer; CSS approximation) ──
     // already rotating via CSS
