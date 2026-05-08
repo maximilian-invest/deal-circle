@@ -183,6 +183,16 @@
       position: absolute; top: 76px; left: 0; right: 0;
       display: flex; justify-content: center; gap: 14px; align-items: center;
       opacity: 0; animation: rise 1s ease 1.2s forwards;
+      flex-wrap: wrap;
+      padding: 0 24px;
+    }
+    /* Mobile: Hero-Corners weg (überlappen sonst die Meta-Zeile),
+       Meta unter die Topbar schieben */
+    @media (max-width: 720px) {
+      .hero-corner { display: none; }
+      .hero-meta { top: 72px; gap: 10px; }
+      .hero-meta span { font-size: 9px; }
+      .hero { padding-top: 110px; }
     }
     .hero-meta .dot { width: 4px; height: 4px; background: rgba(255,255,255,0.4); transform: rotate(45deg); }
     .hero-meta span { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
@@ -426,6 +436,29 @@
       color: rgba(255,255,255,0.5); text-transform: uppercase;
     }
     .h-cue .h-line { flex: 0 0 60px; height: 1px; background: rgba(255,255,255,0.3); }
+    .h-cue .arrow {
+      display: inline-block; color: var(--gold-trace); font-size: 14px;
+      animation: cue-arrow 1.6s ease-in-out infinite;
+    }
+    @keyframes cue-arrow {
+      0%, 100% { transform: translateX(0); opacity: 0.6; }
+      50%      { transform: translateX(8px); opacity: 1; }
+    }
+    /* Mobile: Cards schmaler + Cue-Hint größer + Edge-Fade als Hinweis */
+    @media (max-width: 720px) {
+      .h-track { padding: 0 22px; gap: 18px; }
+      .h-card  { flex: 0 0 84vw; min-height: 480px; padding: 36px 28px; }
+      .h-card h3 { font-size: 36px; margin: 12px 0 18px; }
+      .h-card .roman { font-size: 52px; margin-bottom: 18px; }
+      .h-cue { padding: 22px 22px 0; font-size: 11px; gap: 12px; }
+      .h-cue .h-line { flex: 0 0 32px; }
+      .h-track-wrap { position: relative; }
+      .h-track-wrap::after {
+        content: ''; position: absolute; top: 0; right: 0; bottom: 0;
+        width: 60px; pointer-events: none;
+        background: linear-gradient(90deg, rgba(5,6,8,0) 0%, rgba(5,6,8,0.95) 100%);
+      }
+    }
 
     /* ── ACT 5 · QUOTE on IVORY (LIGHT SECTION!) ────────────── */
     .quote-light {
@@ -1113,7 +1146,12 @@
           <div class="duration">offen · bis spät</div>
         </div>
       </div>
-      <div class="wrap h-cue"><span class="h-line"></span><span>Seitlich scrollen → · 16:00 bis spät</span></div>
+      <div class="wrap h-cue">
+        <span class="h-line"></span>
+        <span>Wisch nach rechts</span>
+        <span class="arrow">→</span>
+        <span>weitere Slots</span>
+      </div>
     </div>
   </section>
 
