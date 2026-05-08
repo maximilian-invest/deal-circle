@@ -790,8 +790,8 @@
       .foot-fine { flex-direction: column; gap: 14px; align-items: flex-start; }
     }
 
-    /* ── ACT 3 · DICE (CSS-3D-Cube · scroll-driven rotation) ───── */
-    .dice-act {
+    /* ── ACT 3 · HOURGLASS (scroll-scrubbed video) ─────────────── */
+    .hourglass-act {
       position: relative;
       background: #050608;
       padding: 180px 0 160px;
@@ -800,7 +800,7 @@
       border-top: 1px solid var(--hairline);
       border-bottom: 1px solid var(--hairline);
     }
-    .dice-act::before {
+    .hourglass-act::before {
       content: '';
       position: absolute; inset: 0;
       background:
@@ -809,79 +809,57 @@
       pointer-events: none;
       z-index: 0;
     }
-    .dice-act::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.4) 50%, transparent 51%),
-        radial-gradient(1px 1px at 28% 62%, rgba(255,255,255,0.25) 50%, transparent 51%),
-        radial-gradient(1px 1px at 46% 31%, rgba(255,255,255,0.5) 50%, transparent 51%),
-        radial-gradient(1px 1px at 67% 84%, rgba(255,200,150,0.4) 50%, transparent 51%),
-        radial-gradient(1px 1px at 82% 26%, rgba(180,160,220,0.4) 50%, transparent 51%),
-        radial-gradient(1px 1px at 91% 55%, rgba(255,255,255,0.35) 50%, transparent 51%);
-      background-size: 200px 200px;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.7;
-    }
-    .dice-act .wrap { position: relative; z-index: 2; }
-    .dice-eyebrow {
+    .hourglass-act .wrap { position: relative; z-index: 2; }
+
+    .hourglass-eyebrow {
       display: inline-flex; align-items: center; gap: 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px; letter-spacing: 0.3em; color: rgba(255,255,255,0.5);
-      text-transform: uppercase; margin-bottom: 64px;
+      text-transform: uppercase; margin-bottom: 56px;
     }
-    .dice-eyebrow::before, .dice-eyebrow::after {
+    .hourglass-eyebrow::before, .hourglass-eyebrow::after {
       content: ''; width: 32px; height: 1px; background: rgba(255,255,255,0.3);
     }
 
-    .dice-stage {
-      perspective: 1400px;
-      width: clamp(220px, 32vw, 380px);
-      margin: 0 auto;
+    .hourglass-stage {
       position: relative;
+      width: clamp(220px, 30vw, 360px);
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
     }
-    .dice-pivot {
+    .hourglass-video {
       width: 100%;
-      transform-style: preserve-3d;
-      will-change: transform;
-      transform: rotateX(-6deg) rotateY(8deg);
-      transition: transform 0s linear;
-    }
-    .dice-image {
-      width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: contain;
       display: block;
+      background: #050608;
       will-change: transform, filter;
-      animation: dice-float 9s ease-in-out infinite;
       filter:
         drop-shadow(0 30px 60px rgba(0, 0, 0, 0.7))
-        drop-shadow(0 0 80px rgba(150, 100, 200, 0.18))
-        drop-shadow(0 0 40px rgba(220, 175, 110, 0.12));
-    }
-    @keyframes dice-float {
-      0%, 100% { transform: translateY(0)    rotateZ(-1.5deg); }
-      50%      { transform: translateY(-14px) rotateZ( 1.5deg); }
+        drop-shadow(0 0 80px rgba(170, 130, 210, 0.16))
+        drop-shadow(0 0 50px rgba(220, 170, 110, 0.10));
+      /* feathered edges so video-BG nahtlos in section-BG übergeht */
+      -webkit-mask: radial-gradient(circle at 50% 50%, #000 65%, transparent 96%);
+              mask: radial-gradient(circle at 50% 50%, #000 65%, transparent 96%);
     }
 
-    .dice-tag {
+    .hourglass-tag {
       margin-top: 80px;
       font-family: 'Cormorant Garamond', serif;
       font-style: italic; font-weight: 300;
       font-size: clamp(20px, 2.2vw, 30px);
       color: rgba(255,255,255,0.78);
-      max-width: 28ch; margin-left: auto; margin-right: auto;
+      max-width: 32ch; margin-left: auto; margin-right: auto;
       line-height: 1.4;
     }
-    .dice-tag .gold { color: var(--gold-trace); }
+    .hourglass-tag .gold { color: var(--gold-trace); }
 
     @media (max-width: 720px) {
-      .dice-act { padding: 120px 0 100px; }
-      .dice-stage { width: clamp(180px, 60vw, 260px); }
+      .hourglass-act { padding: 120px 0 100px; }
+      .hourglass-stage { width: clamp(180px, 60vw, 260px); }
     }
-
     @media (prefers-reduced-motion: reduce) {
-      .dice-image { animation: none; }
+      .hourglass-video { filter: drop-shadow(0 18px 40px rgba(0,0,0,0.6)); }
     }
 
     /* generic reveal helpers */
@@ -1043,21 +1021,22 @@
     </div>
   </section>
 
-  <!-- ── ACT 3 · DICE (scroll-driven 3D-Cube) ───────────────── -->
-  <section class="dice-act" data-screen-label="03 Würfel">
+  <!-- ── ACT 3 · HOURGLASS (scroll-scrubbed video) ──────────── -->
+  <section class="hourglass-act" data-screen-label="03 Sanduhr">
     <div class="wrap">
-      <span class="dice-eyebrow">Manchmal</span>
-      <div class="dice-stage">
-        <div class="dice-pivot" id="dice-pivot">
-          <picture>
-            <source srcset="./brand/assets/dice.webp" type="image/webp">
-            <img src="./brand/assets/dice.png" alt="" class="dice-image" width="720" height="720" loading="lazy" decoding="async">
-          </picture>
-        </div>
+      <span class="hourglass-eyebrow">Während der Sand fällt</span>
+      <div class="hourglass-stage">
+        <video class="hourglass-video" id="hourglass-video"
+               playsinline muted preload="auto" disablepictureinpicture
+               aria-hidden="true">
+          <source src="./brand/assets/hourglass.webm" type="video/webm">
+          <source src="./brand/assets/hourglass.mp4"  type="video/mp4">
+        </video>
       </div>
-      <p class="dice-tag">
-        Manchmal entscheidet der Wurf.<br>
-        <span class="gold">Meistens</span> die richtige Runde am Tisch.
+      <p class="hourglass-tag">
+        Drei Stunden am Tisch.<br>
+        Genug für ein Geschäft. <span class="gold">Mehr als genug</span>
+        für ein Gespräch.
       </p>
     </div>
   </section>
@@ -1517,61 +1496,61 @@
     syncAnchor();
     addEventListener('resize', syncAnchor);
 
-    // ── Wow · Würfel-Bild scroll-getrieben ──────────────────
-    // Tilt + sanfte Rotation + Mouse-Parallax. CSS-float läuft auf
-    // dem <img>, JS modifiziert nur den .dice-pivot wrapper, damit
-    // sich beide transforms addieren.
+    // ── Wow · Sanduhr-Video scroll-scrubbed ─────────────────
+    // currentTime des Videos wird an die Scroll-Position der Section
+    // gebunden. Browser ohne autoplay-Permission spielen das Video so
+    // trotzdem ab — wir kontrollieren jeden Frame manuell.
     (function () {
       const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const pivot = document.getElementById('dice-pivot');
-      const sec   = document.querySelector('.dice-act');
-      if (!pivot || !sec) return;
-      if (reduced) {
-        pivot.style.transform = 'rotateX(-6deg) rotateY(8deg)';
-        return;
-      }
+      const sec = document.querySelector('.hourglass-act');
+      const v   = document.getElementById('hourglass-video');
+      if (!sec || !v) return;
 
-      let scrollT = 0;
-      let mouseX = 0, mouseY = 0;
+      // iOS Safari: muss muted + playsinline + ein erfolgreicher .play()
+      // Aufruf um currentTime-Scrubbing zu erlauben.
+      v.muted = true;
+      v.playsInline = true;
+      let canScrub = false;
+      let duration = 0;
+
+      function arm() {
+        duration = (v.duration && isFinite(v.duration)) ? v.duration : 5;
+        // play().pause() um den Decoder anzuwerfen
+        v.play().then(() => v.pause()).catch(() => {});
+        canScrub = true;
+        update();
+      }
+      if (v.readyState >= 1 && v.duration) arm();
+      else v.addEventListener('loadedmetadata', arm, { once: true });
+
       let ticking = false;
-
-      function compose() {
-        // scrollT: Section-progress through viewport, -1 → +1
-        // mouse: -1 → +1 von der Section-Mitte aus
-        const ry = scrollT * 28 + mouseX * 6;        // ±28° Y-rotation
-        const rx = -6 + scrollT * -10 + mouseY * -4; // -16° → +4° X-tilt
-        const rz = scrollT * 6;                       // sanftes Z-roll
-        pivot.style.transform =
-          `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg)`;
-      }
-
-      function updateScroll() {
-        if (ticking) return;
+      function update() {
+        if (!canScrub || ticking) return;
         ticking = true;
         requestAnimationFrame(() => {
           const r = sec.getBoundingClientRect();
           const winH = innerHeight;
-          const center = r.top + r.height / 2;
-          scrollT = Math.max(-1, Math.min(1, (winH / 2 - center) / (winH * 0.6)));
-          compose();
+          // Progress: 0 wenn Section gerade unten reinkommt, 1 wenn raus oben.
+          const total = r.height + winH;
+          const passed = winH - r.top;
+          const t = Math.max(0, Math.min(1, passed / total));
+          // Kleines Easing damit es weniger linear-mechanisch wirkt
+          const eased = t < 0.5
+            ? 2 * t * t
+            : 1 - Math.pow(-2 * t + 2, 2) / 2;
+          try { v.currentTime = eased * duration; } catch (_) {}
           ticking = false;
         });
       }
 
-      function onMove(e) {
-        const r = sec.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > innerHeight) return;
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        mouseX = Math.max(-1, Math.min(1, (e.clientX - cx) / (innerWidth  / 2)));
-        mouseY = Math.max(-1, Math.min(1, (e.clientY - cy) / (innerHeight / 2)));
-        compose();
+      if (reduced) {
+        v.addEventListener('loadedmetadata', () => {
+          try { v.currentTime = (v.duration || 5) / 2; } catch (_) {}
+        }, { once: true });
+        return;
       }
-
-      addEventListener('scroll', updateScroll, { passive: true });
-      addEventListener('resize', updateScroll);
-      addEventListener('pointermove', onMove, { passive: true });
-      updateScroll();
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
     })();
 
     // ── Wow · Wolken parten beim Scrollen über die Quote ────
