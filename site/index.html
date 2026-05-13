@@ -137,8 +137,16 @@
     .topbar.on-light .dc-mark-img,
     .foot-mark .dc-mark-img { filter: invert(0.85) brightness(0.4) contrast(1.1); }
     .topbar.on-light .foot-mark .dc-mark-img { filter: none; }
+    /* Logo hat oben eine Flamme die optisch nach oben ragt — die
+       mathematische SVG-Mitte liegt unter der wahrgenommenen Mitte.
+       Kleiner Y-Offset + Margin-Top damit es neben dem Cinzel-Text
+       optisch zentriert sitzt. */
+    .topbar-mark .dc-mark-img,
+    .foot-mark .dc-mark-img {
+      transform: translateY(1px);
+    }
     .topbar-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px 56px; }
-    .topbar-mark { display: flex; align-items: center; gap: 14px; text-decoration: none; color: #fff; transition: color .4s ease; }
+    .topbar-mark { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; transition: color .4s ease; }
     .topbar-mark .name { font-family: 'Cinzel', serif; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; font-size: 13px; }
     .topbar-nav { display: flex; gap: 34px; align-items: center; }
     .topbar-nav a { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .25s ease; position: relative; }
@@ -1237,8 +1245,8 @@
 
   <script>
     // ── Marks ───────────────────────────────────────────────
-    document.getElementById('topbar-mark').innerHTML = window.DCMarkSVG(28);
-    document.getElementById('foot-mark').innerHTML   = window.DCMarkSVG(28);
+    document.getElementById('topbar-mark').innerHTML = window.DCMarkSVG(24);
+    document.getElementById('foot-mark').innerHTML   = window.DCMarkSVG(24);
     document.getElementById('intro-mark').innerHTML  = window.DCMarkSVG(220);
 
     // (Klasse mark-svg ist veraltet — Logo ist jetzt ein <img>,
