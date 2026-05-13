@@ -829,78 +829,6 @@
       .foot-fine { flex-direction: column; gap: 14px; align-items: flex-start; }
     }
 
-    /* ── ACT 3 · HOURGLASS (scroll-scrubbed video) ─────────────── */
-    .hourglass-act {
-      position: relative;
-      background: #050608;
-      padding: 180px 0 160px;
-      overflow: hidden;
-      text-align: center;
-      border-top: 1px solid var(--hairline);
-      border-bottom: 1px solid var(--hairline);
-    }
-    .hourglass-act::before {
-      content: '';
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 55% 45% at 50% 50%, rgba(170,130,210,0.10) 0%, transparent 65%),
-        radial-gradient(ellipse 70% 35% at 50% 80%, rgba(220,170,100,0.08) 0%, transparent 65%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .hourglass-act .wrap { position: relative; z-index: 2; }
-
-    .hourglass-eyebrow {
-      display: inline-flex; align-items: center; gap: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; letter-spacing: 0.3em; color: rgba(255,255,255,0.5);
-      text-transform: uppercase; margin-bottom: 56px;
-    }
-    .hourglass-eyebrow::before, .hourglass-eyebrow::after {
-      content: ''; width: 32px; height: 1px; background: rgba(255,255,255,0.3);
-    }
-
-    .hourglass-stage {
-      position: relative;
-      width: clamp(220px, 30vw, 360px);
-      margin: 0 auto;
-      aspect-ratio: 1 / 1;
-    }
-    .hourglass-video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      background: #050608;
-      will-change: transform, filter;
-      filter:
-        drop-shadow(0 30px 60px rgba(0, 0, 0, 0.7))
-        drop-shadow(0 0 80px rgba(170, 130, 210, 0.16))
-        drop-shadow(0 0 50px rgba(220, 170, 110, 0.10));
-      /* feathered edges so video-BG nahtlos in section-BG übergeht */
-      -webkit-mask: radial-gradient(circle at 50% 50%, #000 65%, transparent 96%);
-              mask: radial-gradient(circle at 50% 50%, #000 65%, transparent 96%);
-    }
-
-    .hourglass-tag {
-      margin-top: 80px;
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic; font-weight: 300;
-      font-size: clamp(20px, 2.2vw, 30px);
-      color: rgba(255,255,255,0.78);
-      max-width: 32ch; margin-left: auto; margin-right: auto;
-      line-height: 1.4;
-    }
-    .hourglass-tag .gold { color: var(--gold-trace); }
-
-    @media (max-width: 720px) {
-      .hourglass-act { padding: 120px 0 100px; }
-      .hourglass-stage { width: clamp(180px, 60vw, 260px); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .hourglass-video { filter: drop-shadow(0 18px 40px rgba(0,0,0,0.6)); }
-    }
-
     /* generic reveal helpers */
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s ease, transform .9s ease; }
     .reveal.in { opacity: 1; transform: translateY(0); }
@@ -1024,25 +952,6 @@
         <p>Mit Speaker aus der Runde, gutem Essen und genug Zeit, sich richtig zu unterhalten — am Tisch, beim Wein, im Gespräch.</p>
         <p>Mehr nicht.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- ── ACT 3 · HOURGLASS (scroll-scrubbed video) ──────────── -->
-  <section class="hourglass-act" data-screen-label="03 Sanduhr">
-    <div class="wrap">
-      <span class="hourglass-eyebrow">Während der Sand fällt</span>
-      <div class="hourglass-stage">
-        <video class="hourglass-video" id="hourglass-video"
-               playsinline muted preload="auto" disablepictureinpicture
-               aria-hidden="true">
-          <source src="./brand/assets/hourglass.webm" type="video/webm">
-          <source src="./brand/assets/hourglass.mp4"  type="video/mp4">
-        </video>
-      </div>
-      <p class="hourglass-tag">
-        Genug für ein Geschäft.<br>
-        <span class="gold">Mehr als genug</span> für ein Gespräch.
-      </p>
     </div>
   </section>
 
@@ -1453,63 +1362,6 @@
     }
 
     // ── Location stamp orbit text rotiert via CSS-animation ──
-
-    // ── Wow · Sanduhr-Video scroll-scrubbed ─────────────────
-    // currentTime des Videos wird an die Scroll-Position der Section
-    // gebunden. Browser ohne autoplay-Permission spielen das Video so
-    // trotzdem ab — wir kontrollieren jeden Frame manuell.
-    (function () {
-      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const sec = document.querySelector('.hourglass-act');
-      const v   = document.getElementById('hourglass-video');
-      if (!sec || !v) return;
-
-      // iOS Safari: muss muted + playsinline + ein erfolgreicher .play()
-      // Aufruf um currentTime-Scrubbing zu erlauben.
-      v.muted = true;
-      v.playsInline = true;
-      let canScrub = false;
-      let duration = 0;
-
-      function arm() {
-        duration = (v.duration && isFinite(v.duration)) ? v.duration : 5;
-        // play().pause() um den Decoder anzuwerfen
-        v.play().then(() => v.pause()).catch(() => {});
-        canScrub = true;
-        update();
-      }
-      if (v.readyState >= 1 && v.duration) arm();
-      else v.addEventListener('loadedmetadata', arm, { once: true });
-
-      let ticking = false;
-      function update() {
-        if (!canScrub || ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          const r = sec.getBoundingClientRect();
-          const winH = innerHeight;
-          // Progress: 0 wenn Section gerade unten reinkommt, 1 wenn raus oben.
-          const total = r.height + winH;
-          const passed = winH - r.top;
-          const t = Math.max(0, Math.min(1, passed / total));
-          // Kleines Easing damit es weniger linear-mechanisch wirkt
-          const eased = t < 0.5
-            ? 2 * t * t
-            : 1 - Math.pow(-2 * t + 2, 2) / 2;
-          try { v.currentTime = eased * duration; } catch (_) {}
-          ticking = false;
-        });
-      }
-
-      if (reduced) {
-        v.addEventListener('loadedmetadata', () => {
-          try { v.currentTime = (v.duration || 5) / 2; } catch (_) {}
-        }, { once: true });
-        return;
-      }
-      addEventListener('scroll', update, { passive: true });
-      addEventListener('resize', update);
-    })();
 
     // ── Wow · Wolken parten beim Scrollen über die Quote ────
     // (taste-skill: hardware-accel via transform/opacity, rAF-throttled,
