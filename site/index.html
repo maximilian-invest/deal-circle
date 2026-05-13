@@ -103,18 +103,6 @@
     .intro-skip:hover { background: rgba(255,255,255,0.1); }
     @keyframes fade-in { to { opacity: 1; } }
 
-    /* ── Pinned hourglass (scroll-driven) ───────────────────── */
-    .pin-stage {
-      position: fixed; pointer-events: none;
-      top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 160px; height: 160px;
-      z-index: 5;
-      opacity: 0;
-      transition: opacity .8s ease;
-    }
-    .pin-stage.active { opacity: 1; }
-    .pin-stage svg { width: 100%; height: 100%; }
-
     /* ── Top progress bar ───────────────────────────────────── */
     .scroll-bar {
       position: fixed; top: 0; left: 0; right: 0; height: 1px;
@@ -262,13 +250,6 @@
       50%      { transform: scaleY(0.3); transform-origin: top; opacity: 1; }
     }
     @keyframes rise { to { opacity: 1; transform: translateY(0); } }
-
-    /* The hero hourglass is the FIRST stage of the pinned scrub */
-    .hero-mark-anchor {
-      width: 130px; height: 130px;
-      margin: 0 auto 24px;
-      visibility: hidden; /* the pinned svg sits where this is */
-    }
 
     /* ── ACT 2 · Manifesto wipe (BIG TYPE on onyx) ──────────── */
     .manifesto {
@@ -953,39 +934,6 @@
   <!-- ── Scroll progress ────────────────────────────────────── -->
   <div class="scroll-bar" id="scroll-bar"></div>
 
-  <!-- ── Pinned hourglass overlay (scroll-driven) ───────────── -->
-  <div class="pin-stage" id="pin-stage">
-    <svg viewBox="0 0 200 200" id="pin-svg" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="silver-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"  stop-color="#FFFFFF"/>
-          <stop offset="60%" stop-color="#C8CDD3"/>
-          <stop offset="100%" stop-color="#7A8088"/>
-        </linearGradient>
-        <linearGradient id="gold-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"  stop-color="#D4C28A"/>
-          <stop offset="100%" stop-color="#8A7B4B"/>
-        </linearGradient>
-        <clipPath id="top-tri-pin"><polygon points="36,28 164,28 100,94"/></clipPath>
-        <clipPath id="bot-tri-pin"><polygon points="100,106 164,172 36,172"/></clipPath>
-      </defs>
-      <g id="pin-rotor" style="transform-origin: 100px 100px;">
-        <g fill="none" stroke="url(#silver-grad)" stroke-width="1" opacity="0.7">
-          <polygon points="36,28 164,28 100,94"/>
-          <polygon points="100,106 164,172 36,172"/>
-        </g>
-        <g clip-path="url(#top-tri-pin)">
-          <rect id="pin-top-fill" x="36" y="28" width="128" height="66" fill="url(#silver-grad)"/>
-        </g>
-        <g clip-path="url(#bot-tri-pin)">
-          <rect id="pin-bot-fill" x="36" y="172" width="128" height="0" fill="url(#silver-grad)" style="transform-origin: 100px 172px;"/>
-        </g>
-        <rect id="pin-stream" x="99" y="94" width="2" height="14" fill="#fff"/>
-        <rect x="92" y="98" width="16" height="4" fill="url(#gold-grad)"/>
-      </g>
-    </svg>
-  </div>
-
   <!-- ── Top bar ────────────────────────────────────────────── -->
   <header class="topbar" id="topbar">
     <div class="topbar-inner">
@@ -1018,7 +966,6 @@
     </div>
 
     <div class="wrap hero-inner">
-      <div class="hero-mark-anchor" id="hero-anchor"></div>
       <h1 class="hero-wordmark">
         <span class="word" data-word="Deal"></span>
         <span class="word" data-word="Circle"></span>
@@ -1426,46 +1373,6 @@
     addEventListener('scroll', updateScrollBar, { passive: true });
     updateScrollBar();
 
-    // ── PINNED HOURGLASS that scrubs with scroll ────────────
-    const pin = document.getElementById('pin-stage');
-    const pinRotor = document.getElementById('pin-rotor');
-    const pinTopFill = document.getElementById('pin-top-fill');
-    const pinBotFill = document.getElementById('pin-bot-fill');
-    const pinStream = document.getElementById('pin-stream');
-    const heroAnchor = document.getElementById('hero-anchor');
-
-    function updatePin() {
-      const anchorRect = heroAnchor.getBoundingClientRect();
-      const winH = innerHeight;
-      const docMax = document.documentElement.scrollHeight - winH;
-      const sy = scrollY;
-
-      // Only show inside the hero (anchored to the hero mark slot).
-      const heroRect = document.querySelector('.hero').getBoundingClientRect();
-      const inHero = heroRect.bottom > winH * 0.4;
-      pin.classList.toggle('active', inHero);
-
-      // Scrub rotation + drain only while in hero so the motion still feels alive.
-      const p = Math.max(0, Math.min(1, sy / docMax));
-      const turns = p * 0.5;
-      pinRotor.style.transform = `rotate(${turns * 360}deg)`;
-      const drain = Math.min(1, p * 1.4);
-      pinTopFill.setAttribute('transform', `translate(100 28) scale(1 ${1 - drain * 0.95}) translate(-100 -28)`);
-      pinBotFill.setAttribute('transform', `translate(100 172) scale(1 ${drain * 0.95}) translate(-100 -172)`);
-      pinStream.style.opacity = (drain > 0.02 && drain < 0.97) ? '1' : '0';
-
-      if (inHero && anchorRect.width > 0) {
-        const cx = anchorRect.left + anchorRect.width / 2;
-        const cy = anchorRect.top + anchorRect.height / 2;
-        pin.style.left = '0';
-        pin.style.top = '0';
-        pin.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
-      }
-    }
-    addEventListener('scroll', updatePin, { passive: true });
-    addEventListener('resize', updatePin);
-    updatePin();
-
     // ── IntersectionObserver-based reveals ──────────────────
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('in'); });
@@ -1521,19 +1428,7 @@
       track.addEventListener('pointerleave', release);
     }
 
-    // ── Location stamp orbit text (SVG textPath would be nicer; CSS approximation) ──
-    // already rotating via CSS
-
-    // ── Hero anchor sizing for pin alignment ────────────────
-    function syncAnchor() {
-      // Compact: max 160 px, scaled with viewport so es auf einem 13" MacBook
-      // ohne Scrollen ins Viewport passt.
-      const w = Math.min(160, innerWidth * 0.22, innerHeight * 0.22);
-      heroAnchor.style.width = heroAnchor.style.height = w + 'px';
-      pin.style.width = pin.style.height = w + 'px';
-    }
-    syncAnchor();
-    addEventListener('resize', syncAnchor);
+    // ── Location stamp orbit text rotiert via CSS-animation ──
 
     // ── Wow · Sanduhr-Video scroll-scrubbed ─────────────────
     // currentTime des Videos wird an die Scroll-Position der Section
