@@ -189,6 +189,29 @@
 
     .hero-inner { position: relative; z-index: 4; text-align: center; }
 
+    .hero-mark {
+      width: clamp(108px, 13vw, 170px);
+      height: auto;
+      display: block;
+      margin: 0 auto 28px;
+      opacity: 0;
+      filter: drop-shadow(0 6px 28px rgba(220, 220, 230, 0.10));
+      animation:
+        hero-mark-in 1.4s cubic-bezier(.7,0,.2,1) 0.4s forwards,
+        hero-mark-float 8s ease-in-out 2.5s infinite;
+    }
+    @keyframes hero-mark-in {
+      from { opacity: 0; transform: translateY(-12px) scale(0.94); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes hero-mark-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+    @media (max-width: 720px) {
+      .hero-mark { margin-bottom: 20px; }
+    }
+
     /* Massive split wordmark — letters animate in from above/below */
     .hero-wordmark {
       font-family: 'Cinzel', serif; font-weight: 500;
@@ -906,7 +929,7 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
       .reveal, .reveal-stagger > *, .manifesto .word-line span,
-      .hero-corner, .hero-meta, .hero-wordmark .letter, .hero-tagline,
+      .hero-corner, .hero-meta, .hero-mark, .hero-wordmark .letter, .hero-tagline,
       .hero-actions, .hero-cta-line, .hero-scroll-cue {
         opacity: 1 !important;
         transform: none !important;
@@ -966,6 +989,7 @@
     </div>
 
     <div class="wrap hero-inner">
+      <img class="hero-mark" src="./brand/logo-mark.svg" alt="Deal Circle Salzburg" width="170" height="175" loading="eager" decoding="async">
       <h1 class="hero-wordmark">
         <span class="word" data-word="Deal"></span>
         <span class="word" data-word="Circle"></span>
