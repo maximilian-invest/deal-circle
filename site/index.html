@@ -144,9 +144,11 @@
     .topbar.on-light .topbar-mark, .topbar.on-light .topbar-mark .name { color: var(--ink); }
     .topbar.on-light .topbar-nav a { color: rgba(10,11,13,0.65); }
     .topbar.on-light .topbar-nav a:hover { color: var(--ink); }
-    .topbar.on-light .topbar-mark .mark-svg path,
-    .topbar.on-light .topbar-mark .mark-svg polygon,
-    .topbar.on-light .topbar-mark .mark-svg rect { fill: var(--ink) !important; stroke: var(--ink) !important; }
+    /* Logo-Mark Helper-Klasse: silbergrau auf Dunkel, invertiert auf Hell */
+    .dc-mark-img { transition: filter .4s ease; }
+    .topbar.on-light .dc-mark-img,
+    .foot-mark .dc-mark-img { filter: invert(0.85) brightness(0.4) contrast(1.1); }
+    .topbar.on-light .foot-mark .dc-mark-img { filter: none; }
     .topbar-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px 56px; }
     .topbar-mark { display: flex; align-items: center; gap: 14px; text-decoration: none; color: #fff; transition: color .4s ease; }
     .topbar-mark .name { font-family: 'Cinzel', serif; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; font-size: 13px; }
@@ -1355,12 +1357,12 @@
 
   <script>
     // ── Marks ───────────────────────────────────────────────
-    document.getElementById('topbar-mark').innerHTML = window.DCMarkSVG(22, '#FFFFFF');
-    document.getElementById('foot-mark').innerHTML   = window.DCMarkSVG(22, '#FFFFFF');
-    document.getElementById('intro-mark').innerHTML  = window.DCMarkSVG(220, '#FFFFFF');
+    document.getElementById('topbar-mark').innerHTML = window.DCMarkSVG(28);
+    document.getElementById('foot-mark').innerHTML   = window.DCMarkSVG(28);
+    document.getElementById('intro-mark').innerHTML  = window.DCMarkSVG(220);
 
-    // mark elements get class for color-flip on light topbar
-    document.querySelector('#topbar-mark svg')?.classList.add('mark-svg');
+    // (Klasse mark-svg ist veraltet — Logo ist jetzt ein <img>,
+    // Color-Inversion läuft über .dc-mark-img CSS.)
 
     // ── Letter-by-letter hero wordmark ──────────────────────
     document.querySelectorAll('.hero-wordmark .word').forEach((w, wi) => {
