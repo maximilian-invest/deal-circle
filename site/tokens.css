@@ -48,9 +48,9 @@
   --space-12:256px;
 
   /* Typography · Font Stacks */
-  --font-display:  'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
-  --font-body:     'Geist', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
-  --font-mono:     'Geist Mono', 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  --font-display:  'Space Grotesk', 'Inter Tight', system-ui, sans-serif;
+  --font-body:     'Inter Tight', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+  --font-mono:     'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Type Scale · clamp(mobile, fluid, desktop) */
   --t-xs:    clamp(10px, 0.7vw, 11px);

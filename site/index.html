@@ -11,7 +11,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="./tokens.css" />
 
@@ -40,9 +40,9 @@
       --space-4:  16px;  --space-5:  24px;  --space-6:  32px;
       --space-7:  48px;  --space-8:  64px;  --space-9:  96px;
       --space-10:128px;  --space-11:192px;  --space-12:256px;
-      --font-display: 'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
-      --font-body:    'Geist', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
-      --font-mono:    'Geist Mono', 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+      --font-display: 'Space Grotesk', 'Inter Tight', 'Helvetica Now Display', system-ui, sans-serif;
+      --font-body:    'Inter Tight', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
       --t-xs:    clamp(10px, 0.7vw, 11px);
       --t-sm:    clamp(12px, 0.85vw, 13px);
       --t-base:  clamp(15px, 1vw, 16px);
@@ -84,7 +84,7 @@
     body {
       background: var(--c-bg-primary, #0A0B0F);
       color: var(--c-text-primary, #F4F2EC);
-      font-family: var(--font-body, 'Geist', system-ui, sans-serif);
+      font-family: var(--font-body, 'Inter Tight', system-ui, sans-serif);
       font-weight: 400;
       font-size: var(--t-base, 16px);
       line-height: var(--lh-base, 1.6);
@@ -213,13 +213,13 @@
     }
     .topbar-mark .word {
       font-family: var(--font-display);
-      font-weight: 400;
-      font-style: italic;
-      font-size: var(--t-md);
-      letter-spacing: var(--track-snug);
+      font-weight: 600;
+      font-size: var(--t-sm);
+      letter-spacing: var(--track-widest);
+      text-transform: uppercase;
       color: var(--c-text-primary);
     }
-    .topbar-mark .word .accent { color: var(--c-accent); font-style: normal; padding: 0 2px; }
+    .topbar-mark .word .accent { color: var(--c-accent); padding: 0 4px; }
     .topbar-cta { font-size: var(--t-xs); padding: var(--space-2) var(--space-4); }
     @media (max-width: 480px) {
       .topbar-mark .word { display: none; }
@@ -264,25 +264,25 @@
 
     .hero-title {
       font-family: var(--font-display);
-      font-weight: 300;
+      font-weight: 700;
       font-size: var(--t-hero);
-      line-height: 0.94;
-      letter-spacing: var(--track-tight);
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
       color: var(--c-text-primary);
-      max-width: 12ch;
+      max-width: 11ch;
     }
-    .hero-title .it { font-style: italic; color: var(--c-accent); }
+    .hero-title .it { color: var(--c-accent); font-style: normal; }
     .hero-title span { display: inline-block; }
 
     .hero-sub {
       margin-top: var(--space-6);
-      font-family: var(--font-display);
-      font-style: italic;
-      font-weight: 300;
-      font-size: var(--t-lg);
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: var(--t-md);
       line-height: var(--lh-snug);
       color: var(--c-text-secondary);
-      max-width: 34ch;
+      max-width: 42ch;
     }
     .hero-actions {
       margin-top: var(--space-7);
@@ -325,17 +325,17 @@
     }
     .section-title {
       font-family: var(--font-display);
-      font-weight: 300;
+      font-weight: 600;
       font-size: var(--t-2xl);
-      line-height: var(--lh-tight);
-      letter-spacing: var(--track-snug);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
       max-width: 18ch;
     }
-    .section-title .it { font-style: italic; color: var(--c-accent); }
+    .section-title .it { color: var(--c-accent); font-style: normal; }
     .section-lede {
-      font-family: var(--font-display);
-      font-style: italic;
-      font-weight: 300;
+      font-family: var(--font-body);
+      font-weight: 400;
       font-size: var(--t-md);
       line-height: var(--lh-snug);
       color: var(--c-text-secondary);
@@ -348,15 +348,15 @@
     }
     .manifest-text {
       font-family: var(--font-display);
-      font-style: italic;
-      font-weight: 300;
-      font-size: var(--t-xl);
-      line-height: var(--lh-snug);
-      letter-spacing: var(--track-snug);
+      font-weight: 600;
+      font-size: var(--t-2xl);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
       color: var(--c-text-primary);
-      max-width: 24ch;
+      max-width: 18ch;
     }
-    .manifest-text .accent { color: var(--c-accent); font-style: normal; }
+    .manifest-text .accent { color: var(--c-accent); }
     .manifest-side {
       margin-top: var(--space-6);
       max-width: 38ch;
@@ -402,16 +402,17 @@
     }
     .schedule-body h3 {
       font-family: var(--font-display);
-      font-weight: 400;
-      font-size: var(--t-lg);
-      letter-spacing: var(--track-snug);
+      font-weight: 600;
+      font-size: var(--t-md);
+      letter-spacing: var(--track-wide);
+      text-transform: uppercase;
       margin-bottom: var(--space-2);
     }
     .schedule-body h3 .speaker {
-      font-style: italic;
-      font-weight: 300;
+      font-weight: 400;
       color: var(--c-text-secondary);
-      font-size: var(--t-md);
+      font-size: var(--t-sm);
+      letter-spacing: var(--track-wide);
     }
     .schedule-body p {
       color: var(--c-text-secondary);
@@ -464,9 +465,10 @@
       border: 1px solid var(--c-accent);
       color: var(--c-accent);
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-display);
-      font-style: italic;
-      font-size: var(--t-sm);
+      font-family: var(--font-mono);
+      font-size: var(--t-xs);
+      letter-spacing: var(--track-wide);
+      text-transform: uppercase;
       animation: rot 30s linear infinite;
     }
     @keyframes rot {
@@ -474,13 +476,14 @@
     }
     .venue-text h3 {
       font-family: var(--font-display);
-      font-weight: 300;
+      font-weight: 600;
       font-size: var(--t-2xl);
-      line-height: var(--lh-tight);
-      letter-spacing: var(--track-snug);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
       margin-bottom: var(--space-5);
     }
-    .venue-text h3 .it { font-style: italic; color: var(--c-accent); }
+    .venue-text h3 .it { color: var(--c-accent); }
     .venue-text p {
       color: var(--c-text-secondary);
       line-height: var(--lh-loose);
@@ -530,9 +533,10 @@
     }
     .principle h4 {
       font-family: var(--font-display);
-      font-weight: 400;
-      font-size: var(--t-xl);
-      letter-spacing: var(--track-snug);
+      font-weight: 600;
+      font-size: var(--t-lg);
+      letter-spacing: var(--track-wide);
+      text-transform: uppercase;
       margin-bottom: var(--space-3);
     }
     .principle p {
@@ -612,10 +616,11 @@
     }
     .closing-text {
       font-family: var(--font-display);
-      font-style: italic;
-      font-weight: 300;
+      font-weight: 600;
       font-size: var(--t-2xl);
-      line-height: var(--lh-tight);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
       max-width: 22ch;
       margin: 0 auto;
     }
@@ -645,8 +650,10 @@
     .foot-brand {
       display: flex; align-items: center; gap: var(--space-3);
       font-family: var(--font-display);
-      font-style: italic;
-      font-size: var(--t-md);
+      font-weight: 600;
+      font-size: var(--t-sm);
+      letter-spacing: var(--track-widest);
+      text-transform: uppercase;
       color: var(--c-text-primary);
     }
     .foot-brand img { width: 24px; height: 24px; }
@@ -699,7 +706,7 @@
     <div class="wrap">
       <a class="topbar-mark" href="#top">
         <img src="./brand/assets/dc-logo.png" alt="" />
-        <span class="word">Deal<span class="accent">·</span>Circle</span>
+        <span class="word">Deal Circle <span class="accent">/</span> Salzburg</span>
       </a>
       <a class="btn btn--ghost topbar-cta" href="#hisagen">
         <span>Hi sagen</span>
@@ -943,7 +950,7 @@
       <div>
         <div class="foot-brand">
           <img src="./brand/assets/dc-logo.png" alt="" />
-          <span>Deal<span style="color:var(--c-accent); font-style:normal; padding:0 2px">·</span>Circle Salzburg</span>
+          <span>Deal Circle <span style="color:var(--c-accent); padding:0 4px">/</span> Salzburg</span>
         </div>
         <p style="margin-top: var(--space-3); color: var(--c-text-secondary); font-size: var(--t-sm); max-width: 36ch;">
           Ein Netzwerktreffen mit guten Leuten und Speakern. In Salzburg.
