@@ -1,0 +1,123 @@
+/* ============================================================
+   Deal Circle Salzburg — Design Tokens (Release 05)
+   Aesthetik: Japanese Ma (Negative Space) × Art Deco (Gold Accent)
+   Skill-Quelle: designer-skills / design-tokens
+   Mobile-first · Dark mode default · Light mode prepared
+   ============================================================ */
+
+:root {
+  /* Color · Background */
+  --c-bg-primary:    #0A0B0F;   /* deep onyx mit subtilem navy-hint */
+  --c-bg-secondary:  #11141B;   /* card / elevated surface */
+  --c-bg-tertiary:   #1A1E27;   /* input wells, hover bg */
+  --c-bg-inverse:    #F4F2EC;   /* warm bone, light sections */
+
+  /* Color · Text */
+  --c-text-primary:    rgba(244, 242, 236, 1);
+  --c-text-secondary:  rgba(244, 242, 236, 0.68);
+  --c-text-tertiary:   rgba(244, 242, 236, 0.42);
+  --c-text-inverse:    rgba(10, 11, 15, 0.9);
+
+  /* Color · Border / Rules */
+  --c-border:          rgba(244, 242, 236, 0.10);
+  --c-border-soft:     rgba(244, 242, 236, 0.06);
+  --c-border-strong:   rgba(244, 242, 236, 0.22);
+  --c-border-focus:    rgba(201, 169, 97, 0.6);
+
+  /* Color · Accent (Art Deco Gold) */
+  --c-accent:          #C9A961;
+  --c-accent-soft:     rgba(201, 169, 97, 0.18);
+  --c-accent-hover:    #DEC082;
+  --c-accent-deep:     #8C7430;
+
+  /* Color · Sondermarker (sehr sparsam) */
+  --c-burgundy:        #5C1A1B;
+
+  /* Spacing Scale · 4 px base, generous Ma-style steps */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10:128px;
+  --space-11:192px;
+  --space-12:256px;
+
+  /* Typography · Font Stacks */
+  --font-display:  'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
+  --font-body:     'Geist', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+  --font-mono:     'Geist Mono', 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Type Scale · clamp(mobile, fluid, desktop) */
+  --t-xs:    clamp(10px, 0.7vw, 11px);
+  --t-sm:    clamp(12px, 0.85vw, 13px);
+  --t-base:  clamp(15px, 1vw, 16px);
+  --t-md:    clamp(17px, 1.25vw, 19px);
+  --t-lg:    clamp(20px, 1.6vw, 24px);
+  --t-xl:    clamp(26px, 2.4vw, 36px);
+  --t-2xl:   clamp(36px, 4.2vw, 64px);
+  --t-3xl:   clamp(48px, 7vw, 104px);
+  --t-hero:  clamp(60px, 10vw, 152px);
+
+  /* Tracking */
+  --track-tight:   -0.02em;
+  --track-snug:    -0.01em;
+  --track-normal:   0;
+  --track-wide:     0.04em;
+  --track-wider:    0.12em;
+  --track-widest:   0.28em;
+
+  /* Line-Heights */
+  --lh-none:    1.0;
+  --lh-tight:   1.12;
+  --lh-snug:    1.3;
+  --lh-base:    1.6;
+  --lh-loose:   1.85;
+
+  /* Motion · easing + duration */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft:     cubic-bezier(0.4, 0.0, 0.2, 1);
+  --dur-fast:      180ms;
+  --dur-base:      320ms;
+  --dur-slow:      640ms;
+  --dur-cinema:    1200ms;
+
+  /* Layout */
+  --w-prose:       60ch;
+  --w-content:     1200px;
+  --w-wide:        1480px;
+
+  /* Border-Radius (Ma: minimal, fast 0) */
+  --r-sm:    2px;
+  --r-md:    4px;
+  --r-full:  9999px;
+}
+
+/* Light-Mode override (für spätere quote-Sections) */
+[data-theme="light"] {
+  --c-bg-primary:    #F4F2EC;
+  --c-bg-secondary:  #ECE9E0;
+  --c-bg-tertiary:   #E0DCD0;
+  --c-bg-inverse:    #0A0B0F;
+  --c-text-primary:  rgba(10, 11, 15, 0.92);
+  --c-text-secondary:rgba(10, 11, 15, 0.62);
+  --c-text-tertiary: rgba(10, 11, 15, 0.40);
+  --c-text-inverse:  rgba(244, 242, 236, 0.95);
+  --c-border:        rgba(10, 11, 15, 0.12);
+  --c-border-soft:   rgba(10, 11, 15, 0.06);
+  --c-border-strong: rgba(10, 11, 15, 0.22);
+}
+
+/* Reduzierte Motion respektieren */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast:   0.01ms;
+    --dur-base:   0.01ms;
+    --dur-slow:   0.01ms;
+    --dur-cinema: 0.01ms;
+  }
+}
