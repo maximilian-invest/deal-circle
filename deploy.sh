@@ -12,7 +12,8 @@ set -euo pipefail
 HOST="srhomes-vps"
 TARGET="/var/www/deal-circle"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SITE_DIR="$SCRIPT_DIR/site"
+NEXT_DIR="$SCRIPT_DIR/site"
+SITE_DIR="$NEXT_DIR/out"   # statisches Next.js export
 
 # --- Argumente ---------------------------------------------------------------
 YES=0
@@ -27,11 +28,17 @@ for arg in "$@"; do
   esac
 done
 
+# --- Build (Next.js static export) ------------------------------------------
+if [[ ! -d "$SITE_DIR" || -z "$(ls -A "$SITE_DIR" 2>/dev/null)" ]]; then
+  echo "→ kein out/ vorhanden — baue Next.js …"
+  (cd "$NEXT_DIR" && npm install --no-audit --no-fund --loglevel=warn && npm run build) || { echo "FEHLER: build fehlgeschlagen"; exit 1; }
+fi
+
 # --- Validierung -------------------------------------------------------------
-[[ -d "$SITE_DIR" ]]        || { echo "FEHLER: $SITE_DIR fehlt"; exit 1; }
-[[ -d "$SITE_DIR/brand" ]]  || { echo "FEHLER: $SITE_DIR/brand fehlt"; exit 1; }
-command -v rsync >/dev/null || { echo "FEHLER: rsync nicht installiert"; exit 1; }
-command -v ssh   >/dev/null || { echo "FEHLER: ssh nicht installiert";   exit 1; }
+[[ -d "$SITE_DIR" ]]            || { echo "FEHLER: $SITE_DIR fehlt"; exit 1; }
+[[ -f "$SITE_DIR/index.html" ]] || { echo "FEHLER: $SITE_DIR/index.html fehlt — build defekt?"; exit 1; }
+command -v rsync >/dev/null     || { echo "FEHLER: rsync nicht installiert"; exit 1; }
+command -v ssh   >/dev/null     || { echo "FEHLER: ssh nicht installiert";   exit 1; }
 
 # --- Banner ------------------------------------------------------------------
 cat <<EOF
