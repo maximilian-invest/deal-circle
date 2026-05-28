@@ -203,6 +203,7 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
 .dc-nav-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-ink); text-decoration: none; }
+.dc-nav-logo { display: block; height: 28px; width: auto; flex: 0 0 auto; }
 .dc-nav-wordmark { font-family: var(--font-display); font-weight: 500; font-size: 19px; letter-spacing: -0.9px; }
 .dc-nav-tag { font: var(--type-caption); letter-spacing: var(--tracking-caption); color: var(--color-ink-muted); margin-left: 2px; }
 .dc-nav-links { display: flex; gap: 26px; align-items: center; }

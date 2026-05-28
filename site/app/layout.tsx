@@ -22,7 +22,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mona+Sans:wght@400;500;600;700&display=swap"
         />
-        <link rel="icon" type="image/svg+xml" href="/assets/logo-mark.svg" />
+        <link rel="icon" type="image/svg+xml" href="/assets/logo-dc-white.svg" />
       </head>
       <body>{children}</body>
     </html>

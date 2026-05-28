@@ -11,10 +11,14 @@ export default function Nav() {
     >
       <div className="dc-nav-inner">
         <a href="#top" className="dc-nav-brand" aria-label="DealCircle Salzburg">
-          <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true">
-            <circle cx="20" cy="20" r="14" fill="none" stroke="#fff" strokeWidth="2.4" />
-            <circle cx="20" cy="20" r="4.2" fill="#fff" />
-          </svg>
+          <img
+            src="/assets/logo-dc-white.svg"
+            alt=""
+            width={36}
+            height={29}
+            className="dc-nav-logo"
+            aria-hidden="true"
+          />
           <span className="dc-nav-wordmark">DealCircle</span>
           <span className="dc-nav-tag">Salzburg</span>
         </a>
