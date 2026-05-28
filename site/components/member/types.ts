@@ -42,4 +42,24 @@ export type TabKey =
   | "mitglieder"
   | "notizen"
   | "profil"
-  | "verwaltung";
+  | "verwaltung"
+  | "events-admin";
+
+export type EventStatusApi = "open" | "limited" | "waitlist" | "closed";
+
+export type EventDto = {
+  id: number;
+  title: string;
+  starts_at: string;
+  time_label: string;
+  location: string;
+  status: EventStatusApi;
+  fee_cents: number;
+  max_attendees: number | null;
+  confirmed_count: number;
+  description: string | null;
+  speaker: string | null;
+  photo_count: number;
+  created_at: string;
+  updated_at: string | null;
+};

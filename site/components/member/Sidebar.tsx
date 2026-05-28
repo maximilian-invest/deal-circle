@@ -34,7 +34,8 @@ const ACCOUNT: Item[] = [
 ];
 
 const ADMIN: Item[] = [
-  { id: "verwaltung", label: "Mitglieder verwalten", icon: "shield" },
+  { id: "events-admin", label: "Events verwalten",    icon: "cal" },
+  { id: "verwaltung",   label: "Mitglieder verwalten", icon: "shield" },
 ];
 
 type Props = {

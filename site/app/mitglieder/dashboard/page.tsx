@@ -9,36 +9,46 @@ import Gallery from "../../../components/member/Gallery";
 import PastEvents from "../../../components/member/PastEvents";
 import EventModal from "../../../components/member/EventModal";
 import MembersAdmin from "../../../components/member/MembersAdmin";
+import EventsAdmin from "../../../components/member/EventsAdmin";
 import { fetchMe, type AuthUser } from "../../../components/member/auth";
-import { buildDemoData } from "../../../components/member/demoData";
-import type { TabKey, UpcomingEvent } from "../../../components/member/types";
+import {
+  isPast, listEvents, toNextEventShape, toPastShape, toUpcomingShape,
+} from "../../../components/member/events";
+import type { Album, EventDto, StatItem, TabKey, UpcomingEvent } from "../../../components/member/types";
 
 const TITLES: Record<TabKey, string> = {
-  uebersicht: "",
-  events:     "Anstehende Treffen.",
-  galerie:    "Bildergalerie.",
-  mitglieder: "Mitglieder.",
-  notizen:    "Aus dem Kreis.",
-  profil:     "Ihr Profil.",
-  verwaltung: "Mitglieder verwalten.",
+  uebersicht:    "",
+  events:        "Anstehende Treffen.",
+  galerie:       "Bildergalerie.",
+  mitglieder:    "Mitglieder.",
+  notizen:       "Aus dem Kreis.",
+  profil:        "Ihr Profil.",
+  verwaltung:    "Mitglieder verwalten.",
+  "events-admin": "Events verwalten.",
 };
 
 const SUBS: Record<TabKey, string> = {
-  uebersicht: "Was als nächstes ansteht, was war, und was Sie nicht verpassen sollten.",
-  events:     "Alle anstehenden Treffen und Anmeldungen auf einen Blick.",
-  galerie:    "Bilder aus den vergangenen Treffen — geteilt nur unter Mitgliedern.",
-  mitglieder: "Wer dabei ist. Profile sichtbar nur im Kreis.",
-  notizen:    "Notizen, Decks und Materialien aus dem Kreis.",
-  profil:     "Ihre Stammdaten, Rechnungen und Mitgliedschaft.",
-  verwaltung: "Mitglieder-Accounts anlegen, Rollen ändern, Zugänge zurücksetzen.",
+  uebersicht:    "Was als nächstes ansteht, was war, und was Sie nicht verpassen sollten.",
+  events:        "Alle anstehenden Treffen und Anmeldungen auf einen Blick.",
+  galerie:       "Bilder aus den vergangenen Treffen — geteilt nur unter Mitgliedern.",
+  mitglieder:    "Wer dabei ist. Profile sichtbar nur im Kreis.",
+  notizen:       "Notizen, Decks und Materialien aus dem Kreis.",
+  profil:        "Ihre Stammdaten, Rechnungen und Mitgliedschaft.",
+  verwaltung:    "Mitglieder-Accounts anlegen, Rollen ändern, Zugänge zurücksetzen.",
+  "events-admin": "Events anlegen, bearbeiten und löschen.",
 };
+
+const ALBUM_TONES = ["violet", "magenta", "orange", "coral", "dusk"] as const;
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null | "loading">("loading");
   const [active, setActive] = useState<TabKey>("uebersicht");
   const [modalEvent, setModalEvent] = useState<UpcomingEvent | null>(null);
+  const [events, setEvents] = useState<EventDto[] | null>(null);
+  const [eventsError, setEventsError] = useState<string | null>(null);
 
+  // Auth check
   useEffect(() => {
     let cancelled = false;
     fetchMe().then((u) => {
@@ -52,7 +62,59 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, [router]);
 
-  const data = useMemo(() => buildDemoData(), []);
+  // Events laden, sobald authed
+  useEffect(() => {
+    if (user === "loading" || user === null) return;
+    let cancelled = false;
+    listEvents()
+      .then((list) => { if (!cancelled) setEvents(list); })
+      .catch((err) => { if (!cancelled) setEventsError(err instanceof Error ? err.message : "Events nicht ladbar."); });
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // Wenn ein Event neu angelegt wurde (per EventsAdmin), aktualisieren wir die Liste,
+  // sobald der User zurueck auf einen Anzeige-Tab wechselt.
+  useEffect(() => {
+    if (active === "events-admin") return;
+    if (user === "loading" || user === null) return;
+    listEvents().then(setEvents).catch(() => {});
+  }, [active, user]);
+
+  const derived = useMemo(() => {
+    if (!events) return null;
+    const now = Date.now();
+    const upcoming = events.filter((e) => !isPast(e, now)).map(toUpcomingShape);
+    const past = events.filter((e) => isPast(e, now))
+      .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())
+      .map(toPastShape);
+
+    const firstUpcoming = events
+      .filter((e) => !isPast(e, now))
+      .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0];
+
+    const nextEvent = firstUpcoming ? toNextEventShape(firstUpcoming) : null;
+
+    const visited = events.filter((e) => isPast(e, now)).length;
+    const stats: StatItem[] = [
+      { label: "Treffen besucht",   value: String(visited),                    note: visited > 0 ? "Stand heute" : "noch keines" },
+      { label: "Nächste Anmeldung", value: nextEvent ? "offen" : "—",          note: firstUpcoming?.title ?? "Kein Treffen geplant" },
+      { label: "Offene Beiträge",   value: "€ 0",                              note: "alle Zahlungen aktuell" },
+    ];
+
+    // Album-Platzhalter aus den letzten 5 vergangenen Events ableiten
+    const albums: Album[] = events
+      .filter((e) => isPast(e, now))
+      .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())
+      .slice(0, 5)
+      .map((e, i) => ({
+        title: e.title,
+        meta: new Date(e.starts_at).toLocaleDateString("de-AT", { day: "numeric", month: "long", year: "numeric" }),
+        count: e.photo_count,
+        tone: ALBUM_TONES[i % ALBUM_TONES.length],
+      }));
+
+    return { upcoming, past, nextEvent, stats, albums };
+  }, [events]);
 
   if (user === "loading" || user === null) {
     return (
@@ -64,9 +126,10 @@ export default function DashboardPage() {
     );
   }
 
-  // If non-admin user lands on verwaltung (shouldn't happen via UI, but defensive)
   const safeActive: TabKey =
-    active === "verwaltung" && user.role !== "admin" ? "uebersicht" : active;
+    (active === "verwaltung" || active === "events-admin") && user.role !== "admin"
+      ? "uebersicht"
+      : active;
 
   const firstName = (user.name || "").split(/\s+/)[0] || "Mitglied";
   const headerTitle = safeActive === "uebersicht" ? `Guten Abend, ${firstName}.` : TITLES[safeActive];
@@ -96,69 +159,110 @@ export default function DashboardPage() {
           </div>
         </header>
 
+        {eventsError && (
+          <div className="mb-admin-alert mb-admin-alert--error" style={{ margin: 0 }}>
+            {eventsError}
+          </div>
+        )}
+
         {safeActive === "uebersicht" && (
           <>
-            <NextEvent event={data.nextEvent} onSignup={() => setModalEvent(data.upcoming[0])} />
-            <Stats items={data.stats} />
+            {derived?.nextEvent ? (
+              <NextEvent
+                event={derived.nextEvent}
+                onSignup={() => derived.upcoming[0] && setModalEvent(derived.upcoming[0])}
+              />
+            ) : (
+              <section className="mb-section" style={{ background: "var(--color-surface-1)", padding: "40px", borderRadius: "var(--r-xxl)", textAlign: "center" }}>
+                <p className="dc-body-lg" style={{ color: "var(--color-ink-muted)", margin: 0 }}>
+                  Kein anstehendes Treffen geplant. Das nächste Datum wird hier sichtbar, sobald es feststeht.
+                </p>
+              </section>
+            )}
 
-            <section className="mb-section">
-              <div className="mb-section-head">
-                <h2 className="mb-section-title">Bald auf Schloss Wiespach.</h2>
-                <a className="mb-section-link" href="#events"
-                   onClick={(e) => { e.preventDefault(); setActive("events"); }}>
-                  Alle Events
-                </a>
-              </div>
-              <UpcomingEvents events={data.upcoming.slice(0, 4)} onSignup={(e) => setModalEvent(e)} />
-            </section>
+            {derived?.stats && <Stats items={derived.stats} />}
 
-            <section className="mb-section">
-              <div className="mb-section-head">
-                <h2 className="mb-section-title">Aus den letzten Abenden.</h2>
-                <a className="mb-section-link" href="#galerie"
-                   onClick={(e) => { e.preventDefault(); setActive("galerie"); }}>
-                  Zur Galerie
-                </a>
-              </div>
-              <Gallery albums={data.albums.slice(0, 5)} />
-            </section>
+            {derived?.upcoming && derived.upcoming.length > 0 && (
+              <section className="mb-section">
+                <div className="mb-section-head">
+                  <h2 className="mb-section-title">Bald auf Schloss Wiespach.</h2>
+                  <a className="mb-section-link" href="#events"
+                     onClick={(e) => { e.preventDefault(); setActive("events"); }}>
+                    Alle Events
+                  </a>
+                </div>
+                <UpcomingEvents events={derived.upcoming.slice(0, 4)} onSignup={(e) => setModalEvent(e)} />
+              </section>
+            )}
 
-            <section className="mb-section">
-              <div className="mb-section-head">
-                <h2 className="mb-section-title">Vergangene Treffen.</h2>
-                <a className="mb-section-link" href="#notizen"
-                   onClick={(e) => { e.preventDefault(); setActive("notizen"); }}>
-                  Notizen & Materialien
-                </a>
-              </div>
-              <PastEvents events={data.past.slice(0, 5)} />
-            </section>
+            {derived?.albums && derived.albums.length > 0 && (
+              <section className="mb-section">
+                <div className="mb-section-head">
+                  <h2 className="mb-section-title">Aus den letzten Abenden.</h2>
+                  <a className="mb-section-link" href="#galerie"
+                     onClick={(e) => { e.preventDefault(); setActive("galerie"); }}>
+                    Zur Galerie
+                  </a>
+                </div>
+                <Gallery albums={derived.albums} />
+              </section>
+            )}
+
+            {derived?.past && derived.past.length > 0 && (
+              <section className="mb-section">
+                <div className="mb-section-head">
+                  <h2 className="mb-section-title">Vergangene Treffen.</h2>
+                  <a className="mb-section-link" href="#notizen"
+                     onClick={(e) => { e.preventDefault(); setActive("notizen"); }}>
+                    Notizen & Materialien
+                  </a>
+                </div>
+                <PastEvents events={derived.past.slice(0, 5)} />
+              </section>
+            )}
           </>
         )}
 
         {safeActive === "events" && (
           <>
-            <NextEvent event={data.nextEvent} onSignup={() => setModalEvent(data.upcoming[0])} />
+            {derived?.nextEvent && (
+              <NextEvent
+                event={derived.nextEvent}
+                onSignup={() => derived.upcoming[0] && setModalEvent(derived.upcoming[0])}
+              />
+            )}
             <section className="mb-section">
               <div className="mb-section-head">
                 <h2 className="mb-section-title">Alle anstehenden Treffen.</h2>
               </div>
-              <UpcomingEvents events={data.upcoming} onSignup={(e) => setModalEvent(e)} />
+              {derived?.upcoming && derived.upcoming.length > 0 ? (
+                <UpcomingEvents events={derived.upcoming} onSignup={(e) => setModalEvent(e)} />
+              ) : (
+                <div className="mb-admin-empty">Aktuell sind keine Treffen geplant.</div>
+              )}
             </section>
           </>
         )}
 
         {safeActive === "galerie" && (
           <>
-            <section className="mb-section">
-              <Gallery albums={data.albums} />
-            </section>
-            <section className="mb-section">
-              <div className="mb-section-head">
-                <h2 className="mb-section-title">Alle Alben.</h2>
-              </div>
-              <PastEvents events={data.past} />
-            </section>
+            {derived?.albums && derived.albums.length > 0 ? (
+              <section className="mb-section">
+                <Gallery albums={derived.albums} />
+              </section>
+            ) : (
+              <section className="mb-section">
+                <div className="mb-admin-empty">Noch keine Galerie verfügbar.</div>
+              </section>
+            )}
+            {derived?.past && derived.past.length > 0 && (
+              <section className="mb-section">
+                <div className="mb-section-head">
+                  <h2 className="mb-section-title">Alle Alben.</h2>
+                </div>
+                <PastEvents events={derived.past} />
+              </section>
+            )}
           </>
         )}
 
@@ -196,6 +300,10 @@ export default function DashboardPage() {
 
         {safeActive === "verwaltung" && user.role === "admin" && (
           <MembersAdmin currentUserEmail={user.email} />
+        )}
+
+        {safeActive === "events-admin" && user.role === "admin" && (
+          <EventsAdmin />
         )}
       </main>
 

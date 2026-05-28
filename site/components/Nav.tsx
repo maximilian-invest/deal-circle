@@ -20,7 +20,6 @@ export default function Nav() {
             aria-hidden="true"
           />
           <span className="dc-nav-wordmark">DealCircle</span>
-          <span className="dc-nav-tag">Salzburg</span>
         </a>
         <nav className="dc-nav-links" aria-label="Hauptnavigation">
           <a href="#konzept">Konzept</a>
