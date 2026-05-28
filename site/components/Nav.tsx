@@ -32,6 +32,7 @@ export default function Nav() {
           <a href="#faq">FAQ</a>
         </nav>
         <div className="dc-nav-cta">
+          <a href="/mitglieder/login" className="dc-btn dc-btn-secondary">Login</a>
           <a href="#kontakt" className="dc-btn dc-btn-primary">Mitglied werden</a>
         </div>
       </div>
