@@ -8,7 +8,8 @@ import UpcomingEvents from "../../../components/member/UpcomingEvents";
 import Gallery from "../../../components/member/Gallery";
 import PastEvents from "../../../components/member/PastEvents";
 import EventModal from "../../../components/member/EventModal";
-import { getAuth, type AuthState } from "../../../components/member/auth";
+import MembersAdmin from "../../../components/member/MembersAdmin";
+import { fetchMe, type AuthUser } from "../../../components/member/auth";
 import { buildDemoData } from "../../../components/member/demoData";
 import type { TabKey, UpcomingEvent } from "../../../components/member/types";
 
@@ -19,6 +20,7 @@ const TITLES: Record<TabKey, string> = {
   mitglieder: "Mitglieder.",
   notizen:    "Aus dem Kreis.",
   profil:     "Ihr Profil.",
+  verwaltung: "Mitglieder verwalten.",
 };
 
 const SUBS: Record<TabKey, string> = {
@@ -28,58 +30,63 @@ const SUBS: Record<TabKey, string> = {
   mitglieder: "Wer dabei ist. Profile sichtbar nur im Kreis.",
   notizen:    "Notizen, Decks und Materialien aus dem Kreis.",
   profil:     "Ihre Stammdaten, Rechnungen und Mitgliedschaft.",
+  verwaltung: "Mitglieder-Accounts anlegen, Rollen ändern, Zugänge zurücksetzen.",
 };
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [auth, setAuth] = useState<AuthState | null | "loading">("loading");
+  const [user, setUser] = useState<AuthUser | null | "loading">("loading");
   const [active, setActive] = useState<TabKey>("uebersicht");
   const [modalEvent, setModalEvent] = useState<UpcomingEvent | null>(null);
 
   useEffect(() => {
-    const a = getAuth();
-    if (!a) {
-      router.replace("/mitglieder/login");
-      return;
-    }
-    setAuth(a);
+    let cancelled = false;
+    fetchMe().then((u) => {
+      if (cancelled) return;
+      if (!u) {
+        router.replace("/mitglieder/login/");
+        return;
+      }
+      setUser(u);
+    });
+    return () => { cancelled = true; };
   }, [router]);
 
   const data = useMemo(() => buildDemoData(), []);
 
-  if (auth === "loading" || auth === null) {
+  if (user === "loading" || user === null) {
     return (
       <div className="mb-shell" style={{ gridTemplateColumns: "1fr", placeItems: "center" }}>
-        <div style={{ color: "var(--color-ink-muted)", padding: 80 }}>Mitgliederbereich wird geladen …</div>
+        <div style={{ color: "var(--color-ink-muted)", padding: 80 }}>
+          Mitgliederbereich wird geladen …
+        </div>
       </div>
     );
   }
 
-  const firstName = (auth.email.split("@")[0] || "").split(/[.\-_]/)[0] || "Mitglied";
-  const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-  const headerTitle = active === "uebersicht" ? `Guten Abend, ${displayName}.` : TITLES[active];
+  // If non-admin user lands on verwaltung (shouldn't happen via UI, but defensive)
+  const safeActive: TabKey =
+    active === "verwaltung" && user.role !== "admin" ? "uebersicht" : active;
+
+  const firstName = (user.name || "").split(/\s+/)[0] || "Mitglied";
+  const headerTitle = safeActive === "uebersicht" ? `Guten Abend, ${firstName}.` : TITLES[safeActive];
 
   return (
     <div className="mb-shell">
-      <Sidebar active={active} setActive={setActive} auth={auth} />
+      <Sidebar active={safeActive} setActive={setActive} user={user} />
       <main className="mb-main">
         <header className="mb-main-header">
           <div className="mb-main-header-left">
             <h1 className="mb-main-header-title">{headerTitle}</h1>
-            <p className="mb-main-header-sub">{SUBS[active]}</p>
+            <p className="mb-main-header-sub">{SUBS[safeActive]}</p>
           </div>
           <div className="mb-main-header-actions">
             <div className="mb-search">
               <svg
                 className="mb-search-icon"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                width="14" height="14" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" strokeWidth="1.8"
+                strokeLinecap="round" strokeLinejoin="round"
               >
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -89,7 +96,7 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {active === "uebersicht" && (
+        {safeActive === "uebersicht" && (
           <>
             <NextEvent event={data.nextEvent} onSignup={() => setModalEvent(data.upcoming[0])} />
             <Stats items={data.stats} />
@@ -97,11 +104,8 @@ export default function DashboardPage() {
             <section className="mb-section">
               <div className="mb-section-head">
                 <h2 className="mb-section-title">Bald auf Schloss Wiespach.</h2>
-                <a
-                  className="mb-section-link"
-                  href="#events"
-                  onClick={(e) => { e.preventDefault(); setActive("events"); }}
-                >
+                <a className="mb-section-link" href="#events"
+                   onClick={(e) => { e.preventDefault(); setActive("events"); }}>
                   Alle Events
                 </a>
               </div>
@@ -111,11 +115,8 @@ export default function DashboardPage() {
             <section className="mb-section">
               <div className="mb-section-head">
                 <h2 className="mb-section-title">Aus den letzten Abenden.</h2>
-                <a
-                  className="mb-section-link"
-                  href="#galerie"
-                  onClick={(e) => { e.preventDefault(); setActive("galerie"); }}
-                >
+                <a className="mb-section-link" href="#galerie"
+                   onClick={(e) => { e.preventDefault(); setActive("galerie"); }}>
                   Zur Galerie
                 </a>
               </div>
@@ -125,11 +126,8 @@ export default function DashboardPage() {
             <section className="mb-section">
               <div className="mb-section-head">
                 <h2 className="mb-section-title">Vergangene Treffen.</h2>
-                <a
-                  className="mb-section-link"
-                  href="#notizen"
-                  onClick={(e) => { e.preventDefault(); setActive("notizen"); }}
-                >
+                <a className="mb-section-link" href="#notizen"
+                   onClick={(e) => { e.preventDefault(); setActive("notizen"); }}>
                   Notizen & Materialien
                 </a>
               </div>
@@ -138,7 +136,7 @@ export default function DashboardPage() {
           </>
         )}
 
-        {active === "events" && (
+        {safeActive === "events" && (
           <>
             <NextEvent event={data.nextEvent} onSignup={() => setModalEvent(data.upcoming[0])} />
             <section className="mb-section">
@@ -150,7 +148,7 @@ export default function DashboardPage() {
           </>
         )}
 
-        {active === "galerie" && (
+        {safeActive === "galerie" && (
           <>
             <section className="mb-section">
               <Gallery albums={data.albums} />
@@ -164,7 +162,7 @@ export default function DashboardPage() {
           </>
         )}
 
-        {active === "mitglieder" && (
+        {safeActive === "mitglieder" && (
           <section className="mb-section">
             <div style={{ padding: "60px 0", textAlign: "center", color: "var(--color-ink-muted)" }}>
               <p className="dc-body-lg" style={{ maxWidth: 480, margin: "0 auto" }}>
@@ -175,7 +173,7 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {active === "notizen" && (
+        {safeActive === "notizen" && (
           <section className="mb-section">
             <div style={{ padding: "60px 0", textAlign: "center", color: "var(--color-ink-muted)" }}>
               <p className="dc-body-lg" style={{ maxWidth: 480, margin: "0 auto" }}>
@@ -186,7 +184,7 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {active === "profil" && (
+        {safeActive === "profil" && (
           <section className="mb-section">
             <div style={{ padding: "60px 0", textAlign: "center", color: "var(--color-ink-muted)" }}>
               <p className="dc-body-lg" style={{ maxWidth: 480, margin: "0 auto" }}>
@@ -194,6 +192,10 @@ export default function DashboardPage() {
               </p>
             </div>
           </section>
+        )}
+
+        {safeActive === "verwaltung" && user.role === "admin" && (
+          <MembersAdmin currentUserEmail={user.email} />
         )}
       </main>
 

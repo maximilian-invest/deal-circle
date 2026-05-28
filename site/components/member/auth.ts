@@ -1,27 +1,33 @@
 "use client";
+import { api, clearToken, setToken } from "./api";
 
-const KEY = "dc-auth";
+export type Role = "admin" | "member";
 
-export type AuthState = { email: string; ts: number };
+export type AuthUser = {
+  email: string;
+  name: string;
+  role: Role;
+};
 
-export function signIn(email: string): void {
-  if (typeof window === "undefined") return;
-  const state: AuthState = { email, ts: Date.now() };
-  window.sessionStorage.setItem(KEY, JSON.stringify(state));
+export async function login(email: string, password: string): Promise<AuthUser> {
+  const data = await api<{ token: string; user: AuthUser }>("/auth/login", {
+    method: "POST",
+    body: { email, password },
+    auth: false,
+  });
+  setToken(data.token);
+  return data.user;
 }
 
-export function signOut(): void {
-  if (typeof window === "undefined") return;
-  window.sessionStorage.removeItem(KEY);
-}
-
-export function getAuth(): AuthState | null {
-  if (typeof window === "undefined") return null;
-  const raw = window.sessionStorage.getItem(KEY);
-  if (!raw) return null;
+export async function fetchMe(): Promise<AuthUser | null> {
   try {
-    return JSON.parse(raw) as AuthState;
+    const data = await api<{ user: AuthUser }>("/auth/me");
+    return data.user;
   } catch {
     return null;
   }
+}
+
+export function logout(): void {
+  clearToken();
 }

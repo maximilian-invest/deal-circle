@@ -2,32 +2,33 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { signIn } from "../../../components/member/auth";
+import { login } from "../../../components/member/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [remember, setRemember] = useState(false);
-  const [submitting, setSubmitting] = useState<"none" | "form" | "magic">("none");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setSubmitting("form");
-    signIn(email.trim());
-    setTimeout(() => router.push("/mitglieder/dashboard"), 600);
-  };
+    setError(null);
 
-  const onMagic = () => {
-    if (!email.trim()) {
-      const input = document.getElementById("email") as HTMLInputElement | null;
-      input?.focus();
+    if (!email.trim() || !pwd) {
+      setError("Bitte E-Mail und Passwort angeben.");
       return;
     }
-    setSubmitting("magic");
-    signIn(email.trim());
-    setTimeout(() => router.push("/mitglieder/dashboard"), 800);
+
+    setSubmitting(true);
+    try {
+      await login(email.trim(), pwd);
+      router.push("/mitglieder/dashboard/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Anmeldung fehlgeschlagen.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -82,8 +83,8 @@ export default function LoginPage() {
           </span>
           <h2 className="mb-login-title">Anmelden.</h2>
           <p className="mb-login-sub">
-            Mit Ihren Zugangsdaten oder per Magic Link an Ihre hinterlegte
-            E-Mail-Adresse.
+            Mit Ihren persönlichen Zugangsdaten. Bei Problemen wenden Sie sich
+            bitte an die Organisation.
           </p>
 
           <form className="mb-login-form-fields" onSubmit={onSubmit} noValidate>
@@ -96,6 +97,7 @@ export default function LoginPage() {
                 placeholder="ihre@adresse.at"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={submitting}
                 required
               />
             </div>
@@ -108,6 +110,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 value={pwd}
                 onChange={(e) => setPwd(e.target.value)}
+                disabled={submitting}
                 required
               />
             </div>
@@ -125,26 +128,17 @@ export default function LoginPage() {
               <a href="#" onClick={(e) => e.preventDefault()}>Passwort vergessen?</a>
             </div>
 
+            {error && <div className="mb-login-error" role="alert">{error}</div>}
+
             <button
               type="submit"
               className="dc-btn dc-btn-primary dc-btn--lg mb-login-cta"
               style={{ marginTop: 22 }}
-              disabled={submitting !== "none"}
+              disabled={submitting}
             >
-              {submitting === "form" ? "Anmelden …" : "Anmelden"}
+              {submitting ? "Anmelden …" : "Anmelden"}
             </button>
           </form>
-
-          <div className="mb-login-divider">oder</div>
-
-          <button
-            type="button"
-            className="dc-btn dc-btn-secondary dc-btn--lg mb-login-cta"
-            onClick={onMagic}
-            disabled={submitting !== "none"}
-          >
-            {submitting === "magic" ? "Link gesendet ✓" : "Magic Link senden"}
-          </button>
 
           <p className="mb-login-foot">
             Noch kein Mitglied? <a href="/#kontakt">Auf Empfehlung beitreten →</a>

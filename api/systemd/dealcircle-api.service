@@ -1,0 +1,37 @@
+[Unit]
+Description=DealCircle API (Auth + Admin)
+After=network.target
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=dealcircle
+Group=dealcircle
+WorkingDirectory=/opt/dealcircle-api
+ExecStart=/usr/bin/node /opt/dealcircle-api/server.js
+EnvironmentFile=/etc/dealcircle-api.env
+Restart=always
+RestartSec=3
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/dealcircle-api
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dealcircle-api
+
+[Install]
+WantedBy=multi-user.target

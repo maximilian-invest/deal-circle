@@ -35,4 +35,11 @@ export type PastEventItem = {
   attendees: number;
 };
 
-export type TabKey = "uebersicht" | "events" | "galerie" | "mitglieder" | "notizen" | "profil";
+export type TabKey =
+  | "uebersicht"
+  | "events"
+  | "galerie"
+  | "mitglieder"
+  | "notizen"
+  | "profil"
+  | "verwaltung";
