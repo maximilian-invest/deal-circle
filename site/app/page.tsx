@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import Konzept from "@/components/Konzept";
 import Format from "@/components/Format";
 import Rhythmus from "@/components/Rhythmus";
+import Eindruecke from "@/components/Eindruecke";
 import Mitglieder from "@/components/Mitglieder";
 import Team from "@/components/Team";
 import Werte from "@/components/Werte";
@@ -20,6 +21,7 @@ export default function Home() {
         <Konzept />
         <Format />
         <Rhythmus />
+        <Eindruecke />
         <Mitglieder />
         <Team />
         <Werte />

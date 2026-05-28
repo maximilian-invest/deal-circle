@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { logout, type AuthUser } from "./auth";
 import type { TabKey } from "./types";
 
@@ -45,7 +46,24 @@ type Props = {
 };
 
 export default function Sidebar({ active, setActive, user }: Props) {
+  const [open, setOpen] = useState(false);
   const isAdmin = user.role === "admin";
+
+  // Drawer schließt sich, wenn ein Tab gewechselt wird
+  useEffect(() => { setOpen(false); }, [active]);
+
+  // Body-Scroll lock + Escape-to-close, solange offen
+  useEffect(() => {
+    if (!open) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   const initials = (user.name || user.email)
     .split(/\s+|@|[.\-_]/)
@@ -77,50 +95,104 @@ export default function Sidebar({ active, setActive, user }: Props) {
     </nav>
   );
 
+  const activeLabel =
+    [...MAIN, ...ACCOUNT, ...ADMIN].find((i) => i.id === active)?.label ?? "Mitgliederbereich";
+
   return (
-    <aside className="mb-sidebar">
-      <a href="/" className="mb-sidebar-brand">
-        <img
-          src="/assets/logo-dc-white.svg"
-          alt=""
-          width={28}
-          height={22}
-          className="dc-nav-logo"
+    <>
+      {/* Mobile-Topbar: Brand + aktueller Tab + Hamburger */}
+      <header className="mb-mobile-topbar" role="banner">
+        <a href="/" className="mb-mobile-topbar-brand" aria-label="DealCircle Startseite">
+          <img
+            src="/assets/logo-dc-white.svg"
+            alt=""
+            width={26}
+            height={20}
+            className="dc-nav-logo"
+            aria-hidden="true"
+          />
+          <span className="mb-mobile-topbar-section">{activeLabel}</span>
+        </a>
+        <button
+          type="button"
+          className="mb-mobile-menu-btn"
+          onClick={() => setOpen(true)}
+          aria-label="Menü öffnen"
+          aria-expanded={open}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </header>
+
+      {/* Backdrop nur sichtbar wenn Drawer offen */}
+      {open && (
+        <div
+          className="mb-mobile-backdrop"
+          onClick={() => setOpen(false)}
           aria-hidden="true"
         />
-        <span className="mb-sidebar-brand-wordmark">DealCircle</span>
-        <span className="mb-sidebar-brand-tag">Salzburg</span>
-      </a>
-
-      <div>
-        <div className="mb-sidebar-section-label">Mitgliederbereich</div>
-        {renderNav(MAIN)}
-      </div>
-
-      <div>
-        <div className="mb-sidebar-section-label">Konto</div>
-        {renderNav(ACCOUNT)}
-      </div>
-
-      {isAdmin && (
-        <div>
-          <div className="mb-sidebar-section-label">Admin</div>
-          {renderNav(ADMIN)}
-        </div>
       )}
 
-      <div className="mb-sidebar-profile">
-        <div className="mb-sidebar-profile-avatar">{initials}</div>
-        <div className="mb-sidebar-profile-info">
-          <span className="mb-sidebar-profile-name">{user.name}</span>
-          <span className="mb-sidebar-profile-role">
-            {isAdmin ? "Administrator" : "Mitglied"}
-          </span>
-        </div>
-        <button className="mb-sidebar-profile-logout" title="Abmelden" onClick={onLogout}>
-          <Icon name="logout" />
+      <aside className={`mb-sidebar ${open ? "mb-sidebar--open" : ""}`} aria-label="Mitgliederbereich-Navigation">
+        <button
+          type="button"
+          className="mb-mobile-close-btn"
+          onClick={() => setOpen(false)}
+          aria-label="Menü schließen"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
-      </div>
-    </aside>
+
+        <a href="/" className="mb-sidebar-brand">
+          <img
+            src="/assets/logo-dc-white.svg"
+            alt=""
+            width={28}
+            height={22}
+            className="dc-nav-logo"
+            aria-hidden="true"
+          />
+          <span className="mb-sidebar-brand-wordmark">DealCircle</span>
+          <span className="mb-sidebar-brand-tag">Salzburg</span>
+        </a>
+
+        <div>
+          <div className="mb-sidebar-section-label">Mitgliederbereich</div>
+          {renderNav(MAIN)}
+        </div>
+
+        <div>
+          <div className="mb-sidebar-section-label">Konto</div>
+          {renderNav(ACCOUNT)}
+        </div>
+
+        {isAdmin && (
+          <div>
+            <div className="mb-sidebar-section-label">Admin</div>
+            {renderNav(ADMIN)}
+          </div>
+        )}
+
+        <div className="mb-sidebar-profile">
+          <div className="mb-sidebar-profile-avatar">{initials}</div>
+          <div className="mb-sidebar-profile-info">
+            <span className="mb-sidebar-profile-name">{user.name}</span>
+            <span className="mb-sidebar-profile-role">
+              {isAdmin ? "Administrator" : "Mitglied"}
+            </span>
+          </div>
+          <button className="mb-sidebar-profile-logout" title="Abmelden" onClick={onLogout}>
+            <Icon name="logout" />
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
