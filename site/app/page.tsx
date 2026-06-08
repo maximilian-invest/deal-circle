@@ -1,5 +1,6 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import NextEventBanner from "@/components/NextEventBanner";
 import Konzept from "@/components/Konzept";
 import Format from "@/components/Format";
 import Rhythmus from "@/components/Rhythmus";
@@ -18,6 +19,7 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
+        <NextEventBanner />
         <Konzept />
         <Format />
         <Rhythmus />
