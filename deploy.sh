@@ -2,9 +2,9 @@
 # ============================================================================
 #  Deal Circle — Deploy zu deal-circle.at
 #  Verwendung (lokal auf deinem Rechner, mit deinem SSH-Key):
-#      bash deal-circle/deploy.sh           # interaktiv (mit Bestätigung)
-#      bash deal-circle/deploy.sh --yes     # ohne Rückfrage
-#      bash deal-circle/deploy.sh --dry-run # nur zeigen, nichts pushen
+#      bash deploy.sh           # interaktiv (mit Bestätigung)
+#      bash deploy.sh --yes     # ohne Rückfrage
+#      bash deploy.sh --dry-run # nur zeigen, nichts pushen
 # ============================================================================
 set -euo pipefail
 

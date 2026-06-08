@@ -13,14 +13,14 @@
 #  Verwendung:
 #      bash <(curl -sL https://raw.githubusercontent.com/.../deploy-server.sh)
 #      ODER
-#      git clone … && bash deal-circle/deploy-server.sh
+#      git clone … && bash deploy-server.sh
 #
 #  Voraussetzungen: Node.js 20+, nginx, rsync, git, openssl
 # =============================================================================
 set -euo pipefail
 
-BRANCH="${BRANCH:-claude/find-landing-page-7JoBr}"
-REPO_URL="${REPO_URL:-https://github.com/maximilian-invest/Ultra-geheimer-Code-nicht-klicken-.git}"
+BRANCH="${BRANCH:-main}"
+REPO_URL="${REPO_URL:-https://github.com/maximilian-invest/deal-circle.git}"
 
 WEB_DIR="/var/www/deal-circle"
 API_DIR="/opt/dealcircle-api"
@@ -60,7 +60,7 @@ mkdir -p "$API_DIR"
 rsync -a --delete \
   --exclude 'node_modules' \
   --exclude 'data' \
-  "$TMP/src/deal-circle/api/" "$API_DIR/"
+  "$TMP/src/api/" "$API_DIR/"
 
 step "Backend-Dependencies (npm ci)"
 ( cd "$API_DIR" && npm install --omit=dev --no-audit --no-fund --loglevel=warn ) \
@@ -119,7 +119,7 @@ fi
 
 # ---------- Frontend bauen + deployen ----------
 step "Frontend bauen (Next.js Static Export)"
-( cd "$TMP/src/deal-circle/site" \
+( cd "$TMP/src/site" \
   && npm install --no-audit --no-fund --loglevel=warn >/dev/null 2>&1 \
   && npm run build >/dev/null 2>&1 ) \
   || die "Frontend-Build fehlgeschlagen"
@@ -133,7 +133,7 @@ if [ -d "$WEB_DIR" ]; then
 fi
 mkdir -p "$WEB_DIR"
 rsync -a --delete --exclude '.well-known/' \
-  "$TMP/src/deal-circle/site/out/" "$WEB_DIR/"
+  "$TMP/src/site/out/" "$WEB_DIR/"
 chown -R www-data:www-data "$WEB_DIR"
 ok "Static-Files synchronisiert"
 
