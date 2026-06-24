@@ -109,7 +109,7 @@ export default function DashboardPage() {
       .map((e, i) => ({
         title: e.title,
         meta: new Date(e.starts_at).toLocaleDateString("de-AT", { day: "numeric", month: "long", year: "numeric" }),
-        count: e.photo_count,
+        count: 0,
         tone: ALBUM_TONES[i % ALBUM_TONES.length],
       }));
 

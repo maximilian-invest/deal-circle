@@ -6,7 +6,6 @@ type PublicEvent = {
   id: number;
   title: string;
   starts_at: string;
-  time_label: string;
   location: string;
   status: string;
 };
@@ -49,6 +48,7 @@ export default function NextEventBanner() {
   const dateLabel = d.toLocaleDateString("de-AT", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
+  const timeLabel = d.toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" }) + " Uhr";
 
   return (
     <motion.section
@@ -72,7 +72,7 @@ export default function NextEventBanner() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3" y="5" width="18" height="16" rx="2" /><line x1="3" y1="10" x2="21" y2="10" /><line x1="8" y1="3" x2="8" y2="7" /><line x1="16" y1="3" x2="16" y2="7" />
               </svg>
-              {dateLabel} · {event.time_label}
+              {dateLabel} · {timeLabel}
             </span>
             <span className="dc-next-banner-meta-item">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

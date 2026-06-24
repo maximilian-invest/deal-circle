@@ -88,7 +88,7 @@ export default function NextEvent({ event, onSignup }: Props) {
           ))}
         </div>
         <div className="mb-next-status">
-          <span>{event.confirmed} / {event.attendees} bestätigt</span>
+          <span>{event.attendees > 0 ? `${event.attendees} Plätze` : "Plätze nach Vereinbarung"}</span>
           {event.userStatus === "paid" ? (
             <span className="mb-next-status-chip">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

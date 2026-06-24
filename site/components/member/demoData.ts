@@ -16,7 +16,6 @@ export function buildDemoData() {
     dateLabel: fmtDate(nextDate) + " · 18:30",
     location: "Schloss Wiespach, Hallein",
     attendees: 32,
-    confirmed: 24,
     userStatus: "open",
   };
 

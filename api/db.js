@@ -31,22 +31,53 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     starts_at TEXT NOT NULL,
-    time_label TEXT NOT NULL,
     location TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'limited', 'waitlist', 'closed')),
     fee_cents INTEGER NOT NULL DEFAULT 38000,
     max_attendees INTEGER,
-    confirmed_count INTEGER NOT NULL DEFAULT 0,
     description TEXT,
-    speaker TEXT,
-    photo_count INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT
   );
 
   CREATE INDEX IF NOT EXISTS idx_events_starts_at ON events (starts_at);
+
+  CREATE TABLE IF NOT EXISTS event_timeline (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    position INTEGER NOT NULL DEFAULT 0,
+    time_label TEXT NOT NULL,
+    label TEXT NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_timeline_event ON event_timeline (event_id, position);
+
+  CREATE TABLE IF NOT EXISTS event_speakers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    position INTEGER NOT NULL DEFAULT 0,
+    name TEXT NOT NULL,
+    bio TEXT,
+    photo_path TEXT
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_speakers_event ON event_speakers (event_id, position);
 `);
 
+// --- Migration: alte Spalten droppen (idempotent) -----------------------------
+function migrateEventsSchema() {
+  const cols = db.prepare("PRAGMA table_info(events)").all().map((c) => c.name);
+  const deprecated = ["time_label", "confirmed_count", "photo_count", "speaker"];
+  for (const col of deprecated) {
+    if (cols.includes(col)) {
+      console.log(`[migrate] events: drop column ${col}`);
+      db.exec(`ALTER TABLE events DROP COLUMN ${col}`);
+    }
+  }
+}
+migrateEventsSchema();
+
+// --- Bootstrap Admin ----------------------------------------------------------
 function bootstrapAdmin() {
   const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(ADMIN_EMAIL);
   if (existing) return;
@@ -58,88 +89,84 @@ function bootstrapAdmin() {
 
   console.log(`[bootstrap] admin angelegt: ${ADMIN_EMAIL}`);
 }
-
 bootstrapAdmin();
 
+// --- Bootstrap Sample-Events (nur bei leerer Tabelle) -------------------------
 function bootstrapEvents() {
   const count = db.prepare("SELECT COUNT(*) AS n FROM events").get().n;
   if (count > 0) return;
 
-  // Datumshilfe: relativ zu heute
-  const inDays = (n) => {
+  const inDays = (n, h = 18, m = 30) => {
     const d = new Date();
     d.setDate(d.getDate() + n);
-    d.setHours(18, 30, 0, 0);
+    d.setHours(h, m, 0, 0);
     return d.toISOString();
   };
 
   const samples = [
     {
       title: "Wiespach LXVII · Privatkapital im Mittelstand.",
-      starts_at: inDays(33), time_label: "18:30 – 22:30",
-      location: "Schloss Wiespach, Hallein", status: "open",
-      fee_cents: 38000, max_attendees: 32, confirmed_count: 24,
+      starts_at: inDays(33),
+      location: "Schloss Wiespach, Hallein",
+      status: "open",
+      fee_cents: 38000, max_attendees: 32,
       description: "Privatkapital im Mittelstand — Fokus auf Familienunternehmen, Family Offices und stille Beteiligungen.",
     },
     {
       title: "Frühjahrsevent · Familienunternehmen & Nachfolge.",
-      starts_at: inDays(120), time_label: "Ganztägig",
-      location: "Schloss Wiespach, Hallein", status: "limited",
-      fee_cents: 98000, max_attendees: 60, confirmed_count: 52,
+      starts_at: inDays(120, 10, 0),
+      location: "Schloss Wiespach, Hallein",
+      status: "limited",
+      fee_cents: 98000, max_attendees: 60,
       description: "Halbtagsformat zu Generationenwechsel, Nachfolgekonzepten und Cross-Familien-Kooperationen.",
     },
     {
       title: "Wiespach LXVIII · Energie & Infrastruktur.",
-      starts_at: inDays(180), time_label: "18:30 – 22:30",
-      location: "Schloss Wiespach, Hallein", status: "open",
-      fee_cents: 38000, max_attendees: 32, confirmed_count: 8,
+      starts_at: inDays(180),
+      location: "Schloss Wiespach, Hallein",
+      status: "open",
+      fee_cents: 38000, max_attendees: 32,
       description: "Energiewende-Investments, Netzinfrastruktur, regionale Versorgungsmodelle.",
     },
     {
       title: "Sommerevent · Drei Tage am See.",
-      starts_at: inDays(255), time_label: "Mehrtägig",
-      location: "St. Wolfgang am Wolfgangsee", status: "waitlist",
-      fee_cents: 148000, max_attendees: 80, confirmed_count: 80,
+      starts_at: inDays(255, 16, 0),
+      location: "St. Wolfgang am Wolfgangsee",
+      status: "waitlist",
+      fee_cents: 148000, max_attendees: 80,
       description: "Dreitägiges Hauptevent — gemischtes Programm, gemeinsame Aktivitäten, vertraulicher Rahmen.",
     },
     {
       title: "Wiespach LXVI · Bauwirtschaft im Umbruch.",
-      starts_at: inDays(-30), time_label: "18:30 – 22:30",
-      location: "Schloss Wiespach, Hallein", status: "closed",
-      fee_cents: 38000, max_attendees: 32, confirmed_count: 28,
+      starts_at: inDays(-30),
+      location: "Schloss Wiespach, Hallein",
+      status: "closed",
+      fee_cents: 38000, max_attendees: 32,
       description: "Vortrag von einem Familienunternehmer aus Linz zu Margenverfall und Restrukturierung.",
-      speaker: "Vortrag: Familienunternehmer aus Linz", photo_count: 38,
     },
     {
       title: "Jahresabschluss 2025.",
-      starts_at: inDays(-60), time_label: "Ganztägig",
-      location: "Schloss Wiespach, Hallein", status: "closed",
-      fee_cents: 98000, max_attendees: 60, confirmed_count: 48,
+      starts_at: inDays(-60, 10, 0),
+      location: "Schloss Wiespach, Hallein",
+      status: "closed",
+      fee_cents: 98000, max_attendees: 60,
       description: "Drei Kurzbeiträge zu offenen Themen, gemeinsames Abendessen, Jahresrückblick.",
-      speaker: "Drei Beiträge, gemeinsames Dinner", photo_count: 64,
     },
   ];
 
   const insert = db.prepare(`
-    INSERT INTO events (title, starts_at, time_label, location, status, fee_cents,
-                        max_attendees, confirmed_count, description, speaker, photo_count)
-    VALUES (@title, @starts_at, @time_label, @location, @status, @fee_cents,
-            @max_attendees, @confirmed_count, @description, @speaker, @photo_count)
+    INSERT INTO events (title, starts_at, location, status, fee_cents,
+                        max_attendees, description)
+    VALUES (@title, @starts_at, @location, @status, @fee_cents,
+            @max_attendees, @description)
   `);
   const tx = db.transaction((rows) => {
-    for (const r of rows) {
-      insert.run({
-        ...r,
-        speaker: r.speaker ?? null,
-        photo_count: r.photo_count ?? 0,
-      });
-    }
+    for (const r of rows) insert.run(r);
   });
   tx(samples);
 
   console.log(`[bootstrap] ${samples.length} Beispiel-Events angelegt`);
 }
-
 bootstrapEvents();
 
 export default db;

@@ -18,7 +18,6 @@ export type NextEventData = {
   dateLabel: string;
   location: string;
   attendees: number;
-  confirmed: number;
   userStatus: "open" | "paid";
 };
 
@@ -47,19 +46,30 @@ export type TabKey =
 
 export type EventStatusApi = "open" | "limited" | "waitlist" | "closed";
 
+export type TimelineItem = {
+  id?: number;
+  time_label: string;
+  label: string;
+};
+
+export type Speaker = {
+  id?: number;
+  name: string;
+  bio: string | null;
+  photo_path: string | null;
+};
+
 export type EventDto = {
   id: number;
   title: string;
   starts_at: string;
-  time_label: string;
   location: string;
   status: EventStatusApi;
   fee_cents: number;
   max_attendees: number | null;
-  confirmed_count: number;
   description: string | null;
-  speaker: string | null;
-  photo_count: number;
+  timeline: TimelineItem[];
+  speakers: Speaker[];
   created_at: string;
   updated_at: string | null;
 };

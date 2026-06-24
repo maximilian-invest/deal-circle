@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
 import adminEventsRoutes from "./routes/admin-events.js";
 import eventsRoutes from "./routes/events.js";
+import uploadsRoutes from "./routes/uploads.js";
 
 const app = express();
 const PORT = Number(process.env.DC_PORT || 3001);
@@ -19,6 +20,7 @@ app.get("/healthz", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventsRoutes);
+app.use("/api/uploads", uploadsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/events", adminEventsRoutes);
 
