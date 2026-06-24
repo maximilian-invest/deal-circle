@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import type { Speaker, TimelineItem } from "../components/member/types";
+import type { Speaker, Ticket, TimelineItem } from "../components/member/types";
 
 export type EventDetail = {
   id: number;
@@ -11,8 +11,10 @@ export type EventDetail = {
   fee_cents: number;
   max_attendees: number | null;
   description: string | null;
+  cover_path: string | null;
   timeline: TimelineItem[];
   speakers: Speaker[];
+  tickets: Ticket[];
 };
 
 const MONTH_SHORT = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
@@ -33,8 +35,13 @@ function locationVenue(loc: string): string {
 
 export default function EventLanding({ event }: { event: EventDetail }) {
   const d = new Date(event.starts_at);
-  const fee = Math.round(event.fee_cents / 100);
+  // Headline-Preis: bei mehreren Tickets das günstigste, sonst fee_cents
+  const headlineCents = event.tickets.length > 0
+    ? Math.min(...event.tickets.map((t) => t.price_cents))
+    : event.fee_cents;
+  const fee = Math.round(headlineCents / 100);
   const feeLabel = `${fee.toLocaleString("de-AT")} €`;
+  const hasMultiTickets = event.tickets.length > 1;
 
   const dayShort = `${d.getDate()}. ${MONTH_SHORT[d.getMonth()]}`;
   const yearWeekday = `${d.getFullYear()} · ${WEEKDAY_LONG[d.getDay()]}`;
@@ -74,7 +81,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
           </a>
           {event.status !== "closed" && (
             <a className="dc-ev-nav-cta" href="#ticket">
-              <b>{feeLabel}</b> · Platz sichern
+              <b>{hasMultiTickets ? `Ab ${feeLabel}` : feeLabel}</b> · Platz sichern
             </a>
           )}
         </div>
@@ -104,11 +111,11 @@ export default function EventLanding({ event }: { event: EventDetail }) {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="dc-ev-hero-photo">
-                <img src="/impressions/01-terrasse.jpg" alt="" />
+                <img src={event.cover_path || "/impressions/01-terrasse.jpg"} alt="" />
               </div>
               {event.status !== "closed" && (
                 <div className="dc-ev-price-chip" aria-hidden="true">
-                  <div className="dc-ev-price-chip-k">Ticket</div>
+                  <div className="dc-ev-price-chip-k">{hasMultiTickets ? "Ab" : "Ticket"}</div>
                   <div className="dc-ev-price-chip-v">{feeLabel}</div>
                   <div className="dc-ev-price-chip-n">pro Person · inkl. Dinner</div>
                 </div>
@@ -245,7 +252,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
           </section>
         )}
 
-        {/* TICKET */}
+        {/* TICKETS */}
         {event.status !== "closed" && (
           <section id="ticket" className="dc-ev-section">
             <div className="dc-ev-wrap">
@@ -253,31 +260,67 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                 <span className="dc-ev-sec-num dc-ev-grad">
                   {pad(1 + (event.timeline.length > 0 ? 1 : 0) + (event.speakers.length > 0 ? 1 : 0))}
                 </span>
-                <span className="dc-ev-sec-label">Ticket</span>
+                <span className="dc-ev-sec-label">Ticket{event.tickets.length > 1 ? "s" : ""}</span>
               </div>
-              <h2 className="dc-ev-sec-title" style={{ marginBottom: "48px" }}>Sichere dir deinen Platz.</h2>
+              <h2 className="dc-ev-sec-title" style={{ marginBottom: "48px" }}>
+                {event.tickets.length > 1 ? "Wähle deinen Platz." : "Sichere dir deinen Platz."}
+              </h2>
 
-              <motion.div
-                className="dc-ev-ticket"
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <div>
-                  <div className="dc-ev-ticket-k">Ticket</div>
-                  <div className="dc-ev-ticket-price">
-                    {feeLabel}
-                    <small>pro Person · inkl. Dinner und Getränke</small>
-                  </div>
+              {event.tickets.length > 0 ? (
+                <div className={`dc-ev-tickets dc-ev-tickets--${event.tickets.length === 1 ? "one" : "many"}`}>
+                  {event.tickets.map((t, i) => {
+                    const price = `${Math.round(t.price_cents / 100).toLocaleString("de-AT")} €`;
+                    return (
+                      <motion.div
+                        key={t.id ?? i}
+                        className={`dc-ev-ticket-card${i === 0 ? " is-featured" : ""}`}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-10%" }}
+                        transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <div className="dc-ev-ticket-card-head">
+                          <div className="dc-ev-ticket-k">{t.name}</div>
+                          <div className="dc-ev-ticket-price">
+                            {price}
+                            <small>pro Person · inkl. Dinner und Getränke</small>
+                          </div>
+                        </div>
+                        <ul className="dc-ev-incl">
+                          {t.perks.map((p, pi) => (
+                            <li key={pi}><Check />{p}</li>
+                          ))}
+                        </ul>
+                        <a className="dc-ev-btn-dark" href="/mitglieder/login/">
+                          {t.name} für {price} kaufen
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M5 12h14M13 6l6 6-6 6" />
+                          </svg>
+                        </a>
+                        <p className="dc-ev-ticket-note">Sichere Zahlung · Bestätigung per E-Mail</p>
+                      </motion.div>
+                    );
+                  })}
                 </div>
-                <div>
+              ) : (
+                // Fallback: einzelnes Ticket aus fee_cents wenn admin keine Tickets pflegt
+                <motion.div
+                  className="dc-ev-ticket-card is-featured dc-ev-ticket-card--solo"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-10%" }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className="dc-ev-ticket-card-head">
+                    <div className="dc-ev-ticket-k">Ticket</div>
+                    <div className="dc-ev-ticket-price">
+                      {feeLabel}
+                      <small>pro Person · inkl. Dinner und Getränke</small>
+                    </div>
+                  </div>
                   <ul className="dc-ev-incl">
                     {event.speakers.length > 0 && (
-                      <li>
-                        <Check />
-                        Zugang zu {event.speakers.length === 1 ? "der Keynote" : `${event.speakers.length} Keynotes`}
-                      </li>
+                      <li><Check />Zugang zu {event.speakers.length === 1 ? "der Keynote" : `${event.speakers.length} Keynotes`}</li>
                     )}
                     <li><Check />Mehrgang-Dinner & Getränke</li>
                     <li><Check />Kuratiertes Networking</li>
@@ -292,8 +335,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                     </svg>
                   </a>
                   <p className="dc-ev-ticket-note">Sichere Zahlung · Bestätigung per E-Mail</p>
-                </div>
-              </motion.div>
+                </motion.div>
+              )}
             </div>
           </section>
         )}

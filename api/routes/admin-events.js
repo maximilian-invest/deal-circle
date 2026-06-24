@@ -18,6 +18,12 @@ const speakerSchema = z.object({
   photo_path: z.string().max(500).nullable().optional().default(null),
 });
 
+const ticketSchema = z.object({
+  name: z.string().min(1).max(120),
+  price_cents: z.number().int().min(0).max(10_000_00),
+  perks: z.array(z.string().min(1).max(200)).max(20).default([]),
+});
+
 const eventCreateSchema = z.object({
   title: z.string().min(1).max(200),
   starts_at: z.string().datetime({ offset: true }),
@@ -26,8 +32,10 @@ const eventCreateSchema = z.object({
   fee_cents: z.number().int().min(0).max(10_000_00).default(38000),
   max_attendees: z.number().int().min(0).max(10000).nullable().optional().default(null),
   description: z.string().max(2000).nullable().optional().default(null),
+  cover_path: z.string().max(500).nullable().optional().default(null),
   timeline: z.array(timelineItemSchema).max(50).optional().default([]),
   speakers: z.array(speakerSchema).max(20).optional().default([]),
+  tickets:  z.array(ticketSchema).max(10).optional().default([]),
 });
 
 const eventUpdateSchema = eventCreateSchema.partial();
@@ -37,7 +45,7 @@ function fetchEventFull(id) {
   const ev = db
     .prepare(`
       SELECT id, title, starts_at, location, status, fee_cents,
-             max_attendees, description, created_at, updated_at
+             max_attendees, description, cover_path, created_at, updated_at
       FROM events WHERE id = ?
     `)
     .get(id);
@@ -54,7 +62,24 @@ function fetchEventFull(id) {
       WHERE event_id = ? ORDER BY position ASC
     `)
     .all(id);
+  ev.tickets = db
+    .prepare(`
+      SELECT id, name, price_cents, perks_json FROM event_tickets
+      WHERE event_id = ? ORDER BY position ASC
+    `)
+    .all(id)
+    .map((t) => ({
+      id: t.id,
+      name: t.name,
+      price_cents: t.price_cents,
+      perks: safeParseJson(t.perks_json, []),
+    }));
   return ev;
+}
+
+function safeParseJson(s, fallback) {
+  try { const v = JSON.parse(s); return Array.isArray(v) ? v : fallback; }
+  catch { return fallback; }
 }
 
 const insertTimelineStmt = db.prepare(`
@@ -65,8 +90,13 @@ const insertSpeakerStmt = db.prepare(`
   INSERT INTO event_speakers (event_id, position, name, bio, photo_path)
   VALUES (?, ?, ?, ?, ?)
 `);
+const insertTicketStmt = db.prepare(`
+  INSERT INTO event_tickets (event_id, position, name, price_cents, perks_json)
+  VALUES (?, ?, ?, ?, ?)
+`);
 const deleteTimelineStmt = db.prepare("DELETE FROM event_timeline WHERE event_id = ?");
 const deleteSpeakersStmt = db.prepare("DELETE FROM event_speakers WHERE event_id = ?");
+const deleteTicketsStmt  = db.prepare("DELETE FROM event_tickets  WHERE event_id = ?");
 
 function replaceTimeline(eventId, items) {
   deleteTimelineStmt.run(eventId);
@@ -76,6 +106,12 @@ function replaceSpeakers(eventId, items) {
   deleteSpeakersStmt.run(eventId);
   items.forEach((item, idx) =>
     insertSpeakerStmt.run(eventId, idx, item.name, item.bio ?? null, item.photo_path ?? null)
+  );
+}
+function replaceTickets(eventId, items) {
+  deleteTicketsStmt.run(eventId);
+  items.forEach((item, idx) =>
+    insertTicketStmt.run(eventId, idx, item.name, item.price_cents, JSON.stringify(item.perks || []))
   );
 }
 
@@ -92,13 +128,14 @@ router.post("/", (req, res) => {
     const info = db
       .prepare(`
         INSERT INTO events (title, starts_at, location, status, fee_cents,
-                            max_attendees, description)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+                            max_attendees, description, cover_path)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `)
       .run(d.title, d.starts_at, d.location, d.status, d.fee_cents,
-           d.max_attendees, d.description);
+           d.max_attendees, d.description, d.cover_path);
     replaceTimeline(info.lastInsertRowid, d.timeline);
     replaceSpeakers(info.lastInsertRowid, d.speakers);
+    replaceTickets(info.lastInsertRowid, d.tickets);
     return info.lastInsertRowid;
   });
 
@@ -120,7 +157,7 @@ router.patch("/:id", (req, res) => {
   const d = parsed.data;
 
   const eventCols = ["title", "starts_at", "location", "status", "fee_cents",
-                     "max_attendees", "description"];
+                     "max_attendees", "description", "cover_path"];
   const updates = [];
   const values = [];
   for (const col of eventCols) {
@@ -138,6 +175,7 @@ router.patch("/:id", (req, res) => {
     }
     if (d.timeline !== undefined) replaceTimeline(id, d.timeline);
     if (d.speakers !== undefined) replaceSpeakers(id, d.speakers);
+    if (d.tickets  !== undefined) replaceTickets(id, d.tickets);
   });
   tx();
 

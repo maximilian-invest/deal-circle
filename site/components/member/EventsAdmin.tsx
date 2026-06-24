@@ -5,10 +5,19 @@ import {
   deleteEvent,
   listEvents,
   updateEvent,
+  uploadCoverImage,
+  uploadImage,
   uploadSpeakerPhoto,
   type CreateEventInput,
 } from "./events";
-import type { EventDto, EventStatusApi, Speaker, TimelineItem } from "./types";
+import type { EventDto, EventStatusApi, Speaker, Ticket, TimelineItem } from "./types";
+
+type FormTicket = {
+  id?: number;
+  name: string;
+  price_eur: string;
+  perks: string[];
+};
 
 type FormState = {
   title: string;
@@ -19,9 +28,17 @@ type FormState = {
   fee_eur: string;
   max_attendees: string;
   description: string;
+  cover_path: string | null;
   timeline: TimelineItem[];
   speakers: Speaker[];
+  tickets: FormTicket[];
 };
+
+const DEFAULT_PERKS = [
+  "Zugang zu allen Keynotes",
+  "Mehrgang-Dinner & Getränke",
+  "Kuratiertes Networking",
+];
 
 const EMPTY: FormState = {
   title: "",
@@ -32,8 +49,10 @@ const EMPTY: FormState = {
   fee_eur: "380",
   max_attendees: "32",
   description: "",
+  cover_path: null,
   timeline: [],
   speakers: [],
+  tickets: [],
 };
 
 const STATUS_LABELS: Record<EventStatusApi, string> = {
@@ -56,8 +75,15 @@ function toForm(e: EventDto): FormState {
     fee_eur: String(Math.round(e.fee_cents / 100)),
     max_attendees: e.max_attendees == null ? "" : String(e.max_attendees),
     description: e.description ?? "",
+    cover_path: e.cover_path,
     timeline: e.timeline.map((t) => ({ id: t.id, time_label: t.time_label, label: t.label })),
     speakers: e.speakers.map((s) => ({ id: s.id, name: s.name, bio: s.bio, photo_path: s.photo_path })),
+    tickets: (e.tickets ?? []).map((t) => ({
+      id: t.id,
+      name: t.name,
+      price_eur: String(Math.round(t.price_cents / 100)),
+      perks: [...t.perks],
+    })),
   };
 }
 
@@ -71,6 +97,7 @@ function fromForm(f: FormState): CreateEventInput {
     fee_cents: Math.round(Number(f.fee_eur || "0") * 100),
     max_attendees: f.max_attendees.trim() === "" ? null : Number(f.max_attendees),
     description: f.description.trim() ? f.description.trim() : null,
+    cover_path: f.cover_path,
     timeline: f.timeline
       .filter((t) => t.time_label.trim() && t.label.trim())
       .map((t) => ({ time_label: t.time_label.trim(), label: t.label.trim() })),
@@ -80,6 +107,13 @@ function fromForm(f: FormState): CreateEventInput {
         name: s.name.trim(),
         bio: s.bio?.trim() ? s.bio.trim() : null,
         photo_path: s.photo_path || null,
+      })),
+    tickets: f.tickets
+      .filter((t) => t.name.trim())
+      .map((t) => ({
+        name: t.name.trim(),
+        price_cents: Math.round(Number(t.price_eur || "0") * 100),
+        perks: t.perks.map((p) => p.trim()).filter(Boolean),
       })),
   };
 }
@@ -92,12 +126,15 @@ function fmtDate(iso: string): string {
          d.toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" });
 }
 
-function SpeakerPhoto({
-  photo, onUpload, onRemove,
+function ImagePicker({
+  kind, photo, onUpload, onRemove, variant = "square", label = "Foto wählen",
 }: {
+  kind: "speaker" | "cover";
   photo: string | null;
   onUpload: (path: string) => void;
   onRemove: () => void;
+  variant?: "square" | "wide";
+  label?: string;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [busy, setBusy] = useState(false);
@@ -111,7 +148,7 @@ function SpeakerPhoto({
     setErr(null);
     setBusy(true);
     try {
-      const path = await uploadSpeakerPhoto(file);
+      const path = await uploadImage(kind, file);
       onUpload(path);
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : "Upload fehlgeschlagen");
@@ -122,11 +159,11 @@ function SpeakerPhoto({
   };
 
   return (
-    <div className="mb-speaker-photo">
+    <div className={`mb-speaker-photo mb-speaker-photo--${variant}`}>
       {photo ? (
         <div className="mb-speaker-photo-thumb">
           <img src={photo} alt="" />
-          <button type="button" className="mb-speaker-photo-remove" onClick={onRemove} title="Foto entfernen">×</button>
+          <button type="button" className="mb-speaker-photo-remove" onClick={onRemove} title="Bild entfernen">×</button>
         </div>
       ) : (
         <button type="button" className="mb-speaker-photo-empty" onClick={pick} disabled={busy}>
@@ -137,7 +174,7 @@ function SpeakerPhoto({
                 <circle cx="9" cy="9" r="2" />
                 <path d="M21 15l-5-5L5 21" />
               </svg>
-              <span>Foto wählen</span>
+              <span>{label}</span>
             </>
           )}
         </button>
@@ -152,6 +189,11 @@ function SpeakerPhoto({
       {err && <div className="mb-admin-alert mb-admin-alert--error" style={{ marginTop: 6 }}>{err}</div>}
     </div>
   );
+}
+
+// Backwards-compat fuer bestehende SpeakerCards
+function SpeakerPhoto(props: { photo: string | null; onUpload: (p: string) => void; onRemove: () => void }) {
+  return <ImagePicker kind="speaker" variant="square" label="Foto wählen" {...props} />;
 }
 
 export default function EventsAdmin() {
@@ -212,6 +254,35 @@ export default function EventsAdmin() {
   const removeTimeline = (i: number) => setForm((f) => ({
     ...f,
     timeline: f.timeline.filter((_, idx) => idx !== i),
+  }));
+
+  const addTicket = () => setForm((f) => ({
+    ...f,
+    tickets: [...f.tickets, { name: "Standard", price_eur: f.fee_eur || "300", perks: [...DEFAULT_PERKS] }],
+  }));
+  const updateTicket = (i: number, patch: Partial<FormTicket>) => setForm((f) => ({
+    ...f,
+    tickets: f.tickets.map((t, idx) => idx === i ? { ...t, ...patch } : t),
+  }));
+  const removeTicket = (i: number) => setForm((f) => ({
+    ...f,
+    tickets: f.tickets.filter((_, idx) => idx !== i),
+  }));
+  const addPerk = (ticketIdx: number) => setForm((f) => ({
+    ...f,
+    tickets: f.tickets.map((t, idx) => idx === ticketIdx ? { ...t, perks: [...t.perks, ""] } : t),
+  }));
+  const updatePerk = (ticketIdx: number, perkIdx: number, value: string) => setForm((f) => ({
+    ...f,
+    tickets: f.tickets.map((t, idx) =>
+      idx === ticketIdx ? { ...t, perks: t.perks.map((p, j) => j === perkIdx ? value : p) } : t
+    ),
+  }));
+  const removePerk = (ticketIdx: number, perkIdx: number) => setForm((f) => ({
+    ...f,
+    tickets: f.tickets.map((t, idx) =>
+      idx === ticketIdx ? { ...t, perks: t.perks.filter((_, j) => j !== perkIdx) } : t
+    ),
   }));
 
   const addSpeaker = () => setForm((f) => ({
@@ -403,6 +474,18 @@ export default function EventsAdmin() {
               />
             </div>
 
+            <div className="dc-field">
+              <label>Titelbild</label>
+              <ImagePicker
+                kind="cover"
+                variant="wide"
+                label="Titelbild wählen (16:9, JPG/PNG, max. 8 MB)"
+                photo={form.cover_path}
+                onUpload={(path) => setForm({ ...form, cover_path: path })}
+                onRemove={() => setForm({ ...form, cover_path: null })}
+              />
+            </div>
+
             <div className="mb-admin-section">
               <div className="mb-admin-section-head">
                 <span className="mb-admin-eyebrow">Programm</span>
@@ -486,6 +569,93 @@ export default function EventsAdmin() {
                         aria-label="Vortragende entfernen"
                         title="Vortragende entfernen"
                       >×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mb-admin-section">
+              <div className="mb-admin-section-head">
+                <span className="mb-admin-eyebrow">Tickets & Preise</span>
+                <button type="button" className="mb-admin-action mb-admin-action--add" onClick={addTicket}>
+                  + Ticket-Variante hinzufügen
+                </button>
+              </div>
+
+              {form.tickets.length === 0 ? (
+                <div className="mb-admin-empty-row">
+                  Noch keine Tickets — füg mindestens eines hinzu (z.&nbsp;B. Standard und VIP).
+                  Solange leer, fällt die Event-Page auf den Default-Preis ({form.fee_eur} €) mit
+                  Standard-Inhalten zurück.
+                </div>
+              ) : (
+                <div className="mb-ticket-list">
+                  {form.tickets.map((t, ti) => (
+                    <div key={ti} className="mb-ticket-card">
+                      <div className="mb-ticket-head">
+                        <div className="mb-ticket-head-fields">
+                          <input
+                            type="text"
+                            className="mb-ticket-name"
+                            value={t.name}
+                            onChange={(e) => updateTicket(ti, { name: e.target.value })}
+                            placeholder="Standard / VIP / Frühbucher"
+                          />
+                          <div className="mb-ticket-price-row">
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              className="mb-ticket-price"
+                              value={t.price_eur}
+                              onChange={(e) => updateTicket(ti, { price_eur: e.target.value })}
+                              placeholder="300"
+                            />
+                            <span className="mb-ticket-price-unit">€</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="mb-speaker-remove"
+                          onClick={() => removeTicket(ti)}
+                          title="Ticket-Variante entfernen"
+                          aria-label="Ticket entfernen"
+                        >×</button>
+                      </div>
+
+                      <div className="mb-ticket-perks">
+                        <div className="mb-ticket-perks-head">
+                          <span className="mb-admin-eyebrow">Inhalte</span>
+                          <button type="button" className="mb-admin-action mb-admin-action--add" onClick={() => addPerk(ti)}>
+                            + Inhalt
+                          </button>
+                        </div>
+                        {t.perks.length === 0 ? (
+                          <div className="mb-admin-empty-row">Noch keine Inhalte. Füg z.&nbsp;B. „Zugang zu Keynotes" hinzu.</div>
+                        ) : (
+                          <div className="mb-timeline-list">
+                            {t.perks.map((perk, pi) => (
+                              <div key={pi} className="mb-perk-row">
+                                <input
+                                  type="text"
+                                  className="mb-timeline-label"
+                                  value={perk}
+                                  onChange={(e) => updatePerk(ti, pi, e.target.value)}
+                                  placeholder="z. B. Mehrgang-Dinner & Getränke"
+                                />
+                                <button
+                                  type="button"
+                                  className="mb-timeline-remove"
+                                  onClick={() => removePerk(ti, pi)}
+                                  title="Entfernen"
+                                  aria-label="Inhalt entfernen"
+                                >×</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

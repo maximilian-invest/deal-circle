@@ -1,6 +1,6 @@
 "use client";
 import { api, getToken } from "./api";
-import type { EventDto, EventStatusApi, Speaker, TimelineItem } from "./types";
+import type { EventDto, EventStatusApi, Speaker, Ticket, TimelineItem } from "./types";
 
 export type CreateEventInput = {
   title: string;
@@ -10,8 +10,10 @@ export type CreateEventInput = {
   fee_cents: number;
   max_attendees: number | null;
   description: string | null;
+  cover_path: string | null;
   timeline: TimelineItem[];
   speakers: Speaker[];
+  tickets: Ticket[];
 };
 
 export type UpdateEventInput = Partial<CreateEventInput>;
@@ -41,13 +43,13 @@ export async function deleteEvent(id: number): Promise<void> {
   await api(`/admin/events/${id}`, { method: "DELETE" });
 }
 
-// Speaker-Foto Upload — multipart/form-data, kein JSON
-export async function uploadSpeakerPhoto(file: File): Promise<string> {
+// Bild-Upload (kind = "speaker" oder "cover") — multipart/form-data
+export async function uploadImage(kind: "speaker" | "cover", file: File): Promise<string> {
   const token = getToken();
   const fd = new FormData();
   fd.append("photo", file);
 
-  const res = await fetch("/api/uploads/speaker", {
+  const res = await fetch(`/api/uploads/${kind}`, {
     method: "POST",
     body: fd,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -56,7 +58,7 @@ export async function uploadSpeakerPhoto(file: File): Promise<string> {
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      res.status === 413 ? "Datei zu groß (max. 5 MB)" :
+      res.status === 413 ? "Datei zu groß (max. 8 MB)" :
       res.status === 400 ? "Ungültiges Bildformat (JPG, PNG, WEBP)" :
       `Upload fehlgeschlagen (${res.status}) ${text}`
     );
@@ -65,6 +67,10 @@ export async function uploadSpeakerPhoto(file: File): Promise<string> {
   const data = await res.json();
   return data.path as string;
 }
+
+// Backwards-compat Alias
+export const uploadSpeakerPhoto = (file: File) => uploadImage("speaker", file);
+export const uploadCoverImage = (file: File) => uploadImage("cover", file);
 
 // ---------- Hilfs-Mappings für die Dashboard-UI ----------
 

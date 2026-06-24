@@ -2718,3 +2718,125 @@ html, body { overflow-x: hidden; }
   .dc-ev-btn-primary { width: 100%; justify-content: center; }
   .dc-ev-sp-photo { height: 260px; }
 }
+
+/* =====================================================================
+   EVENTS-ADMIN: Cover-Picker (wide) + Ticket-Cards
+   ===================================================================== */
+.mb-speaker-photo--wide .mb-speaker-photo-empty,
+.mb-speaker-photo--wide .mb-speaker-photo-thumb {
+  width: 100%; height: 200px; max-width: 480px;
+}
+.mb-speaker-photo--wide .mb-speaker-photo-thumb img { object-position: center; }
+
+.mb-ticket-list { display: flex; flex-direction: column; gap: 14px; }
+.mb-ticket-card {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline-soft);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.mb-ticket-head {
+  display: grid; grid-template-columns: 1fr auto; gap: 14px;
+  align-items: flex-start;
+}
+.mb-ticket-head-fields {
+  display: grid; grid-template-columns: 1fr 160px; gap: 10px;
+}
+.mb-ticket-name,
+.mb-ticket-price {
+  background: var(--color-surface-1);
+  color: var(--color-ink);
+  font: var(--type-body); letter-spacing: var(--tracking-body);
+  padding: 12px 14px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--r-md);
+  outline: none;
+  font-family: var(--font-body);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.mb-ticket-price { font-variant-numeric: tabular-nums; text-align: right; padding-right: 30px; }
+.mb-ticket-name:focus,
+.mb-ticket-price:focus { border-color: transparent; box-shadow: var(--elev-3); }
+.mb-ticket-price-row { position: relative; }
+.mb-ticket-price-unit {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font: var(--type-body); color: var(--color-ink-muted);
+  pointer-events: none;
+}
+
+.mb-ticket-perks {
+  display: flex; flex-direction: column; gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-hairline-soft);
+}
+.mb-ticket-perks-head {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.mb-perk-row {
+  display: grid; grid-template-columns: 1fr auto; gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 540px) {
+  .mb-ticket-head-fields { grid-template-columns: 1fr; }
+  .mb-ticket-price { text-align: left; }
+}
+
+/* =====================================================================
+   EVENT-LANDINGPAGE: Tickets-Grid (mehrere Ticket-Varianten)
+   ===================================================================== */
+.dc-ev-tickets {
+  display: grid;
+  gap: 24px;
+}
+.dc-ev-tickets--one { grid-template-columns: minmax(0, 720px); justify-content: center; }
+.dc-ev-tickets--many { grid-template-columns: 1fr 1fr; }
+
+.dc-ev-ticket-card {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--r-xxl);
+  padding: 36px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.dc-ev-ticket-card.is-featured {
+  background: var(--vio);
+  border-color: transparent;
+  box-shadow: 0 30px 80px rgba(138,75,255,0.28);
+}
+.dc-ev-ticket-card--solo { padding: 48px; }
+
+.dc-ev-ticket-card-head { display: flex; flex-direction: column; gap: 12px; }
+
+.dc-ev-ticket-card .dc-ev-ticket-k {
+  font: 500 13px/1 var(--font-body); letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.dc-ev-ticket-card.is-featured .dc-ev-ticket-k { color: rgba(10,10,11,0.6); }
+.dc-ev-ticket-card:not(.is-featured) .dc-ev-ticket-k { color: var(--color-ink-muted); }
+
+.dc-ev-ticket-card .dc-ev-ticket-price {
+  font-size: clamp(56px, 8vw, 84px);
+  margin: 0;
+}
+.dc-ev-tickets--many .dc-ev-ticket-card .dc-ev-ticket-price {
+  font-size: clamp(48px, 6vw, 64px);
+}
+.dc-ev-ticket-card:not(.is-featured) .dc-ev-ticket-price { color: #fff; }
+.dc-ev-ticket-card:not(.is-featured) .dc-ev-ticket-price small { color: var(--color-ink-muted); }
+
+.dc-ev-ticket-card .dc-ev-incl { margin: 0 0 8px; }
+.dc-ev-ticket-card:not(.is-featured) .dc-ev-incl li { color: #fff; }
+.dc-ev-ticket-card:not(.is-featured) .dc-ev-incl svg { color: var(--color-ink-muted); }
+
+.dc-ev-ticket-card:not(.is-featured) .dc-ev-btn-dark {
+  background: #fff; color: #0A0A0B;
+}
+.dc-ev-ticket-card:not(.is-featured) .dc-ev-ticket-note { color: var(--color-ink-muted); }
+
+@media (max-width: 760px) {
+  .dc-ev-tickets--many { grid-template-columns: 1fr; }
+  .dc-ev-ticket-card { padding: 26px; }
+  .dc-ev-ticket-card--solo { padding: 30px; }
+}

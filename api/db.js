@@ -36,6 +36,7 @@ db.exec(`
     fee_cents INTEGER NOT NULL DEFAULT 38000,
     max_attendees INTEGER,
     description TEXT,
+    cover_path TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT
   );
@@ -62,6 +63,17 @@ db.exec(`
   );
 
   CREATE INDEX IF NOT EXISTS idx_speakers_event ON event_speakers (event_id, position);
+
+  CREATE TABLE IF NOT EXISTS event_tickets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    position INTEGER NOT NULL DEFAULT 0,
+    name TEXT NOT NULL,
+    price_cents INTEGER NOT NULL,
+    perks_json TEXT NOT NULL DEFAULT '[]'
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_tickets_event ON event_tickets (event_id, position);
 `);
 
 // --- Migration: alte Spalten droppen (idempotent) -----------------------------
@@ -73,6 +85,10 @@ function migrateEventsSchema() {
       console.log(`[migrate] events: drop column ${col}`);
       db.exec(`ALTER TABLE events DROP COLUMN ${col}`);
     }
+  }
+  if (!cols.includes("cover_path")) {
+    console.log("[migrate] events: add column cover_path");
+    db.exec("ALTER TABLE events ADD COLUMN cover_path TEXT");
   }
 }
 migrateEventsSchema();

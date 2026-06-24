@@ -59,6 +59,13 @@ export type Speaker = {
   photo_path: string | null;
 };
 
+export type Ticket = {
+  id?: number;
+  name: string;
+  price_cents: number;
+  perks: string[];
+};
+
 export type EventDto = {
   id: number;
   title: string;
@@ -68,8 +75,10 @@ export type EventDto = {
   fee_cents: number;
   max_attendees: number | null;
   description: string | null;
+  cover_path: string | null;
   timeline: TimelineItem[];
   speakers: Speaker[];
+  tickets: Ticket[];
   created_at: string;
   updated_at: string | null;
 };

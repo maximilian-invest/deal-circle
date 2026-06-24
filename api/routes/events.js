@@ -30,7 +30,7 @@ router.get("/public/:id", (req, res) => {
   const ev = db
     .prepare(`
       SELECT id, title, starts_at, location, status,
-             fee_cents, max_attendees, description
+             fee_cents, max_attendees, description, cover_path
       FROM events WHERE id = ?
     `)
     .get(id);
@@ -48,16 +48,33 @@ router.get("/public/:id", (req, res) => {
       WHERE event_id = ? ORDER BY position ASC
     `)
     .all(id);
+  ev.tickets = db
+    .prepare(`
+      SELECT id, name, price_cents, perks_json FROM event_tickets
+      WHERE event_id = ? ORDER BY position ASC
+    `)
+    .all(id)
+    .map((t) => ({
+      id: t.id,
+      name: t.name,
+      price_cents: t.price_cents,
+      perks: safeJson(t.perks_json),
+    }));
 
   res.json({ event: ev });
 });
+
+function safeJson(s) {
+  try { const v = JSON.parse(s); return Array.isArray(v) ? v : []; }
+  catch { return []; }
+}
 
 // Member: alle Events mit nested timeline + speakers
 router.get("/", requireAuth, (_req, res) => {
   const events = db
     .prepare(`
       SELECT id, title, starts_at, location, status,
-             fee_cents, max_attendees, description,
+             fee_cents, max_attendees, description, cover_path,
              created_at, updated_at
       FROM events
       ORDER BY starts_at ASC
@@ -66,6 +83,7 @@ router.get("/", requireAuth, (_req, res) => {
 
   const timelineByEvent = new Map();
   const speakersByEvent = new Map();
+  const ticketsByEvent  = new Map();
 
   if (events.length) {
     const ids = events.map((e) => e.id);
@@ -96,11 +114,28 @@ router.get("/", requireAuth, (_req, res) => {
       if (!speakersByEvent.has(r.event_id)) speakersByEvent.set(r.event_id, []);
       speakersByEvent.get(r.event_id).push({ id: r.id, name: r.name, bio: r.bio, photo_path: r.photo_path });
     }
+
+    const tkRows = db
+      .prepare(`
+        SELECT event_id, id, name, price_cents, perks_json
+        FROM event_tickets
+        WHERE event_id IN (${placeholders})
+        ORDER BY event_id, position
+      `)
+      .all(...ids);
+    for (const r of tkRows) {
+      if (!ticketsByEvent.has(r.event_id)) ticketsByEvent.set(r.event_id, []);
+      ticketsByEvent.get(r.event_id).push({
+        id: r.id, name: r.name, price_cents: r.price_cents,
+        perks: safeJson(r.perks_json),
+      });
+    }
   }
 
   for (const e of events) {
     e.timeline = timelineByEvent.get(e.id) || [];
     e.speakers = speakersByEvent.get(e.id) || [];
+    e.tickets  = ticketsByEvent.get(e.id)  || [];
   }
 
   res.json({ events });
