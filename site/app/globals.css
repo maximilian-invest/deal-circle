@@ -2324,32 +2324,63 @@ html, body { overflow-x: hidden; }
 .dc-ev-nav-cta:active { transform: scale(0.97); }
 .dc-ev-nav-cta b { font-feature-settings: "tnum"; }
 
-/* --- Hero --- */
+/* --- Hero (neutraler dunkler BG oben, Bild mit Headline-Overlap unten) --- */
 .dc-ev-hero {
   position: relative;
-  min-height: clamp(640px, 100vh, 1000px);
-  display: flex; align-items: flex-end;
-  padding: 0 0 64px;
+  background: var(--color-canvas);
+  padding: 128px 0 0;
+}
+.dc-ev-hero-content { width: 100%; }
+
+/* Image-Stage rutscht nach oben unter die Headline */
+.dc-ev-hero-stage {
+  position: relative;
+  margin-top: -56px;
+  z-index: 1;
+}
+.dc-ev-hero-photo {
+  position: relative;
+  height: clamp(360px, 56vw, 560px);
+  border-radius: var(--r-xl);
   overflow: hidden;
+  background: var(--color-surface-1);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
 }
-.dc-ev-hero-bg { position: absolute; inset: 0; z-index: 0; }
-.dc-ev-hero-bg img {
+.dc-ev-hero-photo img {
   width: 100%; height: 100%;
-  object-fit: cover; object-position: 44% 36%;
-  filter: saturate(0.96) brightness(0.92);
+  object-fit: cover; object-position: 42% 42%;
+  filter: saturate(0.95);
 }
-.dc-ev-hero-scrim {
-  position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(
-    to top,
-    #0A0A0B 0%,
-    rgba(10,10,11,0.92) 22%,
-    rgba(10,10,11,0.55) 44%,
-    rgba(10,10,11,0.12) 66%,
-    rgba(10,10,11,0.40) 100%
-  );
+
+/* Preis-Chip — überlappt linken unteren Bildrand */
+.dc-ev-price-chip {
+  position: absolute;
+  left: -12px; bottom: -36px;
+  background: var(--vio);
+  border-radius: var(--r-xxl);
+  padding: 24px 32px;
+  box-shadow: 0 24px 60px rgba(138,75,255,0.40);
+  z-index: 3;
+  min-width: 200px;
 }
-.dc-ev-hero-content { position: relative; z-index: 2; width: 100%; padding-top: 100px; }
+.dc-ev-price-chip-k {
+  font: 500 12px/1 var(--font-body);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(10,10,11,0.62);
+}
+.dc-ev-price-chip-v {
+  margin-top: 10px;
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(48px, 8vw, 84px);
+  line-height: 0.84; letter-spacing: -0.05em;
+  color: #0A0A0B;
+  font-feature-settings: "tnum";
+}
+.dc-ev-price-chip-n {
+  margin-top: 8px;
+  font: 500 14px/1.25 var(--font-body); letter-spacing: -0.14px;
+  color: rgba(10,10,11,0.66);
+}
 
 .dc-ev-tag {
   display: inline-flex; align-items: center; gap: 8px;
@@ -2367,6 +2398,8 @@ html, body { overflow-x: hidden; }
 }
 
 .dc-ev-hero-title {
+  position: relative;
+  z-index: 2;            /* steht ueber dem Bild */
   font-family: var(--font-display); font-weight: 600;
   color: #fff;
   font-size: clamp(56px, 11vw, 144px);
@@ -2376,7 +2409,7 @@ html, body { overflow-x: hidden; }
   text-wrap: balance;
 }
 .dc-ev-hero-lede {
-  margin: 26px 0 0;
+  margin: 80px 0 0;       /* extra Abstand wegen Price-Chip-Overhang */
   max-width: 680px;
   font-family: var(--font-display); font-weight: 600;
   font-size: clamp(22px, 4vw, 38px);
@@ -2385,7 +2418,7 @@ html, body { overflow-x: hidden; }
 }
 .dc-ev-hero-actions {
   display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
-  margin-top: 38px;
+  margin-top: 32px;
 }
 .dc-ev-btn-primary {
   display: inline-flex; align-items: center; gap: 10px;
@@ -2650,8 +2683,15 @@ html, body { overflow-x: hidden; }
 /* --- Responsive --- */
 @media (max-width: 760px) {
   .dc-ev { --pad: 22px; }
-  .dc-ev-hero { min-height: 88vh; padding-bottom: 44px; }
-  .dc-ev-hero-content { padding-top: 96px; }
+  .dc-ev-hero { padding: 108px 0 0; }
+  .dc-ev-hero-stage { margin-top: -36px; }
+  .dc-ev-hero-photo { height: clamp(280px, 60vw, 400px); }
+  .dc-ev-price-chip {
+    left: 0; bottom: -28px;
+    padding: 18px 22px; min-width: 0;
+  }
+  .dc-ev-price-chip-v { font-size: clamp(40px, 12vw, 56px); }
+  .dc-ev-hero-lede { margin-top: 64px; }
   .dc-ev-facts {
     grid-template-columns: 1fr; gap: 22px;
     margin-top: 36px; padding-top: 32px;
@@ -2673,6 +2713,7 @@ html, body { overflow-x: hidden; }
 }
 @media (max-width: 460px) {
   .dc-ev-hero-title { font-size: clamp(44px, 14vw, 64px); }
+  .dc-ev-hero-stage { margin-top: -24px; }
   .dc-ev-nav-cta { padding: 10px 14px; font-size: 13px; }
   .dc-ev-btn-primary { width: 100%; justify-content: center; }
   .dc-ev-sp-photo { height: 260px; }

@@ -83,10 +83,6 @@ export default function EventLanding({ event }: { event: EventDetail }) {
       <main>
         {/* HERO */}
         <section className="dc-ev-hero">
-          <div className="dc-ev-hero-bg" aria-hidden="true">
-            <img src="/impressions/01-terrasse.jpg" alt="" />
-          </div>
-          <div className="dc-ev-hero-scrim" aria-hidden="true" />
           <div className="dc-ev-wrap dc-ev-hero-content">
             <span className="dc-ev-tag">
               <i aria-hidden="true" />
@@ -100,11 +96,30 @@ export default function EventLanding({ event }: { event: EventDetail }) {
             >
               {event.title}
             </motion.h1>
+
+            <motion.div
+              className="dc-ev-hero-stage"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="dc-ev-hero-photo">
+                <img src="/impressions/01-terrasse.jpg" alt="" />
+              </div>
+              {event.status !== "closed" && (
+                <div className="dc-ev-price-chip" aria-hidden="true">
+                  <div className="dc-ev-price-chip-k">Ticket</div>
+                  <div className="dc-ev-price-chip-v">{feeLabel}</div>
+                  <div className="dc-ev-price-chip-n">pro Person · inkl. Dinner</div>
+                </div>
+              )}
+            </motion.div>
+
             <motion.p
               className="dc-ev-hero-lede dc-ev-grad"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
             >
               {lede}
             </motion.p>
@@ -112,20 +127,15 @@ export default function EventLanding({ event }: { event: EventDetail }) {
               className="dc-ev-hero-actions"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
               {event.status !== "closed" ? (
-                <>
-                  <a className="dc-ev-btn-primary" href="#ticket">
-                    Ticket sichern
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </a>
-                  <span className="dc-ev-price-inline">
-                    <b>{feeLabel}</b> pro Person · inkl. Dinner
-                  </span>
-                </>
+                <a className="dc-ev-btn-primary" href="#ticket">
+                  Ticket sichern
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
               ) : (
                 <span className="dc-ev-price-inline">Dieses Event ist bereits vorbei.</span>
               )}
@@ -135,7 +145,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
               className="dc-ev-facts"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="dc-ev-fact">
                 <div className="dc-ev-fact-v">{dayShort}</div>
