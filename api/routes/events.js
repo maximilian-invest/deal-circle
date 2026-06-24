@@ -21,6 +21,37 @@ router.get("/public/next", (_req, res) => {
   res.json({ event: row || null });
 });
 
+// Public: ein einzelnes Event fuer die Event-Landingpage mit allen
+// Sales-relevanten Feldern (Preis, Programm, Speakers).
+router.get("/public/:id", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const ev = db
+    .prepare(`
+      SELECT id, title, starts_at, location, status,
+             fee_cents, max_attendees, description
+      FROM events WHERE id = ?
+    `)
+    .get(id);
+  if (!ev) return res.status(404).json({ error: "not_found" });
+
+  ev.timeline = db
+    .prepare(`
+      SELECT id, time_label, label FROM event_timeline
+      WHERE event_id = ? ORDER BY position ASC
+    `)
+    .all(id);
+  ev.speakers = db
+    .prepare(`
+      SELECT id, name, bio, photo_path FROM event_speakers
+      WHERE event_id = ? ORDER BY position ASC
+    `)
+    .all(id);
+
+  res.json({ event: ev });
+});
+
 // Member: alle Events mit nested timeline + speakers
 router.get("/", requireAuth, (_req, res) => {
   const events = db

@@ -50,10 +50,8 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           DealCircle Salzburg ist ein Kreis aus Unternehmern, Investoren
-          und Vortragenden — quer durch die Branchen. Sechs Mal im Jahr
-          treffen wir uns auf Schloss Wiespach für Gespräche, die in offenen
-          Formaten selten möglich sind. Wer etwas beizutragen hat, ist
-          eingeladen sich zu melden.
+          und Vortragenden — quer durch die Branchen. Wer etwas beizutragen
+          hat, ist eingeladen sich zu melden.
         </motion.p>
 
         <motion.div
