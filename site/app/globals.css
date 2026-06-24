@@ -2285,7 +2285,7 @@ html, body { overflow-x: hidden; }
   overflow-x: hidden;
 }
 .dc-ev img { display: block; max-width: 100%; }
-.dc-ev a { color: inherit; }
+:where(.dc-ev) a { color: inherit; }
 
 .dc-ev-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
 
