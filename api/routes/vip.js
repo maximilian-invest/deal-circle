@@ -4,6 +4,7 @@ import { z } from "zod";
 import db from "../db.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { sendMailAsync } from "../lib/mailer.js";
+import { vipWelcome } from "../lib/templates/vip-welcome.js";
 
 const NOTIFY_TO = process.env.DC_NOTIFY_TO || "event@deal-circle.at";
 
@@ -72,31 +73,13 @@ Antworten landet direkt beim Mitglied (Reply-To gesetzt).
 — DealCircle System`,
   });
 
-  // --- Mail 2/2: Customer-Confirm ---
+  // --- Mail 2/2: Customer-Confirm (HTML + Plaintext-Fallback) ---
+  const welcome = vipWelcome({ firstName: d.first_name });
   sendMailAsync({
     to: d.email,
-    subject: "Willkommen im DealCircle — deine Gratis-Mitgliedschaft ist eingegangen",
-    text:
-`Hallo ${d.first_name},
-
-vielen Dank für deine Anmeldung im DealCircle Salzburg.
-
-Als Bestandsmitglied unserer WhatsApp-Runde bekommst du das erste
-Jahr Mitgliedschaft geschenkt — kein Haken, keine versteckten Kosten.
-
-Wir melden uns in den nächsten Tagen persönlich mit deinen
-Zugangsdaten zum Mitgliederbereich und allen Informationen zu unseren
-nächsten Events.
-
-Bei Fragen einfach auf diese E-Mail antworten — landet direkt bei uns.
-
-Herzliche Grüße
-Pascal Grebien & das DealCircle-Team
-
-— —
-DealCircle Salzburg · PRO ASSETS GmbH
-event@deal-circle.at
-https://deal-circle.at`,
+    subject: welcome.subject,
+    text: welcome.text,
+    html: welcome.html,
   });
 
   res.status(201).json({ ok: true });

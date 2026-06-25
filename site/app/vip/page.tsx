@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import AuthBadge from "../../components/AuthBadge";
 import Fireworks, { type FireworksHandle } from "../../components/Fireworks";
 import Footer from "../../components/Footer";
@@ -54,6 +54,7 @@ export default function VipPage() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fxRef = useRef<FireworksHandle>(null);
 
@@ -62,6 +63,19 @@ export default function VipPage() {
     const id = window.setTimeout(() => fxRef.current?.welcome(), 450);
     return () => clearTimeout(id);
   }, []);
+
+  // Body-Scroll-Lock + Escape waehrend Modal offen
+  useEffect(() => {
+    if (!modalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setModalOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [modalOpen]);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -102,15 +116,10 @@ export default function VipPage() {
         return;
       }
       setDone(true);
-      // Grosser Knall — Feuerwerk ausgehend von der Form-Card
+      setModalOpen(true);
+      // Grosser Knall — Feuerwerk ausgehend von der Bildschirmmitte
       requestAnimationFrame(() => {
-        const el = document.getElementById("anmelden");
-        if (el) {
-          const r = el.getBoundingClientRect();
-          fxRef.current?.celebrate(r.left + r.width / 2, r.top + r.height / 2);
-        } else {
-          fxRef.current?.celebrate(window.innerWidth / 2, window.innerHeight / 2);
-        }
+        fxRef.current?.celebrate(window.innerWidth / 2, window.innerHeight * 0.42);
       });
     } catch {
       setError("Verbindung fehlgeschlagen — bitte später nochmal versuchen.");
@@ -347,6 +356,96 @@ export default function VipPage() {
       </main>
 
       <Footer />
+
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div
+            className="dc-vip-modal-ov"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dc-vip-modal-title"
+            onClick={(e) => { if (e.target === e.currentTarget) setModalOpen(false); }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div
+              className="dc-vip-modal"
+              initial={{ opacity: 0, scale: 0.92, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.46, ease: [0.18, 0.9, 0.24, 1] }}
+            >
+              <button
+                type="button"
+                className="dc-vip-modal-close"
+                onClick={() => setModalOpen(false)}
+                aria-label="Schließen"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+
+              <span className="dc-vip-modal-gift">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7S9 2 6.5 4 8 7 12 7Zm0 0s3-5 5.5-3S16 7 12 7Z" />
+                </svg>
+                1 Jahr Mitgliedschaft gratis
+              </span>
+
+              <h2 id="dc-vip-modal-title" className="dc-vip-modal-title">
+                Willkommen<br />im Circle.
+              </h2>
+
+              <p className="dc-vip-modal-msg">
+                Danke für deine Treue{form.first_name.trim() ? `, ${form.first_name.trim()}` : ""}.{" "}
+                <b>Deine Mitgliedschaft ist aktiviert</b> — dein erstes Jahr geht aufs Haus.
+              </p>
+
+              <ul className="dc-vip-modal-list">
+                <li>
+                  <Check />
+                  Erstes Jahr Mitgliedschaft — geschenkt
+                </li>
+                <li>
+                  <Check />
+                  Zugang zu exklusiven Events
+                </li>
+                <li>
+                  <Check />
+                  Preis-Ermäßigungen für zukünftige Events
+                </li>
+              </ul>
+
+              <button
+                type="button"
+                className="dc-vip-btn-submit dc-vip-modal-cta"
+                onClick={() => setModalOpen(false)}
+              >
+                Los geht&apos;s
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </button>
+
+              <p className="dc-vip-modal-hint">
+                Deine Bestätigung ist unterwegs in dein Postfach
+                {form.email.trim() ? <> an <b>{form.email.trim()}</b></> : ""}.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function Check() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
   );
 }

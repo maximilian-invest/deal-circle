@@ -3504,3 +3504,91 @@ html, body { overflow-x: hidden; }
 }
 .mb-sidebar-legal a:hover { color: var(--color-ink); }
 .mb-sidebar-legal span { opacity: 0.5; }
+
+/* =====================================================================
+   VIP-Page: Celebration Modal (nach erfolgreicher Anmeldung)
+   ===================================================================== */
+.dc-vip-modal-ov {
+  position: fixed; inset: 0;
+  z-index: 80;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: rgba(10, 10, 11, 0.74);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.dc-vip-modal {
+  width: 100%; max-width: 480px;
+  background: var(--color-surface-1);
+  border-radius: var(--r-xxl);
+  padding: 44px 40px 40px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.55);
+}
+.dc-vip-modal-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 34px; height: 34px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--color-hairline);
+  background: transparent;
+  color: var(--color-ink-muted);
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.dc-vip-modal-close:hover {
+  color: #fff;
+  border-color: var(--color-ink);
+}
+.dc-vip-modal-gift {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--vio);
+  color: #0A0A0B;
+  border-radius: var(--r-pill);
+  padding: 9px 17px;
+  font: 600 13px/1 var(--font-body); letter-spacing: 0.02em;
+  box-shadow: 0 14px 36px rgba(138, 75, 255, 0.34);
+}
+.dc-vip-modal-title {
+  font-family: var(--font-display); font-weight: 600;
+  color: #fff;
+  font-size: clamp(34px, 6vw, 46px);
+  line-height: 0.92; letter-spacing: -0.04em;
+  margin: 24px 0 0; text-wrap: balance;
+}
+.dc-vip-modal-msg {
+  margin: 16px auto 0;
+  max-width: 340px;
+  font: var(--type-body); letter-spacing: var(--tracking-body);
+  color: var(--color-ink-muted);
+  text-wrap: pretty;
+}
+.dc-vip-modal-msg b { color: #fff; font-weight: 600; }
+.dc-vip-modal-list {
+  list-style: none;
+  margin: 26px 0 30px; padding: 24px 0 0;
+  border-top: 1px solid var(--color-hairline-soft);
+  display: flex; flex-direction: column; gap: 13px;
+  text-align: left;
+}
+.dc-vip-modal-list li {
+  display: flex; align-items: center; gap: 12px;
+  font: 500 15px/1.3 var(--font-body); letter-spacing: -0.14px;
+  color: #fff;
+}
+.dc-vip-modal-list svg {
+  flex: 0 0 auto;
+  color: #B14CFF;
+}
+.dc-vip-modal-cta { margin-top: 0; }
+.dc-vip-modal-hint {
+  margin-top: 18px;
+  font: var(--type-micro); letter-spacing: var(--tracking-micro);
+  color: var(--color-ink-muted);
+}
+.dc-vip-modal-hint b { color: var(--color-ink); }
+
+@media (max-width: 480px) {
+  .dc-vip-modal { padding: 36px 28px 32px; }
+}
