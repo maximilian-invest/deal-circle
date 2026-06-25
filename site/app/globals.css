@@ -3864,3 +3864,69 @@ html, body { overflow-x: hidden; }
   .mb-mailhistory li { grid-template-columns: 1fr auto; }
   .mb-mailhistory-count { grid-column: 1 / -1; text-align: right; }
 }
+
+/* ========== Event-Landingpage: Mitglieder-Rabatt ========== */
+
+/* Prominenter Hinweis-Banner für Nicht-eingeloggte (oben im Ticket-Bereich) */
+.dc-ev-memberbar {
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  margin: 0 0 36px; padding: 22px 26px;
+  border-radius: 22px;
+  background: linear-gradient(120deg, rgba(138,75,255,0.16), rgba(255,111,216,0.10));
+  border: 1px solid rgba(177,76,255,0.38);
+}
+.dc-ev-memberbar-pct {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(38px, 6vw, 54px); line-height: 0.9; letter-spacing: -0.04em;
+  background: var(--vio);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  font-feature-settings: "tnum";
+}
+.dc-ev-memberbar-text { flex: 1 1 260px; min-width: 0; }
+.dc-ev-memberbar-t {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 20px; line-height: 1.2; letter-spacing: -0.01em; color: #fff;
+}
+.dc-ev-memberbar-s {
+  margin-top: 5px; font-size: 14.5px; line-height: 1.45;
+  color: var(--color-ink-muted, #9A9AA2);
+}
+.dc-ev-memberbar-cta {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--vio); color: #fff;
+  border-radius: var(--r-pill, 999px); padding: 14px 24px;
+  font: 600 15px/1 var(--font-body); letter-spacing: -0.1px;
+  white-space: nowrap; box-shadow: 0 10px 30px -12px rgba(177,76,255,0.7);
+}
+
+/* Meta-Zeile unter dem Preis */
+.dc-ev-price-meta {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 14px;
+}
+.dc-ev-price-was {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 22px; letter-spacing: -0.02em;
+  text-decoration: line-through; opacity: 0.42;
+  font-feature-settings: "tnum";
+}
+.dc-ev-price-tag {
+  display: inline-flex; align-items: center;
+  background: var(--vio); color: #fff;
+  border-radius: 999px; padding: 6px 13px;
+  font: 700 12px/1 var(--font-body); letter-spacing: 0.04em;
+  text-transform: uppercase; white-space: nowrap;
+}
+.dc-ev-price-hint {
+  display: inline-flex; align-items: center;
+  background: #B14CFF; color: #fff;
+  border-radius: 999px; padding: 6px 13px;
+  font: 700 12.5px/1 var(--font-body); letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .dc-ev-memberbar { gap: 16px; padding: 18px 18px; }
+  .dc-ev-memberbar-cta { width: 100%; justify-content: center; }
+}

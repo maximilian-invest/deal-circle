@@ -34,7 +34,9 @@ router.post("/:id/register", requireAuth, (req, res) => {
   if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
   const ticketId = parsed.data.ticket_id ?? null;
 
-  const event = db.prepare("SELECT id, status, fee_cents FROM events WHERE id = ?").get(eventId);
+  const event = db.prepare(
+    "SELECT id, status, fee_cents, member_discount_pct FROM events WHERE id = ?"
+  ).get(eventId);
   if (!event) return res.status(404).json({ error: "not_found" });
   if (event.status === "closed") return res.status(409).json({ error: "event_closed" });
 
@@ -55,6 +57,10 @@ router.post("/:id/register", requireAuth, (req, res) => {
     if (!t) return res.status(400).json({ error: "invalid_ticket" });
     amountCents = t.price_cents;
   }
+
+  // Eingeloggte Mitglieder bekommen den Mitglieder-Rabatt des Events.
+  const pct = event.member_discount_pct || 0;
+  if (pct > 0) amountCents = Math.round((amountCents * (100 - pct)) / 100);
 
   // Status: bei waitlist-Event automatisch auf Warteliste, sonst 'reserved'
   const status = event.status === "waitlist" ? "waitlist" : "reserved";
@@ -125,7 +131,8 @@ function loadLandingEvent(id) {
   const ev = db
     .prepare(`
       SELECT id, title, starts_at, location, status,
-             fee_cents, max_attendees, description, cover_path, visibility
+             fee_cents, max_attendees, description, cover_path, visibility,
+             member_discount_pct
       FROM events WHERE id = ?
     `)
     .get(id);
@@ -183,7 +190,7 @@ router.get("/", requireAuth, (_req, res) => {
     .prepare(`
       SELECT id, title, starts_at, location, status,
              fee_cents, max_attendees, description, cover_path,
-             is_main, visibility, created_at, updated_at
+             is_main, visibility, member_discount_pct, created_at, updated_at
       FROM events
       ORDER BY starts_at ASC
     `)

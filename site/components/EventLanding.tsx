@@ -17,6 +17,7 @@ export type EventDetail = {
   max_attendees: number | null;
   description: string | null;
   cover_path: string | null;
+  member_discount_pct: number;
   timeline: TimelineItem[];
   speakers: Speaker[];
   tickets: Ticket[];
@@ -26,6 +27,10 @@ const MONTH_SHORT = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "S
 const WEEKDAY_LONG = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
 function pad(n: number) { return String(n).padStart(2, "0"); }
+function euro(cents: number): string { return `${Math.round(cents / 100).toLocaleString("de-AT")} €`; }
+function memberCents(regularCents: number, pct: number): number {
+  return Math.round((regularCents * (100 - pct)) / 100);
+}
 
 function locationCity(loc: string): string {
   // "Schloss Wiespach, Hallein" → "Hallein", oder "St. Wolfgang am Wolfgangsee" → "St. Wolfgang am Wolfgangsee"
@@ -47,6 +52,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   const fee = Math.round(headlineCents / 100);
   const feeLabel = `${fee.toLocaleString("de-AT")} €`;
   const hasMultiTickets = event.tickets.length > 1;
+  const pct = event.member_discount_pct ?? 0;
 
   // Auth-Status + Registration-Status
   const [me, setMe] = useState<AuthUser | null | "loading">("loading");
@@ -91,6 +97,9 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   };
 
   const loginRedirect = `/mitglieder/login/`;
+  // Eingeloggt = Mitgliederpreis; anonym = regulärer Preis + Hinweis-Badge.
+  const isMember = me !== null && me !== "loading";
+  const anon = me === null;
 
   const dayShort = `${d.getDate()}. ${MONTH_SHORT[d.getMonth()]}`;
   const yearWeekday = `${d.getFullYear()} · ${WEEKDAY_LONG[d.getDay()]}`;
@@ -318,10 +327,24 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                 {event.tickets.length > 1 ? "Wähle deinen Platz." : "Sichere dir deinen Platz."}
               </h2>
 
+              {pct > 0 && anon && (
+                <div className="dc-ev-memberbar">
+                  <span className="dc-ev-memberbar-pct">−{pct}%</span>
+                  <div className="dc-ev-memberbar-text">
+                    <div className="dc-ev-memberbar-t">Als DealCircle-Mitglied {pct}% günstiger.</div>
+                    <div className="dc-ev-memberbar-s">Mit dem monatlichen Abo sicherst du dir Spezialpreise auf alle Events.</div>
+                  </div>
+                  {/* Noch nicht verlinkt — führt später zur Abo-/Bewerbungsseite. */}
+                  <span className="dc-ev-memberbar-cta" role="button" aria-disabled="true">
+                    Mitglied werden <Arrow />
+                  </span>
+                </div>
+              )}
+
               {event.tickets.length > 0 ? (
                 <div className="dc-ev-tickets" data-count={Math.min(event.tickets.length, 3)}>
                   {event.tickets.map((t, i) => {
-                    const price = `${Math.round(t.price_cents / 100).toLocaleString("de-AT")} €`;
+                    const showCents = (pct > 0 && isMember) ? memberCents(t.price_cents, pct) : t.price_cents;
                     return (
                       <motion.div
                         key={t.id ?? i}
@@ -333,7 +356,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                       >
                         {t.badge && <span className="dc-ev-tier-badge">{t.badge}</span>}
                         <div className="dc-ev-tier-name">{t.name}</div>
-                        <div className="dc-ev-tier-price">{price}</div>
+                        <div className="dc-ev-tier-price">{euro(showCents)}</div>
+                        <MemberPriceMeta regularCents={t.price_cents} pct={pct} isMember={isMember} anon={anon} />
                         <div className="dc-ev-tier-sub">pro Person · inkl. Dinner und Getränke</div>
                         <ul className="dc-ev-tier-incl">
                           {t.perks.map((p, pi) => (
@@ -365,10 +389,11 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                   <div className="dc-ev-ticket-card-head">
                     <div className="dc-ev-ticket-k">Ticket</div>
                     <div className="dc-ev-ticket-price">
-                      {feeLabel}
+                      {euro((pct > 0 && isMember) ? memberCents(event.fee_cents, pct) : event.fee_cents)}
                       <small>pro Person · inkl. Dinner und Getränke</small>
                     </div>
                   </div>
+                  <MemberPriceMeta regularCents={event.fee_cents} pct={pct} isMember={isMember} anon={anon} />
                   <ul className="dc-ev-incl">
                     {event.speakers.length > 0 && (
                       <li><Check />Zugang zu {event.speakers.length === 1 ? "der Keynote" : `${event.speakers.length} Keynotes`}</li>
@@ -407,6 +432,30 @@ function Arrow() {
       <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
+}
+
+// Kleine Zeile unter dem Preis: eingeloggt → regulärer Preis durchgestrichen +
+// "Mitgliederpreis"-Tag; anonym → Hinweis-Badge "−X% als Mitglied".
+function MemberPriceMeta({ regularCents, pct, isMember, anon }: {
+  regularCents: number; pct: number; isMember: boolean; anon: boolean;
+}) {
+  if (pct <= 0) return null;
+  if (isMember) {
+    return (
+      <div className="dc-ev-price-meta">
+        <span className="dc-ev-price-was">{euro(regularCents)}</span>
+        <span className="dc-ev-price-tag">Mitgliederpreis · −{pct}%</span>
+      </div>
+    );
+  }
+  if (anon) {
+    return (
+      <div className="dc-ev-price-meta">
+        <span className="dc-ev-price-hint">−{pct}% als DealCircle-Mitglied</span>
+      </div>
+    );
+  }
+  return null;
 }
 
 type CtaCommon = {

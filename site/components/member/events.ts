@@ -13,6 +13,7 @@ export type CreateEventInput = {
   cover_path: string | null;
   is_main: boolean;
   visibility: "public" | "members";
+  member_discount_pct: number;
   timeline: TimelineItem[];
   speakers: Speaker[];
   tickets: Ticket[];

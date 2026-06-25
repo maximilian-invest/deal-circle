@@ -32,6 +32,7 @@ type FormState = {
   is_main: boolean;
   visibility: "public" | "members";
   fee_eur: string;
+  member_discount_pct: string;
   max_attendees: string;
   description: string;
   cover_path: string | null;
@@ -55,6 +56,7 @@ const EMPTY: FormState = {
   is_main: false,
   visibility: "public",
   fee_eur: "380",
+  member_discount_pct: "0",
   max_attendees: "32",
   description: "",
   cover_path: null,
@@ -83,6 +85,7 @@ function toForm(e: EventDto): FormState {
     is_main: e.is_main,
     visibility: e.visibility,
     fee_eur: String(Math.round(e.fee_cents / 100)),
+    member_discount_pct: String(e.member_discount_pct ?? 0),
     max_attendees: e.max_attendees == null ? "" : String(e.max_attendees),
     description: e.description ?? "",
     cover_path: e.cover_path,
@@ -109,6 +112,7 @@ function fromForm(f: FormState): CreateEventInput {
     is_main: f.is_main,
     visibility: f.visibility,
     fee_cents: Math.round(Number(f.fee_eur || "0") * 100),
+    member_discount_pct: Math.max(0, Math.min(90, Math.round(Number(f.member_discount_pct || "0")))),
     max_attendees: f.max_attendees.trim() === "" ? null : Number(f.max_attendees),
     description: f.description.trim() ? f.description.trim() : null,
     cover_path: f.cover_path,
@@ -487,6 +491,24 @@ export default function EventsAdmin() {
               </div>
             </div>
 
+            <div className="dc-field">
+              <label htmlFor="ev-mdisc">Mitglieder-Rabatt (%)</label>
+              <input
+                id="ev-mdisc"
+                type="number"
+                min="0"
+                max="90"
+                step="1"
+                value={form.member_discount_pct}
+                onChange={(e) => setForm({ ...form, member_discount_pct: e.target.value })}
+                placeholder="z. B. 20"
+              />
+              <p style={{ margin: "6px 2px 0", fontSize: 13, lineHeight: 1.5, color: "var(--color-ink-muted)" }}>
+                0 = kein Rabatt. Eingeloggte Mitglieder sehen automatisch den vergünstigten Preis;
+                Nicht-Mitglieder den regulären Preis plus einen „−X %"-Hinweis-Badge.
+              </p>
+            </div>
+
             <div className="mb-admin-form-row">
               <div className="dc-field">
                 <label htmlFor="ev-visibility">Sichtbarkeit</label>
@@ -788,6 +810,9 @@ export default function EventsAdmin() {
                         )}
                         {e.visibility === "members" && (
                           <span className="mb-admin-role mb-admin-role--member" style={{ marginLeft: 8 }}>Nur Mitglieder</span>
+                        )}
+                        {e.member_discount_pct > 0 && (
+                          <span className="mb-admin-role mb-admin-role--admin" style={{ marginLeft: 8 }}>−{e.member_discount_pct}% Mitglieder</span>
                         )}
                       </td>
                       <td>{e.location}</td>

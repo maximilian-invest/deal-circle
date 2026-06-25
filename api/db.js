@@ -51,6 +51,7 @@ db.exec(`
     cover_path TEXT,
     is_main INTEGER NOT NULL DEFAULT 0,
     visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'members')),
+    member_discount_pct INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT
   );
@@ -157,6 +158,10 @@ function migrateEventsSchema() {
   if (!cols.includes("visibility")) {
     console.log("[migrate] events: add column visibility");
     db.exec("ALTER TABLE events ADD COLUMN visibility TEXT NOT NULL DEFAULT 'public'");
+  }
+  if (!cols.includes("member_discount_pct")) {
+    console.log("[migrate] events: add column member_discount_pct");
+    db.exec("ALTER TABLE events ADD COLUMN member_discount_pct INTEGER NOT NULL DEFAULT 0");
   }
 
   // event_tickets: badge + featured
