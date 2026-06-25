@@ -76,6 +76,22 @@ db.exec(`
   );
 
   CREATE INDEX IF NOT EXISTS idx_tickets_event ON event_tickets (event_id, position);
+
+  CREATE TABLE IF NOT EXISTS vip_signups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    email TEXT NOT NULL COLLATE NOCASE,
+    phone TEXT NOT NULL,
+    company TEXT,
+    consent_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    processed_at TEXT,
+    note TEXT
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_vip_signups_email ON vip_signups (email);
+  CREATE INDEX IF NOT EXISTS idx_vip_signups_created ON vip_signups (created_at DESC);
 `);
 
 // --- Migration: alte Spalten droppen (idempotent) -----------------------------
