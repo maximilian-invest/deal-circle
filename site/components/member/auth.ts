@@ -88,7 +88,7 @@ export type RegisterInput = {
 };
 
 export async function registerMember(input: RegisterInput): Promise<{ token: string; user: AuthUser }> {
-  const data = await api<{ token: string; user: AuthUser }>("/vip/register", {
+  const data = await api<{ token: string; user: AuthUser }>("/member/register", {
     method: "POST",
     body: input,
     auth: false,

@@ -73,9 +73,9 @@ router.post("/register", signupLimiter, (req, res) => {
   sendMailAsync({
     to: NOTIFY_TO,
     replyTo: d.email,
-    subject: `Neue Mitgliedschafts-Anmeldung: ${fullName}`,
+    subject: `Neue Anmeldung: ${fullName}`,
     text:
-`Neue Mitgliedschafts-Anmeldung über https://deal-circle.at/vip/
+`Neue Anmeldung über https://deal-circle.at/member/
 
 Name:        ${fullName}
 E-Mail:      ${d.email}
