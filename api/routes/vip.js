@@ -3,6 +3,9 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import db from "../db.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
+import { sendMailAsync } from "../lib/mailer.js";
+
+const NOTIFY_TO = process.env.DC_NOTIFY_TO || "event@deal-circle.at";
 
 const router = Router();
 
@@ -45,6 +48,56 @@ router.post("/register", signupLimiter, (req, res) => {
     `INSERT INTO vip_signups (first_name, last_name, email, phone, company, consent_at)
      VALUES (?, ?, ?, ?, ?, datetime('now'))`
   ).run(d.first_name, d.last_name, d.email, d.phone, d.company ?? null);
+
+  // --- Mail 1/2: Admin-Notify (fire-and-forget) ---
+  const ts = new Date().toLocaleString("de-AT", {
+    year: "numeric", month: "long", day: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
+  sendMailAsync({
+    to: NOTIFY_TO,
+    replyTo: d.email,
+    subject: `Neue VIP-Anmeldung: ${d.first_name} ${d.last_name}`,
+    text:
+`Neue Bestandsmitglieder-Anmeldung auf https://deal-circle.at/vip/
+
+Name:        ${d.first_name} ${d.last_name}
+E-Mail:      ${d.email}
+WhatsApp:    ${d.phone}
+Unternehmen: ${d.company || "—"}
+Eingelangt:  ${ts}
+
+Antworten landet direkt beim Mitglied (Reply-To gesetzt).
+
+— DealCircle System`,
+  });
+
+  // --- Mail 2/2: Customer-Confirm ---
+  sendMailAsync({
+    to: d.email,
+    subject: "Willkommen im DealCircle — deine Gratis-Mitgliedschaft ist eingegangen",
+    text:
+`Hallo ${d.first_name},
+
+vielen Dank für deine Anmeldung im DealCircle Salzburg.
+
+Als Bestandsmitglied unserer WhatsApp-Runde bekommst du das erste
+Jahr Mitgliedschaft geschenkt — kein Haken, keine versteckten Kosten.
+
+Wir melden uns in den nächsten Tagen persönlich mit deinen
+Zugangsdaten zum Mitgliederbereich und allen Informationen zu unseren
+nächsten Events.
+
+Bei Fragen einfach auf diese E-Mail antworten — landet direkt bei uns.
+
+Herzliche Grüße
+Pascal Grebien & das DealCircle-Team
+
+— —
+DealCircle Salzburg · PRO ASSETS GmbH
+event@deal-circle.at
+https://deal-circle.at`,
+  });
 
   res.status(201).json({ ok: true });
 });

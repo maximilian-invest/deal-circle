@@ -87,6 +87,16 @@ DC_ADMIN_NAME=Maximilian
 DC_JWT_SECRET=$JWT_SECRET
 DC_JWT_TTL=7d
 DC_CORS_ORIGIN=https://deal-circle.at
+
+# SMTP fuer VIP-Signup-Mails + Event-Bestaetigungen
+# (Bitte Passwort regelmaessig rotieren — niemals in Repo committen.)
+DC_SMTP_HOST=smtp.world4you.com
+DC_SMTP_PORT=587
+DC_SMTP_USER=event@deal-circle.at
+DC_SMTP_PASS=BITTE_HIER_DAS_SMTP_PASSWORT_EINTRAGEN
+DC_SMTP_FROM=event@deal-circle.at
+DC_SMTP_FROM_NAME=DealCircle Salzburg
+DC_NOTIFY_TO=event@deal-circle.at
 EOF
   chmod 640 "$API_ENV_FILE"
   chown root:"$API_USER" "$API_ENV_FILE"
