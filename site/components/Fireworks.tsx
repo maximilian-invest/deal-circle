@@ -28,8 +28,9 @@ const Fireworks = forwardRef<FireworksHandle>(function Fireworks(_, ref) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const maybeCtx = canvas.getContext("2d");
+    if (!maybeCtx) return;
+    const ctx: CanvasRenderingContext2D = maybeCtx;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
