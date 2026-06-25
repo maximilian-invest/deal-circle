@@ -51,19 +51,31 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           PORT="${DEPLOY_PORT:-22}"
           USER_AT="${DEPLOY_USER:-root}"
 
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -p "$PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-          # Aktuelles Deploy-Skript (aus diesem Commit) auf den Server kopieren …
-          scp -i ~/.ssh/id_deploy -P "$PORT" -o StrictHostKeyChecking=accept-new \
-            deploy-server.sh "$USER_AT@$DEPLOY_HOST:/tmp/deploy-server.sh"
+          # Gemeinsame SSH-Optionen: schnell scheitern (ConnectTimeout) statt ~2 min
+          # zu hängen; lange Sitzung am Leben halten (ServerAlive).
+          SSH_OPTS="-i $HOME/.ssh/id_deploy -o StrictHostKeyChecking=accept-new -o ConnectTimeout=25 -o ServerAliveInterval=15 -o ServerAliveCountMax=4"
 
-          # … und ausführen: klont main, baut Frontend+Backend, restartet API, reloaded nginx.
-          ssh -i ~/.ssh/id_deploy -p "$PORT" -o StrictHostKeyChecking=accept-new \
-            "$USER_AT@$DEPLOY_HOST" 'BRANCH=main bash /tmp/deploy-server.sh'
+          # Deploy mit Retry — der VPS-SSH timed gelegentlich aus (flaky).
+          n=0
+          until [ "$n" -ge 3 ]; do
+            n=$((n+1))
+            echo "→ Deploy-Versuch $n/3 …"
+            ssh-keyscan -p "$PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+            if scp $SSH_OPTS -P "$PORT" deploy-server.sh "$USER_AT@$DEPLOY_HOST:/tmp/deploy-server.sh" \
+               && ssh $SSH_OPTS -p "$PORT" "$USER_AT@$DEPLOY_HOST" 'BRANCH=main bash /tmp/deploy-server.sh'; then
+              echo "✓ Deploy erfolgreich (Versuch $n)."
+              exit 0
+            fi
+            echo "⚠ Versuch $n fehlgeschlagen."
+            [ "$n" -lt 3 ] && sleep 15
+          done
+          echo "✗ Deploy nach 3 Versuchen fehlgeschlagen — VPS per SSH nicht erreichbar."
+          exit 1
