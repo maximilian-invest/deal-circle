@@ -1,0 +1,69 @@
+# Automatischer Deploy auf deal-circle.at bei jedem Push auf main.
+#
+# Mechanik: per SSH wird das vorhandene deploy-server.sh auf dem VPS ausgeführt.
+# Das Skript klont main frisch, baut Frontend (Next.js static export) + Backend,
+# restartet die API (systemd → DB-Migration läuft) und reloaded nginx.
+#
+# Benötigte Repo-Secrets (Settings → Secrets and variables → Actions):
+#   DEPLOY_HOST     Host/IP des VPS (das echte Ziel hinter dem SSH-Alias "srhomes-vps")
+#   DEPLOY_SSH_KEY  privater SSH-Key (PEM), dessen Public-Key am VPS in
+#                   ~/.ssh/authorized_keys des Deploy-Users liegt
+#   DEPLOY_USER     SSH-User (optional, Default: root — deploy-server.sh braucht root)
+#   DEPLOY_PORT     SSH-Port (optional, Default: 22)
+#
+# Manuell auslösen: Actions → "Deploy zu deal-circle.at" → "Run workflow".
+
+name: Deploy zu deal-circle.at
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Nie zwei Deploys gleichzeitig; laufenden Deploy nicht abbrechen.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy-Secrets prüfen
+        id: gate
+        run: |
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ] || [ -z "${{ secrets.DEPLOY_SSH_KEY }}" ]; then
+            echo "::warning::Deploy übersprungen — bitte Repo-Secrets DEPLOY_HOST und DEPLOY_SSH_KEY (optional DEPLOY_USER/DEPLOY_PORT) setzen."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.gate.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Auf den Server deployen (deploy-server.sh)
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          PORT="${DEPLOY_PORT:-22}"
+          USER_AT="${DEPLOY_USER:-root}"
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "$PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          # Aktuelles Deploy-Skript (aus diesem Commit) auf den Server kopieren …
+          scp -i ~/.ssh/id_deploy -P "$PORT" -o StrictHostKeyChecking=accept-new \
+            deploy-server.sh "$USER_AT@$DEPLOY_HOST:/tmp/deploy-server.sh"
+
+          # … und ausführen: klont main, baut Frontend+Backend, restartet API, reloaded nginx.
+          ssh -i ~/.ssh/id_deploy -p "$PORT" -o StrictHostKeyChecking=accept-new \
+            "$USER_AT@$DEPLOY_HOST" 'BRANCH=main bash /tmp/deploy-server.sh'
