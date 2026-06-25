@@ -65,8 +65,12 @@ export default function NextEvent({ event, onSignup }: Props) {
             </>
           ) : (
             <>
-              <button className="dc-btn dc-btn-primary dc-btn--lg" onClick={onSignup}>Jetzt anmelden</button>
-              <a href="#" className="dc-btn dc-btn-secondary dc-btn--lg" onClick={(e) => e.preventDefault()}>Programm ansehen</a>
+              {event.checkoutUrl ? (
+                <a className="dc-btn dc-btn-primary dc-btn--lg" href={event.checkoutUrl}>Jetzt anmelden</a>
+              ) : (
+                <button className="dc-btn dc-btn-primary dc-btn--lg" onClick={onSignup}>Jetzt anmelden</button>
+              )}
+              <a className="dc-btn dc-btn-secondary dc-btn--lg" href={`/event/?id=${event.id}#programm`}>Programm ansehen</a>
             </>
           )}
         </div>

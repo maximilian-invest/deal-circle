@@ -215,12 +215,14 @@ export function toNextEventShape(e: EventDto) {
   }) + " · " + d.toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" });
 
   return {
+    id: e.id,
     iso: e.starts_at,
     title: e.title,
     dateLabel,
     location: e.location,
     attendees: e.max_attendees ?? 0,
     userStatus: "open" as const,
+    checkoutUrl: e.checkout_url ?? null,
   };
 }
 

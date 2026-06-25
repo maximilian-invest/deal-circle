@@ -11,6 +11,7 @@ export function buildDemoData() {
   nextDate.setHours(18, 30, 0, 0);
 
   const nextEvent: NextEventData = {
+    id: 0,
     iso: nextDate.toISOString(),
     title: "Wiespach LXVII · Privatkapital im Mittelstand.",
     dateLabel: fmtDate(nextDate) + " · 18:30",

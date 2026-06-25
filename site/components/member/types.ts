@@ -13,12 +13,17 @@ export type UpcomingEvent = {
 };
 
 export type NextEventData = {
+  id: number;
   iso: string;
   title: string;
   dateLabel: string;
   location: string;
   attendees: number;
   userStatus: "open" | "paid";
+  // Stripe Checkout / Payment Link des Events. Sobald Stripe live ist und das
+  // Backend diese URL liefert, verlinkt "Jetzt anmelden" direkt dorthin;
+  // bis dahin null → Fallback auf den bestehenden Anmelde-Flow.
+  checkoutUrl?: string | null;
 };
 
 export type StatItem = { label: string; value: string; note: string };
@@ -78,6 +83,8 @@ export type EventDto = {
   max_attendees: number | null;
   description: string | null;
   cover_path: string | null;
+  // Stripe Checkout / Payment Link (optional, erst gesetzt sobald Stripe live ist).
+  checkout_url?: string | null;
   timeline: TimelineItem[];
   speakers: Speaker[];
   tickets: Ticket[];
