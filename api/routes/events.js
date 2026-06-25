@@ -99,37 +99,37 @@ router.delete("/:id/register", requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// Public: naechstes upcoming-Event fuer den Landingpage-Banner.
-// Keine Auth, nur sichere Felder.
+// Public: prominentes Event fuer den Startseiten-Banner.
+// Bevorzugt ein als "Main Event" getaggtes Event, sonst das naechste upcoming.
+// Nur oeffentliche Events, keine Auth, nur sichere Felder.
 router.get("/public/next", (_req, res) => {
   const row = db
     .prepare(`
-      SELECT id, title, starts_at, location, status
+      SELECT id, title, starts_at, location, status, is_main
       FROM events
       WHERE starts_at >= datetime('now')
         AND status != 'closed'
-      ORDER BY starts_at ASC
+        AND visibility = 'public'
+      ORDER BY is_main DESC, starts_at ASC
       LIMIT 1
     `)
     .get();
 
+  if (row) row.is_main = row.is_main === 1;
   res.json({ event: row || null });
 });
 
-// Public: ein einzelnes Event fuer die Event-Landingpage mit allen
-// Sales-relevanten Feldern (Preis, Programm, Speakers).
-router.get("/public/:id", (req, res) => {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
-
+// Vollstaendiges Event fuer die Landingpage (Preis, Programm, Speaker, Tickets).
+// Liefert visibility mit, damit die Aufrufer die Sichtbarkeit pruefen koennen.
+function loadLandingEvent(id) {
   const ev = db
     .prepare(`
       SELECT id, title, starts_at, location, status,
-             fee_cents, max_attendees, description, cover_path
+             fee_cents, max_attendees, description, cover_path, visibility
       FROM events WHERE id = ?
     `)
     .get(id);
-  if (!ev) return res.status(404).json({ error: "not_found" });
+  if (!ev) return null;
 
   ev.timeline = db
     .prepare(`
@@ -157,7 +157,18 @@ router.get("/public/:id", (req, res) => {
       price_cents: t.price_cents,
       perks: safeJson(t.perks_json),
     }));
+  return ev;
+}
 
+// Public: ein einzelnes OEFFENTLICHES Event fuer die Event-Landingpage.
+// Nur-Mitglieder-Events sind hier nicht abrufbar (404).
+router.get("/public/:id", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const ev = loadLandingEvent(id);
+  if (!ev || ev.visibility !== "public") return res.status(404).json({ error: "not_found" });
+  delete ev.visibility;
   res.json({ event: ev });
 });
 
@@ -172,7 +183,7 @@ router.get("/", requireAuth, (_req, res) => {
     .prepare(`
       SELECT id, title, starts_at, location, status,
              fee_cents, max_attendees, description, cover_path,
-             created_at, updated_at
+             is_main, visibility, created_at, updated_at
       FROM events
       ORDER BY starts_at ASC
     `)
@@ -232,12 +243,25 @@ router.get("/", requireAuth, (_req, res) => {
   }
 
   for (const e of events) {
+    e.is_main = e.is_main === 1;
     e.timeline = timelineByEvent.get(e.id) || [];
     e.speakers = speakersByEvent.get(e.id) || [];
     e.tickets  = ticketsByEvent.get(e.id)  || [];
   }
 
   res.json({ events });
+});
+
+// Member: ein einzelnes Event (oeffentlich ODER nur-Mitglieder) fuer die
+// Landingpage eines eingeloggten Mitglieds. Muss nach /public/:id stehen.
+router.get("/:id", requireAuth, (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const ev = loadLandingEvent(id);
+  if (!ev) return res.status(404).json({ error: "not_found" });
+  delete ev.visibility;
+  res.json({ event: ev });
 });
 
 export default router;

@@ -39,6 +39,8 @@ const eventCreateSchema = z.object({
   max_attendees: z.number().int().min(0).max(10000).nullable().optional().default(null),
   description: z.string().max(2000).nullable().optional().default(null),
   cover_path: z.string().max(500).nullable().optional().default(null),
+  is_main: z.boolean().default(false),
+  visibility: z.enum(["public", "members"]).default("public"),
   timeline: z.array(timelineItemSchema).max(50).optional().default([]),
   speakers: z.array(speakerSchema).max(20).optional().default([]),
   tickets:  z.array(ticketSchema).max(10).optional().default([]),
@@ -51,11 +53,13 @@ function fetchEventFull(id) {
   const ev = db
     .prepare(`
       SELECT id, title, starts_at, location, status, fee_cents,
-             max_attendees, description, cover_path, created_at, updated_at
+             max_attendees, description, cover_path, is_main, visibility,
+             created_at, updated_at
       FROM events WHERE id = ?
     `)
     .get(id);
   if (!ev) return null;
+  ev.is_main = ev.is_main === 1;
   ev.timeline = db
     .prepare(`
       SELECT id, time_label, label FROM event_timeline
@@ -142,11 +146,11 @@ router.post("/", (req, res) => {
     const info = db
       .prepare(`
         INSERT INTO events (title, starts_at, location, status, fee_cents,
-                            max_attendees, description, cover_path)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            max_attendees, description, cover_path, is_main, visibility)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `)
       .run(d.title, d.starts_at, d.location, d.status, d.fee_cents,
-           d.max_attendees, d.description, d.cover_path);
+           d.max_attendees, d.description, d.cover_path, d.is_main ? 1 : 0, d.visibility);
     replaceTimeline(info.lastInsertRowid, d.timeline);
     replaceSpeakers(info.lastInsertRowid, d.speakers);
     replaceTickets(info.lastInsertRowid, d.tickets);
@@ -171,7 +175,7 @@ router.patch("/:id", (req, res) => {
   const d = parsed.data;
 
   const eventCols = ["title", "starts_at", "location", "status", "fee_cents",
-                     "max_attendees", "description", "cover_path"];
+                     "max_attendees", "description", "cover_path", "visibility"];
   const updates = [];
   const values = [];
   for (const col of eventCols) {
@@ -179,6 +183,10 @@ router.patch("/:id", (req, res) => {
       updates.push(`${col} = ?`);
       values.push(d[col]);
     }
+  }
+  if (d.is_main !== undefined) {
+    updates.push("is_main = ?");
+    values.push(d.is_main ? 1 : 0);
   }
 
   const tx = db.transaction(() => {

@@ -49,6 +49,8 @@ db.exec(`
     max_attendees INTEGER,
     description TEXT,
     cover_path TEXT,
+    is_main INTEGER NOT NULL DEFAULT 0,
+    visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'members')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT
   );
@@ -147,6 +149,14 @@ function migrateEventsSchema() {
   if (!cols.includes("cover_path")) {
     console.log("[migrate] events: add column cover_path");
     db.exec("ALTER TABLE events ADD COLUMN cover_path TEXT");
+  }
+  if (!cols.includes("is_main")) {
+    console.log("[migrate] events: add column is_main");
+    db.exec("ALTER TABLE events ADD COLUMN is_main INTEGER NOT NULL DEFAULT 0");
+  }
+  if (!cols.includes("visibility")) {
+    console.log("[migrate] events: add column visibility");
+    db.exec("ALTER TABLE events ADD COLUMN visibility TEXT NOT NULL DEFAULT 'public'");
   }
 
   // event_tickets: badge + featured
