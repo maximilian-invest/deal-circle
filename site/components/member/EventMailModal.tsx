@@ -6,6 +6,7 @@ import type { EventDto } from "./types";
 type Props = {
   event: EventDto;
   onClose: () => void;
+  onSent: (message: string) => void;
 };
 
 const KIND_INFO: Record<MailKind, { title: string; sub: string; icon: string }> = {
@@ -34,7 +35,7 @@ function suggestedKind(status: EventDto["status"]): MailKind {
   return "announcement";
 }
 
-export default function EventMailModal({ event, onClose }: Props) {
+export default function EventMailModal({ event, onClose, onSent }: Props) {
   const [stats, setStats] = useState<MailStats | null>(null);
   const [kind, setKind] = useState<MailKind>(suggestedKind(event.status));
   const [excludeRegistered, setExcludeRegistered] = useState(kind === "limited");
@@ -75,18 +76,18 @@ export default function EventMailModal({ event, onClose }: Props) {
     setSending(true);
     try {
       const r = await sendEventMail(event.id, { kind, exclude_registered: excludeRegistered, test_to_self: testToSelf });
-      setResult(
-        r.test
-          ? `Test-Mail an dich gesendet (${r.label}).`
-          : `${r.label}: an ${r.recipient_count} Mitglieder versendet.`
-      );
-      if (!r.test) {
-        // Refresh history
-        getMailStats(event.id).then(setStats).catch(() => {});
+      if (r.test) {
+        // Test-Versand: Modal offen lassen, Ergebnis inline anzeigen
+        setResult(`Test-Mail an dich gesendet (${r.label}).`);
+        setSending(false);
+      } else {
+        // Live-Versand erfolgreich: Bestätigung hochreichen, Parent schließt das Modal
+        const n = r.recipient_count;
+        onSent(`${r.label}: an ${n} ${n === 1 ? "Mitglied" : "Mitglieder"} versendet.`);
+        // kein weiteres setState — das Modal wird vom Parent unmounted
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Versand fehlgeschlagen.");
-    } finally {
       setSending(false);
     }
   };

@@ -803,7 +803,11 @@ export default function EventsAdmin() {
       </section>
 
       {mailEvent && (
-        <EventMailModal event={mailEvent} onClose={() => setMailEvent(null)} />
+        <EventMailModal
+          event={mailEvent}
+          onClose={() => setMailEvent(null)}
+          onSent={(msg) => { setMailEvent(null); setNotice(msg); }}
+        />
       )}
       {regsEvent && (
         <EventRegistrationsModal event={regsEvent} onClose={() => setRegsEvent(null)} />
