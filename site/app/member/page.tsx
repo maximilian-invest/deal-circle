@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthBadge from "../../components/AuthBadge";
+import SessionCta from "../../components/SessionCta";
 import Fireworks, { type FireworksHandle } from "../../components/Fireworks";
 import Footer from "../../components/Footer";
 import { registerMember } from "../../components/member/auth";
@@ -133,7 +134,7 @@ export default function VipPage() {
           </a>
           <div className="dc-vip-nav-right">
             <AuthBadge variant="dark" />
-            <a className="dc-vip-nav-cta" href="#anmelden">Jetzt aktivieren</a>
+            <SessionCta joinHref="#anmelden" joinLabel="Jetzt aktivieren" className="dc-vip-nav-cta" />
           </div>
         </div>
       </header>

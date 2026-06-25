@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
+import SessionCta from "./SessionCta";
 
 export default function Nav() {
   return (
@@ -33,7 +34,7 @@ export default function Nav() {
         </nav>
         <div className="dc-nav-cta">
           <AuthBadge variant="dark" />
-          <a href="#kontakt" className="dc-btn dc-btn-primary">Mitglied werden</a>
+          <SessionCta joinHref="#kontakt" joinLabel="Mitglied werden" className="dc-btn dc-btn-primary" />
         </div>
       </div>
     </motion.header>
