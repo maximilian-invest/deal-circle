@@ -69,6 +69,8 @@ db.exec(`
     event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
     position INTEGER NOT NULL DEFAULT 0,
     name TEXT NOT NULL,
+    badge TEXT,
+    featured INTEGER NOT NULL DEFAULT 0,
     price_cents INTEGER NOT NULL,
     perks_json TEXT NOT NULL DEFAULT '[]'
   );
@@ -89,6 +91,17 @@ function migrateEventsSchema() {
   if (!cols.includes("cover_path")) {
     console.log("[migrate] events: add column cover_path");
     db.exec("ALTER TABLE events ADD COLUMN cover_path TEXT");
+  }
+
+  // event_tickets: badge + featured
+  const tcols = db.prepare("PRAGMA table_info(event_tickets)").all().map((c) => c.name);
+  if (!tcols.includes("badge")) {
+    console.log("[migrate] event_tickets: add column badge");
+    db.exec("ALTER TABLE event_tickets ADD COLUMN badge TEXT");
+  }
+  if (!tcols.includes("featured")) {
+    console.log("[migrate] event_tickets: add column featured");
+    db.exec("ALTER TABLE event_tickets ADD COLUMN featured INTEGER NOT NULL DEFAULT 0");
   }
 }
 migrateEventsSchema();

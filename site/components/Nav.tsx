@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import AuthBadge from "./AuthBadge";
 
 export default function Nav() {
   return (
@@ -31,7 +32,7 @@ export default function Nav() {
           <a href="#faq">FAQ</a>
         </nav>
         <div className="dc-nav-cta">
-          <a href="/mitglieder/login/" className="dc-btn dc-btn-secondary">Login</a>
+          <AuthBadge variant="dark" />
           <a href="#kontakt" className="dc-btn dc-btn-primary">Mitglied werden</a>
         </div>
       </div>

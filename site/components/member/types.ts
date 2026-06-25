@@ -62,6 +62,8 @@ export type Speaker = {
 export type Ticket = {
   id?: number;
   name: string;
+  badge: string | null;
+  featured: boolean;
   price_cents: number;
   perks: string[];
 };

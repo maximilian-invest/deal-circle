@@ -50,13 +50,15 @@ router.get("/public/:id", (req, res) => {
     .all(id);
   ev.tickets = db
     .prepare(`
-      SELECT id, name, price_cents, perks_json FROM event_tickets
+      SELECT id, name, badge, featured, price_cents, perks_json FROM event_tickets
       WHERE event_id = ? ORDER BY position ASC
     `)
     .all(id)
     .map((t) => ({
       id: t.id,
       name: t.name,
+      badge: t.badge,
+      featured: t.featured === 1,
       price_cents: t.price_cents,
       perks: safeJson(t.perks_json),
     }));
@@ -117,7 +119,7 @@ router.get("/", requireAuth, (_req, res) => {
 
     const tkRows = db
       .prepare(`
-        SELECT event_id, id, name, price_cents, perks_json
+        SELECT event_id, id, name, badge, featured, price_cents, perks_json
         FROM event_tickets
         WHERE event_id IN (${placeholders})
         ORDER BY event_id, position
@@ -126,7 +128,9 @@ router.get("/", requireAuth, (_req, res) => {
     for (const r of tkRows) {
       if (!ticketsByEvent.has(r.event_id)) ticketsByEvent.set(r.event_id, []);
       ticketsByEvent.get(r.event_id).push({
-        id: r.id, name: r.name, price_cents: r.price_cents,
+        id: r.id, name: r.name,
+        badge: r.badge, featured: r.featured === 1,
+        price_cents: r.price_cents,
         perks: safeJson(r.perks_json),
       });
     }

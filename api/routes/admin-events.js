@@ -20,6 +20,8 @@ const speakerSchema = z.object({
 
 const ticketSchema = z.object({
   name: z.string().min(1).max(120),
+  badge: z.string().max(60).nullable().optional().default(null),
+  featured: z.boolean().default(false),
   price_cents: z.number().int().min(0).max(10_000_00),
   perks: z.array(z.string().min(1).max(200)).max(20).default([]),
 });
@@ -64,13 +66,15 @@ function fetchEventFull(id) {
     .all(id);
   ev.tickets = db
     .prepare(`
-      SELECT id, name, price_cents, perks_json FROM event_tickets
+      SELECT id, name, badge, featured, price_cents, perks_json FROM event_tickets
       WHERE event_id = ? ORDER BY position ASC
     `)
     .all(id)
     .map((t) => ({
       id: t.id,
       name: t.name,
+      badge: t.badge,
+      featured: t.featured === 1,
       price_cents: t.price_cents,
       perks: safeParseJson(t.perks_json, []),
     }));
@@ -91,8 +95,8 @@ const insertSpeakerStmt = db.prepare(`
   VALUES (?, ?, ?, ?, ?)
 `);
 const insertTicketStmt = db.prepare(`
-  INSERT INTO event_tickets (event_id, position, name, price_cents, perks_json)
-  VALUES (?, ?, ?, ?, ?)
+  INSERT INTO event_tickets (event_id, position, name, badge, featured, price_cents, perks_json)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
 `);
 const deleteTimelineStmt = db.prepare("DELETE FROM event_timeline WHERE event_id = ?");
 const deleteSpeakersStmt = db.prepare("DELETE FROM event_speakers WHERE event_id = ?");
@@ -111,7 +115,13 @@ function replaceSpeakers(eventId, items) {
 function replaceTickets(eventId, items) {
   deleteTicketsStmt.run(eventId);
   items.forEach((item, idx) =>
-    insertTicketStmt.run(eventId, idx, item.name, item.price_cents, JSON.stringify(item.perks || []))
+    insertTicketStmt.run(
+      eventId, idx, item.name,
+      item.badge ?? null,
+      item.featured ? 1 : 0,
+      item.price_cents,
+      JSON.stringify(item.perks || [])
+    )
   );
 }
 

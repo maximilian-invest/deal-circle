@@ -2840,3 +2840,229 @@ html, body { overflow-x: hidden; }
   .dc-ev-ticket-card { padding: 26px; }
   .dc-ev-ticket-card--solo { padding: 30px; }
 }
+
+/* =====================================================================
+   EVENT-LANDINGPAGE — Pricing-Tiers (mehrere Ticket-Cards mit Badge)
+   ===================================================================== */
+.dc-ev-tickets {
+  display: grid;
+  gap: 22px;
+  align-items: stretch;
+}
+.dc-ev-tickets[data-count="1"] { grid-template-columns: minmax(0, 720px); justify-content: center; }
+.dc-ev-tickets[data-count="2"] { grid-template-columns: 1fr 1fr; }
+.dc-ev-tickets[data-count="3"] { grid-template-columns: 1fr 1fr 1fr; }
+
+.dc-ev-tier {
+  position: relative;
+  display: flex; flex-direction: column;
+  background: var(--color-surface-1);
+  border-radius: var(--r-xxl);
+  padding: 36px 30px;
+}
+.dc-ev-tier.is-featured {
+  background: var(--vio);
+  box-shadow: 0 30px 80px rgba(138, 75, 255, 0.28);
+}
+
+.dc-ev-tier-badge {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--r-pill);
+  padding: 6px 13px;
+  font: var(--type-caption); letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+.dc-ev-tier.is-featured .dc-ev-tier-badge {
+  border-color: rgba(10, 10, 11, 0.28);
+  color: rgba(10, 10, 11, 0.72);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.dc-ev-tier-name {
+  margin-top: 22px;
+  font-family: var(--font-display); font-weight: 600;
+  color: #fff;
+  font-size: 26px; letter-spacing: -0.03em;
+}
+.dc-ev-tier.is-featured .dc-ev-tier-name { color: #0A0A0B; }
+
+.dc-ev-tier-price {
+  margin-top: 12px;
+  font-family: var(--font-display); font-weight: 600;
+  color: #fff;
+  font-size: clamp(50px, 6.5vw, 72px);
+  line-height: 0.84; letter-spacing: -0.05em;
+  font-feature-settings: "tnum";
+}
+.dc-ev-tier.is-featured .dc-ev-tier-price { color: #0A0A0B; }
+
+.dc-ev-tier-sub {
+  margin-top: 12px;
+  font: 500 14px/1.35 var(--font-body); letter-spacing: -0.14px;
+  color: var(--color-ink-muted);
+}
+.dc-ev-tier.is-featured .dc-ev-tier-sub { color: rgba(10, 10, 11, 0.66); }
+
+.dc-ev-tier-incl {
+  list-style: none; margin: 26px 0 0; padding: 26px 0 0;
+  border-top: 1px solid var(--color-hairline-soft);
+  display: flex; flex-direction: column; gap: 13px;
+  flex: 1;
+}
+.dc-ev-tier.is-featured .dc-ev-tier-incl { border-top-color: rgba(10, 10, 11, 0.18); }
+.dc-ev-tier-incl li {
+  display: flex; align-items: flex-start; gap: 11px;
+  font: 500 16px/1.35 var(--font-body); letter-spacing: -0.16px;
+  color: #fff;
+}
+.dc-ev-tier.is-featured .dc-ev-tier-incl li { color: #0A0A0B; }
+.dc-ev-tier-incl svg { flex: 0 0 auto; margin-top: 3px; color: #B14CFF; }
+.dc-ev-tier.is-featured .dc-ev-tier-incl svg { color: #0A0A0B; }
+
+.dc-ev-btn-tier {
+  margin-top: 28px;
+  display: inline-flex; width: 100%; justify-content: center; align-items: center;
+  gap: 10px;
+  border-radius: var(--r-pill);
+  padding: 16px 24px;
+  font: 500 16px/1 var(--font-body); letter-spacing: -0.14px;
+  text-decoration: none;
+  transition: transform 120ms ease;
+}
+.dc-ev-btn-tier.is-light { background: #fff; color: #0A0A0B; }
+.dc-ev-btn-tier.is-dark  { background: #0A0A0B; color: #fff; }
+.dc-ev-btn-tier:active { transform: scale(0.97); }
+
+@media (max-width: 960px) {
+  .dc-ev-tickets[data-count="3"] { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .dc-ev-tickets[data-count="2"],
+  .dc-ev-tickets[data-count="3"] { grid-template-columns: 1fr; }
+}
+
+/* Event-Nav rechts: AuthBadge + Ticket-CTA nebeneinander */
+.dc-ev-nav-right { display: inline-flex; align-items: center; gap: 12px; }
+
+/* =====================================================================
+   EVENT-ADMIN: Featured-Checkbox + featured-Highlight in der Card
+   ===================================================================== */
+.mb-ticket-featured {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--r-md);
+  background: var(--color-surface-1);
+  font: var(--type-body-sm); letter-spacing: var(--tracking-body-sm);
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+.mb-ticket-featured input { accent-color: #B14CFF; }
+.mb-ticket-featured:hover { color: var(--color-ink); border-color: var(--color-hairline); }
+
+.mb-ticket-card.is-featured {
+  border-color: transparent;
+  box-shadow: inset 0 0 0 2px rgba(138, 75, 255, 0.55), 0 12px 40px rgba(138, 75, 255, 0.18);
+}
+
+/* =====================================================================
+   AUTH-BADGE: Admin-Pille + Login-Link in Navs
+   ===================================================================== */
+.dc-auth-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  border-radius: var(--r-pill);
+  font: 500 14px/1 var(--font-body); letter-spacing: -0.14px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 120ms ease, background 160ms ease;
+}
+.dc-auth-badge--placeholder {
+  width: 84px; height: 36px;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* Login (anonym) — dezent, gleiches Pattern wie dc-btn-secondary */
+.dc-auth-badge--login.dc-auth-badge--dark {
+  background: var(--color-surface-1);
+  color: var(--color-ink);
+  border: 1px solid var(--color-hairline-soft);
+}
+.dc-auth-badge--login.dc-auth-badge--dark:hover {
+  background: var(--color-surface-2);
+}
+.dc-auth-badge--login.dc-auth-badge--light {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Mitgliederbereich (member) */
+.dc-auth-badge--member.dc-auth-badge--dark {
+  background: var(--color-surface-1);
+  color: var(--color-ink);
+  border: 1px solid var(--color-hairline-soft);
+}
+.dc-auth-badge--member.dc-auth-badge--dark:hover { background: var(--color-surface-2); }
+
+/* Admin-Pille — glowing violet gradient */
+.dc-auth-badge--admin {
+  background: var(--vio, linear-gradient(118deg, #8A4BFF 0%, #B14CFF 50%, #FF6FD8 100%));
+  color: #0A0A0B;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(138, 75, 255, 0.38);
+  position: relative;
+  overflow: hidden;
+}
+.dc-auth-badge--admin::before {
+  content: "";
+  position: absolute; inset: -1px;
+  background: linear-gradient(118deg, #B14CFF, #FF6FD8, #8A4BFF, #B14CFF);
+  background-size: 220% 100%;
+  z-index: -1;
+  border-radius: inherit;
+  animation: dc-auth-shimmer 6s linear infinite;
+  opacity: 0;
+}
+.dc-auth-badge--admin:hover::before { opacity: 0.8; }
+@keyframes dc-auth-shimmer {
+  to { background-position: 220% 0; }
+}
+.dc-auth-badge-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #0A0A0B;
+  box-shadow: 0 0 0 2px rgba(10, 10, 11, 0.35), 0 0 12px rgba(10, 10, 11, 0.4);
+  animation: dc-auth-pulse 2.4s ease-out infinite;
+}
+@keyframes dc-auth-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
+}
+.dc-auth-badge-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+.dc-auth-badge-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(10, 10, 11, 0.72);
+  border-left: 1px solid rgba(10, 10, 11, 0.28);
+  padding-left: 8px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 540px) {
+  .dc-auth-badge-name { display: none; }
+}

@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import AuthBadge from "./AuthBadge";
 import type { Speaker, Ticket, TimelineItem } from "../components/member/types";
 
 export type EventDetail = {
@@ -79,11 +80,14 @@ export default function EventLanding({ event }: { event: EventDetail }) {
             <img src="/assets/logo-dc-white.svg" alt="" width={32} height={26} aria-hidden="true" />
             <span>DealCircle</span>
           </a>
-          {event.status !== "closed" && (
-            <a className="dc-ev-nav-cta" href="#ticket">
-              <b>{hasMultiTickets ? `Ab ${feeLabel}` : feeLabel}</b> · Platz sichern
-            </a>
-          )}
+          <div className="dc-ev-nav-right">
+            <AuthBadge variant="dark" />
+            {event.status !== "closed" && (
+              <a className="dc-ev-nav-cta" href="#ticket">
+                <b>{hasMultiTickets ? `Ab ${feeLabel}` : feeLabel}</b> · Platz sichern
+              </a>
+            )}
+          </div>
         </div>
       </header>
 
@@ -267,37 +271,31 @@ export default function EventLanding({ event }: { event: EventDetail }) {
               </h2>
 
               {event.tickets.length > 0 ? (
-                <div className={`dc-ev-tickets dc-ev-tickets--${event.tickets.length === 1 ? "one" : "many"}`}>
+                <div className="dc-ev-tickets" data-count={Math.min(event.tickets.length, 3)}>
                   {event.tickets.map((t, i) => {
                     const price = `${Math.round(t.price_cents / 100).toLocaleString("de-AT")} €`;
                     return (
                       <motion.div
                         key={t.id ?? i}
-                        className={`dc-ev-ticket-card${i === 0 ? " is-featured" : ""}`}
+                        className={`dc-ev-tier${t.featured ? " is-featured" : ""}`}
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-10%" }}
                         transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                       >
-                        <div className="dc-ev-ticket-card-head">
-                          <div className="dc-ev-ticket-k">{t.name}</div>
-                          <div className="dc-ev-ticket-price">
-                            {price}
-                            <small>pro Person · inkl. Dinner und Getränke</small>
-                          </div>
-                        </div>
-                        <ul className="dc-ev-incl">
+                        {t.badge && <span className="dc-ev-tier-badge">{t.badge}</span>}
+                        <div className="dc-ev-tier-name">{t.name}</div>
+                        <div className="dc-ev-tier-price">{price}</div>
+                        <div className="dc-ev-tier-sub">pro Person · inkl. Dinner und Getränke</div>
+                        <ul className="dc-ev-tier-incl">
                           {t.perks.map((p, pi) => (
                             <li key={pi}><Check />{p}</li>
                           ))}
                         </ul>
-                        <a className="dc-ev-btn-dark" href="/mitglieder/login/">
-                          {t.name} für {price} kaufen
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M5 12h14M13 6l6 6-6 6" />
-                          </svg>
+                        <a className={`dc-ev-btn-tier ${t.featured ? "is-dark" : "is-light"}`}
+                           href="/mitglieder/login/">
+                          {t.featured ? `${t.name}-Platz sichern` : "Platz sichern"}
                         </a>
-                        <p className="dc-ev-ticket-note">Sichere Zahlung · Bestätigung per E-Mail</p>
                       </motion.div>
                     );
                   })}

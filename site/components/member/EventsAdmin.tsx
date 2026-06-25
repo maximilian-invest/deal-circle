@@ -15,6 +15,8 @@ import type { EventDto, EventStatusApi, Speaker, Ticket, TimelineItem } from "./
 type FormTicket = {
   id?: number;
   name: string;
+  badge: string;
+  featured: boolean;
   price_eur: string;
   perks: string[];
 };
@@ -81,6 +83,8 @@ function toForm(e: EventDto): FormState {
     tickets: (e.tickets ?? []).map((t) => ({
       id: t.id,
       name: t.name,
+      badge: t.badge ?? "",
+      featured: !!t.featured,
       price_eur: String(Math.round(t.price_cents / 100)),
       perks: [...t.perks],
     })),
@@ -112,6 +116,8 @@ function fromForm(f: FormState): CreateEventInput {
       .filter((t) => t.name.trim())
       .map((t) => ({
         name: t.name.trim(),
+        badge: t.badge.trim() ? t.badge.trim() : null,
+        featured: t.featured,
         price_cents: Math.round(Number(t.price_eur || "0") * 100),
         perks: t.perks.map((p) => p.trim()).filter(Boolean),
       })),
@@ -258,7 +264,13 @@ export default function EventsAdmin() {
 
   const addTicket = () => setForm((f) => ({
     ...f,
-    tickets: [...f.tickets, { name: "Standard", price_eur: f.fee_eur || "300", perks: [...DEFAULT_PERKS] }],
+    tickets: [...f.tickets, {
+      name: "Standard",
+      badge: "Standard",
+      featured: false,
+      price_eur: f.fee_eur || "300",
+      perks: [...DEFAULT_PERKS],
+    }],
   }));
   const updateTicket = (i: number, patch: Partial<FormTicket>) => setForm((f) => ({
     ...f,
@@ -592,7 +604,7 @@ export default function EventsAdmin() {
               ) : (
                 <div className="mb-ticket-list">
                   {form.tickets.map((t, ti) => (
-                    <div key={ti} className="mb-ticket-card">
+                    <div key={ti} className={`mb-ticket-card${t.featured ? " is-featured" : ""}`}>
                       <div className="mb-ticket-head">
                         <div className="mb-ticket-head-fields">
                           <input
@@ -600,7 +612,7 @@ export default function EventsAdmin() {
                             className="mb-ticket-name"
                             value={t.name}
                             onChange={(e) => updateTicket(ti, { name: e.target.value })}
-                            placeholder="Standard / VIP / Frühbucher"
+                            placeholder="Name: Einzelplatz / VIP / Tisch"
                           />
                           <div className="mb-ticket-price-row">
                             <input
@@ -622,6 +634,24 @@ export default function EventsAdmin() {
                           title="Ticket-Variante entfernen"
                           aria-label="Ticket entfernen"
                         >×</button>
+                      </div>
+
+                      <div className="mb-ticket-head-fields">
+                        <input
+                          type="text"
+                          className="mb-ticket-name"
+                          value={t.badge}
+                          onChange={(e) => updateTicket(ti, { badge: e.target.value })}
+                          placeholder="Badge: Standard / Beliebt / VIP / Für Teams"
+                        />
+                        <label className="mb-ticket-featured">
+                          <input
+                            type="checkbox"
+                            checked={t.featured}
+                            onChange={(e) => updateTicket(ti, { featured: e.target.checked })}
+                          />
+                          <span>Lila-Highlight (VIP)</span>
+                        </label>
                       </div>
 
                       <div className="mb-ticket-perks">
