@@ -126,10 +126,11 @@ export default function DashboardPage() {
     );
   }
 
+  // Defense-in-depth: wenn ein Mitglied (Nicht-Admin) auf einem Admin-only-Tab
+  // landet (via URL, Bookmarks, alter State), redirect auf Uebersicht.
+  const ADMIN_ONLY_TABS: TabKey[] = ["mitglieder", "verwaltung", "events-admin"];
   const safeActive: TabKey =
-    (active === "verwaltung" || active === "events-admin") && user.role !== "admin"
-      ? "uebersicht"
-      : active;
+    ADMIN_ONLY_TABS.includes(active) && user.role !== "admin" ? "uebersicht" : active;
 
   const firstName = (user.name || "").split(/\s+/)[0] || "Mitglied";
   const headerTitle = safeActive === "uebersicht" ? `Guten Abend, ${firstName}.` : TITLES[safeActive];
@@ -266,12 +267,12 @@ export default function DashboardPage() {
           </>
         )}
 
-        {safeActive === "mitglieder" && (
+        {safeActive === "mitglieder" && user.role === "admin" && (
           <section className="mb-section">
             <div style={{ padding: "60px 0", textAlign: "center", color: "var(--color-ink-muted)" }}>
               <p className="dc-body-lg" style={{ maxWidth: 480, margin: "0 auto" }}>
-                Das Mitgliederverzeichnis ist nur nach erstmaliger Anmeldung freigeschaltet
-                — bitte aktualisieren Sie zuerst Ihr Profil.
+                Das Mitgliederverzeichnis (Admin-Ansicht) wird im naechsten Sprint
+                gebaut — Mitglieder-Profile mit Foto, Branche, Kontakt-Wunsch.
               </p>
             </div>
           </section>

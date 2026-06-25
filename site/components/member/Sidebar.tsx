@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { logout, type AuthUser } from "./auth";
 import type { TabKey } from "./types";
 
-type Item = { id: TabKey; label: string; icon: keyof typeof PATHS; badge?: string };
+type Item = { id: TabKey; label: string; icon: keyof typeof PATHS; badge?: string; adminOnly?: boolean };
 
 const PATHS = {
   home:    "M3 11.5L12 4l9 7.5M5 10v10h14V10",
@@ -26,7 +26,7 @@ const MAIN: Item[] = [
   { id: "uebersicht", label: "Übersicht",    icon: "home" },
   { id: "events",     label: "Events",       icon: "cal", badge: "2" },
   { id: "galerie",    label: "Galerie",      icon: "photo" },
-  { id: "mitglieder", label: "Mitglieder",   icon: "people" },
+  { id: "mitglieder", label: "Mitglieder",   icon: "people", adminOnly: true },
   { id: "notizen",    label: "Aus dem Kreis", icon: "doc" },
 ];
 
@@ -77,23 +77,27 @@ export default function Sidebar({ active, setActive, user }: Props) {
     window.location.href = "/mitglieder/login/";
   };
 
-  const renderNav = (items: Item[]) => (
-    <nav className="mb-sidebar-nav">
-      {items.map((item) => (
-        <a
-          key={item.id}
-          className="mb-sidebar-nav-item"
-          data-active={active === item.id ? "true" : "false"}
-          onClick={(e) => { e.preventDefault(); setActive(item.id); }}
-          href={"#" + item.id}
-        >
-          <Icon name={item.icon} />
-          <span>{item.label}</span>
-          {item.badge ? <span className="mb-sidebar-nav-item-badge">{item.badge}</span> : null}
-        </a>
-      ))}
-    </nav>
-  );
+  const renderNav = (items: Item[]) => {
+    const visible = items.filter((i) => !i.adminOnly || isAdmin);
+    if (visible.length === 0) return null;
+    return (
+      <nav className="mb-sidebar-nav">
+        {visible.map((item) => (
+          <a
+            key={item.id}
+            className="mb-sidebar-nav-item"
+            data-active={active === item.id ? "true" : "false"}
+            onClick={(e) => { e.preventDefault(); setActive(item.id); }}
+            href={"#" + item.id}
+          >
+            <Icon name={item.icon} />
+            <span>{item.label}</span>
+            {item.badge ? <span className="mb-sidebar-nav-item-badge">{item.badge}</span> : null}
+          </a>
+        ))}
+      </nav>
+    );
+  };
 
   const activeLabel =
     [...MAIN, ...ACCOUNT, ...ADMIN].find((i) => i.id === active)?.label ?? "Mitgliederbereich";
