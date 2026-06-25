@@ -1,8 +1,11 @@
 "use client";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
 import Footer from "./Footer";
-import type { Speaker, Ticket, TimelineItem } from "../components/member/types";
+import { fetchMe, type AuthUser } from "./member/auth";
+import { registerForEvent } from "./member/events";
+import type { Speaker, Ticket, TimelineItem } from "./member/types";
 
 export type EventDetail = {
   id: number;
@@ -44,6 +47,50 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   const fee = Math.round(headlineCents / 100);
   const feeLabel = `${fee.toLocaleString("de-AT")} €`;
   const hasMultiTickets = event.tickets.length > 1;
+
+  // Auth-Status + Registration-Status
+  const [me, setMe] = useState<AuthUser | null | "loading">("loading");
+  const [registered, setRegistered] = useState<boolean>(false);
+  const [registering, setRegistering] = useState<number | "default" | null>(null);
+  const [regError, setRegError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchMe().then((u) => {
+      if (cancelled) return;
+      setMe(u);
+      if (u) {
+        // schauen ob ich fuer dieses Event schon angemeldet bin
+        fetch("/api/events/me/registrations", {
+          headers: { Authorization: `Bearer ${sessionStorage.getItem("dc-token") || ""}` },
+        }).then(r => r.ok ? r.json() : null).then((data) => {
+          if (cancelled || !data) return;
+          const has = (data.registrations || []).some(
+            (r: { event_id: number; status: string }) =>
+              r.event_id === event.id && r.status !== "cancelled"
+          );
+          setRegistered(has);
+        });
+      }
+    });
+    return () => { cancelled = true; };
+  }, [event.id]);
+
+  const doRegister = async (ticketId?: number) => {
+    if (!me || me === "loading") return;
+    setRegistering(ticketId ?? "default");
+    setRegError(null);
+    try {
+      await registerForEvent(event.id, ticketId ?? null);
+      setRegistered(true);
+    } catch (err) {
+      setRegError(err instanceof Error ? err.message : "Anmeldung fehlgeschlagen.");
+    } finally {
+      setRegistering(null);
+    }
+  };
+
+  const loginRedirect = `/mitglieder/login/`;
 
   const dayShort = `${d.getDate()}. ${MONTH_SHORT[d.getMonth()]}`;
   const yearWeekday = `${d.getFullYear()} · ${WEEKDAY_LONG[d.getDay()]}`;
@@ -293,10 +340,15 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                             <li key={pi}><Check />{p}</li>
                           ))}
                         </ul>
-                        <a className={`dc-ev-btn-tier ${t.featured ? "is-dark" : "is-light"}`}
-                           href="/mitglieder/login/">
-                          {t.featured ? `${t.name}-Platz sichern` : "Platz sichern"}
-                        </a>
+                        <TierCta
+                          me={me}
+                          registered={registered}
+                          registering={registering === (t.id ?? -1)}
+                          featured={t.featured}
+                          name={t.name}
+                          onRegister={() => doRegister(t.id ?? undefined)}
+                          loginHref={loginRedirect}
+                        />
                       </motion.div>
                     );
                   })}
@@ -327,12 +379,15 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                       <li><Check />Limitiert auf {event.max_attendees} Plätze</li>
                     )}
                   </ul>
-                  <a className="dc-ev-btn-dark" href="/mitglieder/login/">
-                    Ticket für {feeLabel} kaufen
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </a>
+                  <SoloCta
+                    me={me}
+                    registered={registered}
+                    registering={registering === "default"}
+                    feeLabel={feeLabel}
+                    onRegister={() => doRegister()}
+                    loginHref={loginRedirect}
+                  />
+                  {regError && <p className="dc-ev-ticket-note" style={{ color: "#FFB0B0" }}>{regError}</p>}
                   <p className="dc-ev-ticket-note">Sichere Zahlung · Bestätigung per E-Mail</p>
                 </motion.div>
               )}
@@ -343,6 +398,56 @@ export default function EventLanding({ event }: { event: EventDetail }) {
 
       <Footer />
     </div>
+  );
+}
+
+function Arrow() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+type CtaCommon = {
+  me: AuthUser | null | "loading";
+  registered: boolean;
+  registering: boolean;
+  loginHref: string;
+};
+
+function TierCta({
+  me, registered, registering, featured, name, onRegister, loginHref,
+}: CtaCommon & { featured: boolean; name: string; onRegister: () => void }) {
+  const cls = `dc-ev-btn-tier ${featured ? "is-dark" : "is-light"}`;
+  if (me === "loading") return <button className={cls} disabled>…</button>;
+  if (me === null) return <a className={cls} href={loginHref}>Zum Login</a>;
+  if (registered) return <span className={`${cls} is-registered`}>✓ Angemeldet</span>;
+  return (
+    <button type="button" className={cls} onClick={onRegister} disabled={registering}>
+      {registering ? "Wird angemeldet …" : (featured ? `${name}-Platz sichern` : "Platz sichern")}
+    </button>
+  );
+}
+
+function SoloCta({
+  me, registered, registering, feeLabel, onRegister, loginHref,
+}: CtaCommon & { feeLabel: string; onRegister: () => void }) {
+  if (me === "loading") return <button className="dc-ev-btn-dark" disabled>…</button>;
+  if (me === null) return (
+    <a className="dc-ev-btn-dark" href={loginHref}>
+      Zum Login <Arrow />
+    </a>
+  );
+  if (registered) return (
+    <span className="dc-ev-btn-dark is-registered">
+      <Check /> Du bist angemeldet
+    </span>
+  );
+  return (
+    <button type="button" className="dc-ev-btn-dark" onClick={onRegister} disabled={registering}>
+      {registering ? "Wird angemeldet …" : <>Ticket für {feeLabel} reservieren <Arrow /></>}
+    </button>
   );
 }
 

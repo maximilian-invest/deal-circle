@@ -1,8 +1,103 @@
 import { Router } from "express";
+import { z } from "zod";
 import db from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
+
+// ---------- MEMBER: meine Anmeldungen ----------
+router.get("/me/registrations", requireAuth, (req, res) => {
+  const rows = db.prepare(`
+    SELECT r.id, r.event_id, r.ticket_id, r.status, r.amount_cents,
+           r.created_at, r.paid_at,
+           e.title AS event_title, e.starts_at, e.location,
+           t.name AS ticket_name
+    FROM event_registrations r
+    JOIN events e ON e.id = r.event_id
+    LEFT JOIN event_tickets t ON t.id = r.ticket_id
+    WHERE r.user_id = ?
+    ORDER BY e.starts_at ASC
+  `).all(req.user.sub);
+  res.json({ registrations: rows });
+});
+
+// ---------- MEMBER: anmelden ----------
+const registerSchema = z.object({
+  ticket_id: z.number().int().min(1).nullable().optional(),
+});
+
+router.post("/:id/register", requireAuth, (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const parsed = registerSchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
+  const ticketId = parsed.data.ticket_id ?? null;
+
+  const event = db.prepare("SELECT id, status, fee_cents FROM events WHERE id = ?").get(eventId);
+  if (!event) return res.status(404).json({ error: "not_found" });
+  if (event.status === "closed") return res.status(409).json({ error: "event_closed" });
+
+  // Already registered?
+  const existing = db.prepare(
+    "SELECT id, status FROM event_registrations WHERE event_id = ? AND user_id = ?"
+  ).get(eventId, req.user.sub);
+  if (existing && existing.status !== "cancelled") {
+    return res.status(409).json({ error: "already_registered", registration_id: existing.id });
+  }
+
+  // Ticket preis ableiten
+  let amountCents = event.fee_cents;
+  if (ticketId) {
+    const t = db.prepare(
+      "SELECT id, price_cents FROM event_tickets WHERE id = ? AND event_id = ?"
+    ).get(ticketId, eventId);
+    if (!t) return res.status(400).json({ error: "invalid_ticket" });
+    amountCents = t.price_cents;
+  }
+
+  // Status: bei waitlist-Event automatisch auf Warteliste, sonst 'reserved'
+  const status = event.status === "waitlist" ? "waitlist" : "reserved";
+
+  let info;
+  if (existing) {
+    // Wiederbeleben
+    db.prepare(`
+      UPDATE event_registrations
+      SET status = ?, ticket_id = ?, amount_cents = ?, created_at = datetime('now')
+      WHERE id = ?
+    `).run(status, ticketId, amountCents, existing.id);
+    info = { lastInsertRowid: existing.id };
+  } else {
+    info = db.prepare(`
+      INSERT INTO event_registrations (event_id, user_id, ticket_id, amount_cents, status)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(eventId, req.user.sub, ticketId, amountCents, status);
+  }
+
+  res.status(201).json({
+    ok: true,
+    registration: {
+      id: info.lastInsertRowid,
+      event_id: eventId,
+      ticket_id: ticketId,
+      status,
+      amount_cents: amountCents,
+    },
+  });
+});
+
+// ---------- MEMBER: eigene Anmeldung stornieren ----------
+router.delete("/:id/register", requireAuth, (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  db.prepare(`
+    UPDATE event_registrations SET status = 'cancelled'
+    WHERE event_id = ? AND user_id = ?
+  `).run(eventId, req.user.sub);
+  res.json({ ok: true });
+});
 
 // Public: naechstes upcoming-Event fuer den Landingpage-Banner.
 // Keine Auth, nur sichere Felder.

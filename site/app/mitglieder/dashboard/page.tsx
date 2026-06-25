@@ -11,6 +11,7 @@ import EventModal from "../../../components/member/EventModal";
 import MembersAdmin from "../../../components/member/MembersAdmin";
 import EventsAdmin from "../../../components/member/EventsAdmin";
 import Profile from "../../../components/member/Profile";
+import MyRegistrations from "../../../components/member/MyRegistrations";
 import { fetchMe, type AuthUser } from "../../../components/member/auth";
 import {
   isPast, listEvents, toNextEventShape, toPastShape, toUpcomingShape,
@@ -190,6 +191,8 @@ export default function DashboardPage() {
             )}
 
             {derived?.stats && <Stats items={derived.stats} />}
+
+            <MyRegistrations />
 
             {derived?.upcoming && derived.upcoming.length > 0 && (
               <section className="mb-section">

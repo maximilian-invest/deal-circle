@@ -11,6 +11,8 @@ import {
   type CreateEventInput,
 } from "./events";
 import type { EventDto, EventStatusApi, Speaker, Ticket, TimelineItem } from "./types";
+import EventMailModal from "./EventMailModal";
+import EventRegistrationsModal from "./EventRegistrationsModal";
 
 type FormTicket = {
   id?: number;
@@ -211,6 +213,8 @@ export default function EventsAdmin() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [mailEvent, setMailEvent] = useState<EventDto | null>(null);
+  const [regsEvent, setRegsEvent] = useState<EventDto | null>(null);
 
   const reload = async () => {
     try {
@@ -755,6 +759,24 @@ export default function EventsAdmin() {
                         <div className="mb-admin-actions">
                           <button
                             type="button"
+                            className="mb-admin-action mb-admin-action--primary"
+                            onClick={() => setMailEvent(e)}
+                            disabled={editingId !== null}
+                            title="Anmeldungs-Mail an Mitglieder schicken"
+                          >
+                            Mailen …
+                          </button>
+                          <button
+                            type="button"
+                            className="mb-admin-action"
+                            onClick={() => setRegsEvent(e)}
+                            disabled={editingId !== null}
+                            title="Angemeldete Mitglieder ansehen"
+                          >
+                            Anmeldungen
+                          </button>
+                          <button
+                            type="button"
                             className="mb-admin-action"
                             onClick={() => startEdit(e)}
                             disabled={editingId !== null}
@@ -779,6 +801,13 @@ export default function EventsAdmin() {
           </div>
         )}
       </section>
+
+      {mailEvent && (
+        <EventMailModal event={mailEvent} onClose={() => setMailEvent(null)} />
+      )}
+      {regsEvent && (
+        <EventRegistrationsModal event={regsEvent} onClose={() => setRegsEvent(null)} />
+      )}
     </div>
   );
 }

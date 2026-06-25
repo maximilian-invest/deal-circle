@@ -104,6 +104,34 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_vip_signups_email ON vip_signups (email);
   CREATE INDEX IF NOT EXISTS idx_vip_signups_created ON vip_signups (created_at DESC);
+
+  CREATE TABLE IF NOT EXISTS event_registrations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ticket_id INTEGER REFERENCES event_tickets(id) ON DELETE SET NULL,
+    status TEXT NOT NULL DEFAULT 'reserved'
+      CHECK (status IN ('reserved','paid','waitlist','cancelled')),
+    amount_cents INTEGER,
+    note TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    paid_at TEXT,
+    UNIQUE (event_id, user_id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_event_regs_event ON event_registrations (event_id);
+  CREATE INDEX IF NOT EXISTS idx_event_regs_user  ON event_registrations (user_id);
+
+  CREATE TABLE IF NOT EXISTS event_mail_sends (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL CHECK (kind IN ('announcement','limited','soldout')),
+    triggered_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    recipient_count INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_event_mail_sends_event ON event_mail_sends (event_id, created_at DESC);
 `);
 
 // --- Migration: alte Spalten droppen (idempotent) -----------------------------

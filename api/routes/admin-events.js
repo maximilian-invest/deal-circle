@@ -2,6 +2,10 @@ import { Router } from "express";
 import { z } from "zod";
 import db from "../db.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
+import { sendMailAsync } from "../lib/mailer.js";
+import { eventAnnouncement } from "../lib/templates/event-announcement.js";
+import { eventLimited } from "../lib/templates/event-limited.js";
+import { eventSoldout } from "../lib/templates/event-soldout.js";
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -202,6 +206,156 @@ router.delete("/:id", (req, res) => {
   // CASCADE entfernt timeline + speakers
   db.prepare("DELETE FROM events WHERE id = ?").run(id);
   res.json({ ok: true });
+});
+
+// ---------- ADMIN: Anmeldungen pro Event ----------
+router.get("/:id/registrations", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const rows = db.prepare(`
+    SELECT r.id, r.status, r.amount_cents, r.created_at, r.paid_at, r.note,
+           u.id AS user_id, u.name, u.email, u.phone, u.company,
+           t.id AS ticket_id, t.name AS ticket_name
+    FROM event_registrations r
+    JOIN users u ON u.id = r.user_id
+    LEFT JOIN event_tickets t ON t.id = r.ticket_id
+    WHERE r.event_id = ?
+    ORDER BY r.created_at DESC
+  `).all(id);
+  res.json({ registrations: rows });
+});
+
+// Admin kann Status / Note einer Registrierung aendern
+const regUpdateSchema = z.object({
+  status: z.enum(["reserved","paid","waitlist","cancelled"]).optional(),
+  note:   z.string().max(500).nullable().optional(),
+});
+router.patch("/:eventId/registrations/:regId", (req, res) => {
+  const eventId = Number(req.params.eventId);
+  const regId = Number(req.params.regId);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+  if (!Number.isInteger(regId) || regId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const parsed = regUpdateSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
+
+  const updates = [], values = [];
+  if (parsed.data.status !== undefined) {
+    updates.push("status = ?"); values.push(parsed.data.status);
+    if (parsed.data.status === "paid") updates.push("paid_at = datetime('now')");
+  }
+  if (parsed.data.note !== undefined) {
+    updates.push("note = ?"); values.push(parsed.data.note);
+  }
+  if (!updates.length) return res.status(400).json({ error: "nothing_to_update" });
+  values.push(regId, eventId);
+  db.prepare(`UPDATE event_registrations SET ${updates.join(", ")}
+              WHERE id = ? AND event_id = ?`).run(...values);
+  res.json({ ok: true });
+});
+
+// ---------- ADMIN: Mail an Mitglieder ----------
+// Lieferanzahl + Verlauf (UI zeigt das, bevor gesendet wird)
+router.get("/:id/mail-stats", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const memberCount = db.prepare(
+    "SELECT COUNT(*) AS n FROM users WHERE role = 'member'"
+  ).get().n;
+  const registeredCount = db.prepare(
+    "SELECT COUNT(*) AS n FROM event_registrations WHERE event_id = ? AND status != 'cancelled'"
+  ).get(id).n;
+  const history = db.prepare(`
+    SELECT s.id, s.kind, s.recipient_count, s.created_at,
+           u.name AS triggered_by_name
+    FROM event_mail_sends s
+    LEFT JOIN users u ON u.id = s.triggered_by_user_id
+    WHERE s.event_id = ?
+    ORDER BY s.created_at DESC
+    LIMIT 20
+  `).all(id);
+
+  res.json({
+    member_count: memberCount,
+    registered_count: registeredCount,
+    history,
+  });
+});
+
+const mailSendSchema = z.object({
+  kind: z.enum(["announcement","limited","soldout"]),
+  exclude_registered: z.boolean().default(false),
+  test_to_self: z.boolean().default(false),
+});
+
+const TEMPLATE_MAP = {
+  announcement: { fn: eventAnnouncement, label: "Anmeldung möglich" },
+  limited:      { fn: eventLimited,      label: "Wenige Plätze" },
+  soldout:      { fn: eventSoldout,      label: "Ausgebucht" },
+};
+
+router.post("/:id/mail", (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const parsed = mailSendSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
+  const { kind, exclude_registered, test_to_self } = parsed.data;
+
+  const event = fetchEventFull(eventId);
+  if (!event) return res.status(404).json({ error: "not_found" });
+
+  // Empfaengerliste bauen
+  let recipients;
+  if (test_to_self) {
+    const me = db.prepare("SELECT email, name FROM users WHERE id = ?").get(req.user.sub);
+    recipients = me ? [me] : [];
+  } else if (exclude_registered) {
+    recipients = db.prepare(`
+      SELECT u.email, u.name FROM users u
+      WHERE u.role = 'member'
+        AND NOT EXISTS (
+          SELECT 1 FROM event_registrations r
+          WHERE r.event_id = ? AND r.user_id = u.id AND r.status != 'cancelled'
+        )
+    `).all(eventId);
+  } else {
+    recipients = db.prepare(
+      "SELECT email, name FROM users WHERE role = 'member'"
+    ).all();
+  }
+
+  const tpl = TEMPLATE_MAP[kind];
+  if (!tpl) return res.status(400).json({ error: "invalid_kind" });
+
+  for (const r of recipients) {
+    const firstName = (r.name || "").split(/\s+/)[0] || "";
+    const mail = tpl.fn({ event, firstName });
+    sendMailAsync({
+      to: r.email,
+      subject: mail.subject,
+      text: mail.text,
+      html: mail.html,
+    });
+  }
+
+  // Log-Entry (nur bei realem Send, nicht bei Test)
+  if (!test_to_self) {
+    db.prepare(`
+      INSERT INTO event_mail_sends (event_id, kind, triggered_by_user_id, recipient_count)
+      VALUES (?, ?, ?, ?)
+    `).run(eventId, kind, req.user.sub, recipients.length);
+  }
+
+  res.json({
+    ok: true,
+    kind,
+    label: tpl.label,
+    recipient_count: recipients.length,
+    test: test_to_self,
+  });
 });
 
 export default router;

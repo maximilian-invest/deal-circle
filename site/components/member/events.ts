@@ -43,6 +43,111 @@ export async function deleteEvent(id: number): Promise<void> {
   await api(`/admin/events/${id}`, { method: "DELETE" });
 }
 
+// ========== Member registrations ==========
+export type MyRegistration = {
+  id: number;
+  event_id: number;
+  ticket_id: number | null;
+  status: "reserved" | "paid" | "waitlist" | "cancelled";
+  amount_cents: number | null;
+  created_at: string;
+  paid_at: string | null;
+  event_title: string;
+  starts_at: string;
+  location: string;
+  ticket_name: string | null;
+};
+
+export async function listMyRegistrations(): Promise<MyRegistration[]> {
+  const data = await api<{ registrations: MyRegistration[] }>("/events/me/registrations");
+  return data.registrations;
+}
+
+export async function registerForEvent(
+  eventId: number,
+  ticketId?: number | null
+): Promise<{
+  ok: boolean;
+  registration: {
+    id: number;
+    event_id: number;
+    ticket_id: number | null;
+    status: string;
+    amount_cents: number;
+  };
+}> {
+  return api(`/events/${eventId}/register`, {
+    method: "POST",
+    body: { ticket_id: ticketId ?? null },
+  });
+}
+
+export async function cancelRegistration(eventId: number): Promise<void> {
+  await api(`/events/${eventId}/register`, { method: "DELETE" });
+}
+
+// ========== Admin: registrations + mail per event ==========
+export type AdminRegistration = {
+  id: number;
+  status: "reserved" | "paid" | "waitlist" | "cancelled";
+  amount_cents: number | null;
+  created_at: string;
+  paid_at: string | null;
+  note: string | null;
+  user_id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  company: string | null;
+  ticket_id: number | null;
+  ticket_name: string | null;
+};
+
+export async function listEventRegistrations(eventId: number): Promise<AdminRegistration[]> {
+  const data = await api<{ registrations: AdminRegistration[] }>(
+    `/admin/events/${eventId}/registrations`
+  );
+  return data.registrations;
+}
+
+export async function updateRegistration(
+  eventId: number, regId: number,
+  patch: { status?: AdminRegistration["status"]; note?: string | null }
+): Promise<void> {
+  await api(`/admin/events/${eventId}/registrations/${regId}`, {
+    method: "PATCH",
+    body: patch,
+  });
+}
+
+export type MailKind = "announcement" | "limited" | "soldout";
+
+export type MailStats = {
+  member_count: number;
+  registered_count: number;
+  history: Array<{
+    id: number;
+    kind: MailKind;
+    recipient_count: number;
+    created_at: string;
+    triggered_by_name: string | null;
+  }>;
+};
+
+export async function getMailStats(eventId: number): Promise<MailStats> {
+  return api(`/admin/events/${eventId}/mail-stats`);
+}
+
+export async function sendEventMail(
+  eventId: number,
+  opts: { kind: MailKind; exclude_registered?: boolean; test_to_self?: boolean }
+): Promise<{ ok: boolean; kind: MailKind; label: string; recipient_count: number; test: boolean }> {
+  return api(`/admin/events/${eventId}/mail`, {
+    method: "POST",
+    body: opts,
+  });
+}
+
 // Bild-Upload (kind = "speaker" oder "cover") — multipart/form-data
 export async function uploadImage(kind: "speaker" | "cover", file: File): Promise<string> {
   const token = getToken();
