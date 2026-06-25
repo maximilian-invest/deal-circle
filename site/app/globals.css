@@ -3294,7 +3294,8 @@ html, body { overflow-x: hidden; }
 }
 .dc-vip-form-card input[type="text"],
 .dc-vip-form-card input[type="email"],
-.dc-vip-form-card input[type="tel"] {
+.dc-vip-form-card input[type="tel"],
+.dc-vip-form-card input[type="password"] {
   width: 100%;
   background: var(--color-canvas);
   border: 1px solid transparent;
