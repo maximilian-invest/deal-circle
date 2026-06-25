@@ -26,7 +26,6 @@ const MAIN: Item[] = [
   { id: "uebersicht", label: "Übersicht",    icon: "home" },
   { id: "events",     label: "Events",       icon: "cal", badge: "2" },
   { id: "galerie",    label: "Galerie",      icon: "photo" },
-  { id: "mitglieder", label: "Mitglieder",   icon: "people", adminOnly: true },
   { id: "notizen",    label: "Aus dem Kreis", icon: "doc" },
 ];
 

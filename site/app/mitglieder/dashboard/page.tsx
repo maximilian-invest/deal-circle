@@ -129,9 +129,16 @@ export default function DashboardPage() {
 
   // Defense-in-depth: wenn ein Mitglied (Nicht-Admin) auf einem Admin-only-Tab
   // landet (via URL, Bookmarks, alter State), redirect auf Uebersicht.
+  // "mitglieder" wurde entfernt — Admin nutzt "verwaltung". Wenn ein
+  // alter Bookmark/URL-Hash trotzdem darauf zeigt, rerouten wir.
   const ADMIN_ONLY_TABS: TabKey[] = ["mitglieder", "verwaltung", "events-admin"];
+  const REROUTE_TO_ADMIN: TabKey[] = ["mitglieder"];
   const safeActive: TabKey =
-    ADMIN_ONLY_TABS.includes(active) && user.role !== "admin" ? "uebersicht" : active;
+    REROUTE_TO_ADMIN.includes(active) && user.role === "admin"
+      ? "verwaltung"
+      : ADMIN_ONLY_TABS.includes(active) && user.role !== "admin"
+        ? "uebersicht"
+        : active;
 
   const firstName = (user.name || "").split(/\s+/)[0] || "Mitglied";
   const headerTitle = safeActive === "uebersicht" ? `Guten Abend, ${firstName}.` : TITLES[safeActive];
@@ -268,16 +275,6 @@ export default function DashboardPage() {
           </>
         )}
 
-        {safeActive === "mitglieder" && user.role === "admin" && (
-          <section className="mb-section">
-            <div style={{ padding: "60px 0", textAlign: "center", color: "var(--color-ink-muted)" }}>
-              <p className="dc-body-lg" style={{ maxWidth: 480, margin: "0 auto" }}>
-                Das Mitgliederverzeichnis (Admin-Ansicht) wird im naechsten Sprint
-                gebaut — Mitglieder-Profile mit Foto, Branche, Kontakt-Wunsch.
-              </p>
-            </div>
-          </section>
-        )}
 
         {safeActive === "notizen" && (
           <section className="mb-section">
