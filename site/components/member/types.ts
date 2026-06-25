@@ -85,6 +85,10 @@ export type EventDto = {
   cover_path: string | null;
   // Stripe Checkout / Payment Link (optional, erst gesetzt sobald Stripe live ist).
   checkout_url?: string | null;
+  // Main-Event → prominent auf der Startseite. Sichtbarkeit steuert, ob das
+  // Event öffentlich ist oder nur eingeloggten Mitgliedern angezeigt wird.
+  is_main: boolean;
+  visibility: "public" | "members";
   timeline: TimelineItem[];
   speakers: Speaker[];
   tickets: Ticket[];

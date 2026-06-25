@@ -29,6 +29,8 @@ type FormState = {
   time_local: string;
   location: string;
   status: EventStatusApi;
+  is_main: boolean;
+  visibility: "public" | "members";
   fee_eur: string;
   max_attendees: string;
   description: string;
@@ -50,6 +52,8 @@ const EMPTY: FormState = {
   time_local: "18:30",
   location: "Schloss Wiespach, Hallein",
   status: "open",
+  is_main: false,
+  visibility: "public",
   fee_eur: "380",
   max_attendees: "32",
   description: "",
@@ -76,6 +80,8 @@ function toForm(e: EventDto): FormState {
     time_local: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
     location: e.location,
     status: e.status,
+    is_main: e.is_main,
+    visibility: e.visibility,
     fee_eur: String(Math.round(e.fee_cents / 100)),
     max_attendees: e.max_attendees == null ? "" : String(e.max_attendees),
     description: e.description ?? "",
@@ -100,6 +106,8 @@ function fromForm(f: FormState): CreateEventInput {
     starts_at: iso,
     location: f.location.trim(),
     status: f.status,
+    is_main: f.is_main,
+    visibility: f.visibility,
     fee_cents: Math.round(Number(f.fee_eur || "0") * 100),
     max_attendees: f.max_attendees.trim() === "" ? null : Number(f.max_attendees),
     description: f.description.trim() ? f.description.trim() : null,
@@ -479,6 +487,33 @@ export default function EventsAdmin() {
               </div>
             </div>
 
+            <div className="mb-admin-form-row">
+              <div className="dc-field">
+                <label htmlFor="ev-visibility">Sichtbarkeit</label>
+                <select
+                  id="ev-visibility"
+                  className="mb-admin-select"
+                  value={form.visibility}
+                  onChange={(e) => setForm({ ...form, visibility: e.target.value as "public" | "members" })}
+                >
+                  <option value="public">Öffentlich — für alle sichtbar</option>
+                  <option value="members">Nur Mitglieder — nur im eingeloggten Bereich</option>
+                </select>
+              </div>
+              <div className="dc-field">
+                <label htmlFor="ev-main">Startseite</label>
+                <label className="mb-mailopt">
+                  <input
+                    id="ev-main"
+                    type="checkbox"
+                    checked={form.is_main}
+                    onChange={(e) => setForm({ ...form, is_main: e.target.checked })}
+                  />
+                  <span>Als Main-Event prominent auf der Startseite anzeigen</span>
+                </label>
+              </div>
+            </div>
+
             <div className="dc-field">
               <label htmlFor="ev-desc">Beschreibung</label>
               <textarea
@@ -746,7 +781,15 @@ export default function EventsAdmin() {
                   return (
                     <tr key={e.id} style={past ? { opacity: 0.7 } : undefined}>
                       <td><span className="mb-admin-email">{fmtDate(e.starts_at)}</span></td>
-                      <td>{e.title}</td>
+                      <td>
+                        {e.title}
+                        {e.is_main && (
+                          <span className="mb-admin-role mb-admin-role--admin" style={{ marginLeft: 8 }}>★ Main</span>
+                        )}
+                        {e.visibility === "members" && (
+                          <span className="mb-admin-role mb-admin-role--member" style={{ marginLeft: 8 }}>Nur Mitglieder</span>
+                        )}
+                      </td>
                       <td>{e.location}</td>
                       <td>
                         <span className={`mb-admin-role mb-admin-role--${e.status === "closed" ? "member" : "admin"}`}>
@@ -757,6 +800,16 @@ export default function EventsAdmin() {
                       <td>{e.max_attendees ?? "—"}</td>
                       <td>
                         <div className="mb-admin-actions">
+                          <a
+                            className="mb-admin-action"
+                            href={`/event/?id=${e.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Landingpage des Events öffnen"
+                            style={{ textDecoration: "none" }}
+                          >
+                            Seite ansehen
+                          </a>
                           <button
                             type="button"
                             className="mb-admin-action mb-admin-action--primary"

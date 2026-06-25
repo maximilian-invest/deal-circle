@@ -11,6 +11,8 @@ export type CreateEventInput = {
   max_attendees: number | null;
   description: string | null;
   cover_path: string | null;
+  is_main: boolean;
+  visibility: "public" | "members";
   timeline: TimelineItem[];
   speakers: Speaker[];
   tickets: Ticket[];
