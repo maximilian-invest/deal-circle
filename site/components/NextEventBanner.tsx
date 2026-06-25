@@ -8,6 +8,7 @@ type PublicEvent = {
   starts_at: string;
   location: string;
   status: string;
+  is_main?: boolean;
 };
 
 type State = "loading" | { event: PublicEvent } | "empty";
@@ -64,7 +65,7 @@ export default function NextEventBanner() {
         <div className="dc-next-banner-text">
           <span className="dc-next-banner-eyebrow">
             <span className="dc-next-banner-eyebrow-dot" aria-hidden="true" />
-            Nächstes Treffen
+            {event.is_main ? "Main Event" : "Nächstes Treffen"}
           </span>
           <h2 className="dc-next-banner-title">{event.title}</h2>
           <div className="dc-next-banner-meta">

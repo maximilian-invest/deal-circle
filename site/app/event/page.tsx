@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import EventLanding, { type EventDetail } from "../../components/EventLanding";
+import { getToken } from "../../components/member/api";
 
 type State =
   | { tag: "loading" }
@@ -21,15 +22,32 @@ function EventInner() {
     if (!/^\d+$/.test(id)) { setState({ tag: "notfound" }); return; }
 
     let cancelled = false;
-    fetch(`/api/events/public/${id}`)
-      .then(async (r) => {
+
+    async function load() {
+      try {
+        // 1) Öffentlicher Endpoint — funktioniert ohne Login.
+        let r = await fetch(`/api/events/public/${id}`);
+        // 2) Nur-Mitglieder-Event? Liefert 404 öffentlich → mit Token über den
+        //    Member-Endpoint nachladen (eingeloggte Mitglieder sehen es).
+        if (r.status === 404) {
+          const token = getToken();
+          if (token) {
+            r = await fetch(`/api/events/${id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+          }
+        }
         if (cancelled) return;
         if (r.status === 404) { setState({ tag: "notfound" }); return; }
         if (!r.ok) { setState({ tag: "error", message: `HTTP ${r.status}` }); return; }
         const data = await r.json();
         if (!cancelled) setState({ tag: "ok", event: data.event });
-      })
-      .catch((e) => { if (!cancelled) setState({ tag: "error", message: e instanceof Error ? e.message : "Netzwerk-Fehler" }); });
+      } catch (e) {
+        if (!cancelled) setState({ tag: "error", message: e instanceof Error ? e.message : "Netzwerk-Fehler" });
+      }
+    }
+    load();
+
     return () => { cancelled = true; };
   }, [id]);
 
