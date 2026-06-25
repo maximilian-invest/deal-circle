@@ -260,7 +260,11 @@ router.get("/", requireAuth, (_req, res) => {
     .prepare(`
       SELECT id, title, starts_at, location, status,
              fee_cents, max_attendees, description, cover_path,
-             is_main, visibility, member_discount_pct, created_at, updated_at
+             is_main, visibility, member_discount_pct, created_at, updated_at,
+             (SELECT COUNT(*) FROM event_registrations r
+                WHERE r.event_id = events.id AND r.status != 'cancelled')
+             + (SELECT COUNT(*) FROM event_guest_registrations g
+                WHERE g.event_id = events.id AND g.status != 'cancelled') AS registered
       FROM events
       ORDER BY starts_at ASC
     `)

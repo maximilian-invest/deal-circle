@@ -92,6 +92,8 @@ export type EventDto = {
   // Mitglieder-Rabatt in Prozent (0–90). Eingeloggte Mitglieder zahlen
   // entsprechend weniger; 0 = kein Rabatt.
   member_discount_pct: number;
+  // Anzahl nicht-stornierter Anmeldungen (Mitglieder + Gäste); von GET /events.
+  registered?: number;
   timeline: TimelineItem[];
   speakers: Speaker[];
   tickets: Ticket[];

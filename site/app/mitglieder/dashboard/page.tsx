@@ -147,7 +147,8 @@ export default function DashboardPage() {
   return (
     <div className="mb-shell">
       <Sidebar active={safeActive} setActive={setActive} user={user} />
-      <main className="mb-main">
+      <main className={`mb-main${safeActive === "events-admin" ? " mb-main--bleed" : ""}`}>
+        {safeActive !== "events-admin" && (
         <header className="mb-main-header">
           <div className="mb-main-header-left">
             <h1 className="mb-main-header-title">{headerTitle}</h1>
@@ -168,6 +169,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </header>
+        )}
 
         {eventsError && (
           <div className="mb-admin-alert mb-admin-alert--error" style={{ margin: 0 }}>
