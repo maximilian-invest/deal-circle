@@ -158,6 +158,16 @@ export default function EventLanding({ event }: { event: EventDetail }) {
         {/* HERO */}
         <section className="dc-ev-hero">
           <div className="dc-ev-wrap dc-ev-hero-content">
+            <nav className="dc-ev-crumbs" aria-label="Brotkrumen">
+              <a href="/" className="dc-ev-crumb-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Startseite
+              </a>
+              <span className="dc-ev-crumb-sep" aria-hidden="true">/</span>
+              <span className="dc-ev-crumb-current">{event.title}</span>
+            </nav>
             <span className="dc-ev-tag">
               <i aria-hidden="true" />
               {statusLabel}{city}

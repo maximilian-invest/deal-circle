@@ -4178,3 +4178,24 @@ html, body { overflow-x: hidden; }
   .adm-spk { grid-template-columns: 64px 1fr 34px; gap: 10px; padding: 12px; }
   .adm-toast { left: 16px; right: 16px; transform: none; justify-content: center; }
 }
+
+/* ========== Event-Landingpage: Breadcrumbs / Zurück ========== */
+.dc-ev-crumbs {
+  display: flex; align-items: center; gap: 11px; flex-wrap: wrap;
+  margin-bottom: 26px;
+  font: var(--type-body-sm); letter-spacing: var(--tracking-body-sm);
+}
+.dc-ev-crumb-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: var(--color-ink-muted); text-decoration: none;
+  padding: 7px 14px 7px 11px; border-radius: 999px;
+  border: 1px solid var(--color-hairline-soft);
+  transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+.dc-ev-crumb-back:hover { color: #fff; border-color: var(--color-hairline); background: var(--color-surface-1); }
+.dc-ev-crumb-sep { color: var(--color-ink-muted); opacity: 0.45; }
+.dc-ev-crumb-current {
+  color: var(--color-ink-muted);
+  min-width: 0; max-width: 60vw;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
