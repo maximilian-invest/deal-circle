@@ -89,6 +89,18 @@ export async function cancelRegistration(eventId: number): Promise<void> {
   await api(`/events/${eventId}/register`, { method: "DELETE" });
 }
 
+// Gast-Reservierung (ohne Login) für öffentliche Events.
+export async function registerGuest(
+  eventId: number,
+  body: { name: string; email: string; ticket_id?: number | null }
+): Promise<{ ok: boolean }> {
+  return api(`/events/${eventId}/register-guest`, {
+    method: "POST",
+    body,
+    auth: false,
+  });
+}
+
 // ========== Admin: registrations + mail per event ==========
 export type AdminRegistration = {
   id: number;
@@ -106,11 +118,25 @@ export type AdminRegistration = {
   ticket_name: string | null;
 };
 
-export async function listEventRegistrations(eventId: number): Promise<AdminRegistration[]> {
-  const data = await api<{ registrations: AdminRegistration[] }>(
+export type GuestRegistration = {
+  id: number;
+  status: "reserved" | "paid" | "cancelled";
+  amount_cents: number | null;
+  created_at: string;
+  paid_at: string | null;
+  name: string;
+  email: string;
+  ticket_id: number | null;
+  ticket_name: string | null;
+};
+
+export async function listEventRegistrations(
+  eventId: number
+): Promise<{ registrations: AdminRegistration[]; guests: GuestRegistration[] }> {
+  const data = await api<{ registrations: AdminRegistration[]; guests?: GuestRegistration[] }>(
     `/admin/events/${eventId}/registrations`
   );
-  return data.registrations;
+  return { registrations: data.registrations, guests: data.guests ?? [] };
 }
 
 export async function updateRegistration(

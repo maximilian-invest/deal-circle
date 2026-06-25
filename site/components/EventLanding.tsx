@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
 import Footer from "./Footer";
 import { fetchMe, type AuthUser } from "./member/auth";
-import { registerForEvent } from "./member/events";
+import { registerForEvent, registerGuest } from "./member/events";
 import type { Speaker, Ticket, TimelineItem } from "./member/types";
 
 export type EventDetail = {
@@ -59,6 +59,9 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   const [registered, setRegistered] = useState<boolean>(false);
   const [registering, setRegistering] = useState<number | "default" | null>(null);
   const [regError, setRegError] = useState<string | null>(null);
+  // Gast-Reservierung (ohne Login) für öffentliche Events
+  const [guestFor, setGuestFor] = useState<{ ticketId: number | null; cents: number; label: string } | null>(null);
+  const [guestDone, setGuestDone] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -96,7 +99,6 @@ export default function EventLanding({ event }: { event: EventDetail }) {
     }
   };
 
-  const loginRedirect = `/mitglieder/login/`;
   // Eingeloggt = Mitgliederpreis; anonym = regulärer Preis + Hinweis-Badge.
   const isMember = me !== null && me !== "loading";
   const anon = me === null;
@@ -371,7 +373,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                           featured={t.featured}
                           name={t.name}
                           onRegister={() => doRegister(t.id ?? undefined)}
-                          loginHref={loginRedirect}
+                          guestDone={guestDone}
+                          onGuest={() => setGuestFor({ ticketId: t.id ?? null, cents: t.price_cents, label: t.name })}
                         />
                       </motion.div>
                     );
@@ -410,7 +413,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                     registering={registering === "default"}
                     feeLabel={feeLabel}
                     onRegister={() => doRegister()}
-                    loginHref={loginRedirect}
+                    guestDone={guestDone}
+                    onGuest={() => setGuestFor({ ticketId: null, cents: event.fee_cents, label: "Ticket" })}
                   />
                   {regError && <p className="dc-ev-ticket-note" style={{ color: "#FFB0B0" }}>{regError}</p>}
                   <p className="dc-ev-ticket-note">Sichere Zahlung · Bestätigung per E-Mail</p>
@@ -420,6 +424,17 @@ export default function EventLanding({ event }: { event: EventDetail }) {
           </section>
         )}
       </main>
+
+      {guestFor && (
+        <GuestForm
+          eventId={event.id}
+          ticketId={guestFor.ticketId}
+          label={guestFor.label}
+          cents={guestFor.cents}
+          onClose={() => setGuestFor(null)}
+          onDone={() => { setGuestDone(true); setGuestFor(null); }}
+        />
+      )}
 
       <Footer />
     </div>
@@ -462,32 +477,42 @@ type CtaCommon = {
   me: AuthUser | null | "loading";
   registered: boolean;
   registering: boolean;
-  loginHref: string;
+  guestDone: boolean;
+  onGuest: () => void;
 };
 
 function TierCta({
-  me, registered, registering, featured, name, onRegister, loginHref,
+  me, registered, registering, featured, name, onRegister, guestDone, onGuest,
 }: CtaCommon & { featured: boolean; name: string; onRegister: () => void }) {
   const cls = `dc-ev-btn-tier ${featured ? "is-dark" : "is-light"}`;
+  const label = featured ? `${name}-Platz sichern` : "Platz sichern";
   if (me === "loading") return <button className={cls} disabled>…</button>;
-  if (me === null) return <a className={cls} href={loginHref}>Zum Login</a>;
+  if (me === null) {
+    if (guestDone) return <span className={`${cls} is-registered`}>✓ Reserviert</span>;
+    return <button type="button" className={cls} onClick={onGuest}>{label}</button>;
+  }
   if (registered) return <span className={`${cls} is-registered`}>✓ Angemeldet</span>;
   return (
     <button type="button" className={cls} onClick={onRegister} disabled={registering}>
-      {registering ? "Wird angemeldet …" : (featured ? `${name}-Platz sichern` : "Platz sichern")}
+      {registering ? "Wird angemeldet …" : label}
     </button>
   );
 }
 
 function SoloCta({
-  me, registered, registering, feeLabel, onRegister, loginHref,
+  me, registered, registering, feeLabel, onRegister, guestDone, onGuest,
 }: CtaCommon & { feeLabel: string; onRegister: () => void }) {
   if (me === "loading") return <button className="dc-ev-btn-dark" disabled>…</button>;
-  if (me === null) return (
-    <a className="dc-ev-btn-dark" href={loginHref}>
-      Zum Login <Arrow />
-    </a>
-  );
+  if (me === null) {
+    if (guestDone) return (
+      <span className="dc-ev-btn-dark is-registered"><Check /> Reserviert</span>
+    );
+    return (
+      <button type="button" className="dc-ev-btn-dark" onClick={onGuest}>
+        Ticket für {feeLabel} sichern <Arrow />
+      </button>
+    );
+  }
   if (registered) return (
     <span className="dc-ev-btn-dark is-registered">
       <Check /> Du bist angemeldet
@@ -497,6 +522,55 @@ function SoloCta({
     <button type="button" className="dc-ev-btn-dark" onClick={onRegister} disabled={registering}>
       {registering ? "Wird angemeldet …" : <>Ticket für {feeLabel} reservieren <Arrow /></>}
     </button>
+  );
+}
+
+// Gast-Reservierung ohne Login (öffentliche Events): Name + E-Mail.
+function GuestForm({ eventId, ticketId, label, cents, onClose, onDone }: {
+  eventId: number; ticketId: number | null; label: string; cents: number;
+  onClose: () => void; onDone: () => void;
+}) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setErr(null);
+    if (!name.trim() || !email.trim()) { setErr("Bitte Name und E-Mail angeben."); return; }
+    setBusy(true);
+    try {
+      await registerGuest(eventId, { name: name.trim(), email: email.trim(), ticket_id: ticketId });
+      onDone();
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : "Reservierung fehlgeschlagen.");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="dc-ev-guest-ov" onClick={onClose} role="dialog" aria-modal="true">
+      <form className="dc-ev-guest" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
+        <button type="button" className="dc-ev-guest-x" onClick={onClose} aria-label="Schließen">✕</button>
+        <div className="dc-ev-guest-eyebrow">{label} · {euro(cents)}</div>
+        <h3 className="dc-ev-guest-title">Platz reservieren</h3>
+        <p className="dc-ev-guest-sub">Trag dich kurz ein — du bekommst deine Bestätigung per E-Mail.</p>
+        <label className="dc-ev-guest-field">
+          <span>Name</span>
+          <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Max Mustermann" disabled={busy} required />
+        </label>
+        <label className="dc-ev-guest-field">
+          <span>E-Mail</span>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="max@firma.at" disabled={busy} required />
+        </label>
+        {err && <p className="dc-ev-guest-err">{err}</p>}
+        <button type="submit" className="dc-ev-btn-primary dc-ev-guest-submit" disabled={busy}>
+          {busy ? "Wird reserviert …" : <>Platz reservieren <Arrow /></>}
+        </button>
+        <p className="dc-ev-guest-note">Mitglied im DealCircle? <a href="/mitglieder/login/">Einloggen</a> und günstiger sichern.</p>
+      </form>
+    </div>
   );
 }
 

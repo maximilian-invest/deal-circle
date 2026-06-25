@@ -235,7 +235,17 @@ router.get("/:id/registrations", (req, res) => {
     WHERE r.event_id = ?
     ORDER BY r.created_at DESC
   `).all(id);
-  res.json({ registrations: rows });
+
+  const guests = db.prepare(`
+    SELECT g.id, g.status, g.amount_cents, g.created_at, g.paid_at,
+           g.name, g.email, t.id AS ticket_id, t.name AS ticket_name
+    FROM event_guest_registrations g
+    LEFT JOIN event_tickets t ON t.id = g.ticket_id
+    WHERE g.event_id = ?
+    ORDER BY g.created_at DESC
+  `).all(id);
+
+  res.json({ registrations: rows, guests });
 });
 
 // Admin kann Status / Note einer Registrierung aendern

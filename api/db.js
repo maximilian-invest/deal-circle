@@ -135,6 +135,22 @@ db.exec(`
   );
 
   CREATE INDEX IF NOT EXISTS idx_event_mail_sends_event ON event_mail_sends (event_id, created_at DESC);
+
+  CREATE TABLE IF NOT EXISTS event_guest_registrations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    ticket_id INTEGER REFERENCES event_tickets(id) ON DELETE SET NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL COLLATE NOCASE,
+    status TEXT NOT NULL DEFAULT 'reserved'
+      CHECK (status IN ('reserved','paid','cancelled')),
+    amount_cents INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    paid_at TEXT,
+    UNIQUE (event_id, email)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_event_guest_regs_event ON event_guest_registrations (event_id, created_at DESC);
 `);
 
 // --- Migration: alte Spalten droppen (idempotent) -----------------------------

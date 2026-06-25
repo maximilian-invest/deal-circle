@@ -4,6 +4,7 @@ import {
   listEventRegistrations,
   updateRegistration,
   type AdminRegistration,
+  type GuestRegistration,
 } from "./events";
 import type { EventDto } from "./types";
 
@@ -31,6 +32,7 @@ function fmtTime(iso: string): string {
 
 export default function EventRegistrationsModal({ event, onClose }: Props) {
   const [regs, setRegs] = useState<AdminRegistration[] | null>(null);
+  const [guests, setGuests] = useState<GuestRegistration[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<number | null>(null);
 
@@ -47,8 +49,9 @@ export default function EventRegistrationsModal({ event, onClose }: Props) {
   const reload = async () => {
     try {
       setErr(null);
-      const list = await listEventRegistrations(event.id);
-      setRegs(list);
+      const data = await listEventRegistrations(event.id);
+      setRegs(data.registrations);
+      setGuests(data.guests);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Anmeldungen nicht ladbar.");
     }
@@ -125,7 +128,7 @@ export default function EventRegistrationsModal({ event, onClose }: Props) {
             <div className="mb-admin-empty">Wird geladen …</div>
           )}
 
-          {regs && regs.length === 0 && (
+          {regs && regs.length === 0 && guests.length === 0 && (
             <div className="mb-admin-empty">
               Noch keine Anmeldungen. Sobald sich jemand über die Event-Seite einträgt, taucht er hier auf.
             </div>
@@ -193,6 +196,40 @@ export default function EventRegistrationsModal({ event, onClose }: Props) {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {guests.length > 0 && (
+            <div className="mb-regs-group" style={{ marginTop: 4 }}>
+              <span className="mb-admin-eyebrow" style={{ display: "block", marginBottom: 8 }}>
+                Gäste · ohne Login ({guests.length})
+              </span>
+              <div className="mb-admin-table-wrap">
+                <table className="mb-admin-table">
+                  <thead>
+                    <tr>
+                      <th>Wer</th>
+                      <th>Kontakt</th>
+                      <th>Ticket</th>
+                      <th>Betrag</th>
+                      <th>Reserviert</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {guests.map((g) => (
+                      <tr key={g.id}>
+                        <td><div style={{ fontWeight: 600 }}>{g.name}</div></td>
+                        <td><div className="mb-admin-email">{g.email}</div></td>
+                        <td>{g.ticket_name ?? "—"}</td>
+                        <td>{g.amount_cents == null ? "—" : `€ ${Math.round(g.amount_cents / 100).toLocaleString("de-AT")}`}</td>
+                        <td><span className="mb-admin-email">{fmtTime(g.created_at.replace(" ", "T") + "Z")}</span></td>
+                        <td><span className="mb-admin-email">{STATUS_LABELS[g.status]}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

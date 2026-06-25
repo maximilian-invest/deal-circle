@@ -3930,3 +3930,60 @@ html, body { overflow-x: hidden; }
   .dc-ev-memberbar { gap: 16px; padding: 18px 18px; }
   .dc-ev-memberbar-cta { width: 100%; justify-content: center; }
 }
+
+/* ========== Event-Landingpage: Gast-Reservierung (ohne Login) ========== */
+.dc-ev-guest-ov {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  background: rgba(6,6,8,0.72); backdrop-filter: blur(6px);
+}
+.dc-ev-guest {
+  position: relative;
+  width: min(440px, 100%);
+  background: #161618;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 22px;
+  padding: 30px 28px 26px;
+  box-shadow: 0 40px 120px -30px rgba(0,0,0,0.8);
+}
+.dc-ev-guest-x {
+  position: absolute; top: 16px; right: 16px;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12); background: transparent;
+  color: #9A9AA2; font-size: 14px; cursor: pointer; line-height: 1;
+}
+.dc-ev-guest-x:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.dc-ev-guest-eyebrow {
+  font: 600 12px/1 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase;
+  color: #B14CFF; margin-bottom: 10px;
+}
+.dc-ev-guest-title {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 28px; letter-spacing: -0.02em; color: #fff; margin: 0;
+}
+.dc-ev-guest-sub {
+  margin: 8px 0 20px; font-size: 14.5px; line-height: 1.45; color: #9A9AA2;
+}
+.dc-ev-guest-field { display: block; margin-bottom: 14px; }
+.dc-ev-guest-field span {
+  display: block; margin-bottom: 6px;
+  font: 600 13px/1 var(--font-body); color: #C8C8CE;
+}
+.dc-ev-guest-field input {
+  width: 100%; box-sizing: border-box;
+  background: #0E0E10; color: #fff;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+  padding: 13px 15px; font: 400 15px/1.2 var(--font-body);
+  outline: none; transition: border-color 120ms ease;
+}
+.dc-ev-guest-field input:focus { border-color: rgba(177,76,255,0.7); }
+.dc-ev-guest-err {
+  margin: 0 0 12px; color: #FFB0B0; font-size: 13.5px;
+}
+.dc-ev-guest-submit { width: 100%; justify-content: center; margin-top: 4px; }
+.dc-ev-guest-note {
+  margin: 14px 0 0; text-align: center; font-size: 13px; color: #9A9AA2;
+}
+.dc-ev-guest-note a { color: #C79BFF; text-decoration: none; }
+.dc-ev-guest-note a:hover { text-decoration: underline; }

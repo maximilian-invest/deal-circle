@@ -105,6 +105,75 @@ router.delete("/:id/register", requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+// ---------- PUBLIC (Gast): Ticket ohne Login reservieren ----------
+// Nur für öffentliche Events. Gäste zahlen den regulären Preis (kein
+// Mitglieder-Rabatt). Name + E-Mail genügen.
+const guestRegisterSchema = z.object({
+  name: z.string().min(1).max(120),
+  email: z.string().email().max(200),
+  ticket_id: z.number().int().min(1).nullable().optional(),
+});
+
+router.post("/:id/register-guest", (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const parsed = guestRegisterSchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
+  const name = parsed.data.name.trim();
+  const email = parsed.data.email.trim();
+  const ticketId = parsed.data.ticket_id ?? null;
+
+  const event = db.prepare(
+    "SELECT id, status, fee_cents, visibility FROM events WHERE id = ?"
+  ).get(eventId);
+  if (!event) return res.status(404).json({ error: "not_found" });
+  if (event.visibility !== "public") return res.status(403).json({ error: "members_only" });
+  if (event.status === "closed") return res.status(409).json({ error: "event_closed" });
+
+  let amountCents = event.fee_cents;
+  if (ticketId) {
+    const t = db.prepare(
+      "SELECT id, price_cents FROM event_tickets WHERE id = ? AND event_id = ?"
+    ).get(ticketId, eventId);
+    if (!t) return res.status(400).json({ error: "invalid_ticket" });
+    amountCents = t.price_cents;
+  }
+
+  const existing = db.prepare(
+    "SELECT id, status FROM event_guest_registrations WHERE event_id = ? AND email = ?"
+  ).get(eventId, email);
+  if (existing && existing.status !== "cancelled") {
+    return res.status(409).json({ error: "already_registered" });
+  }
+
+  let info;
+  if (existing) {
+    db.prepare(`
+      UPDATE event_guest_registrations
+      SET status = 'reserved', name = ?, ticket_id = ?, amount_cents = ?, created_at = datetime('now')
+      WHERE id = ?
+    `).run(name, ticketId, amountCents, existing.id);
+    info = { lastInsertRowid: existing.id };
+  } else {
+    info = db.prepare(`
+      INSERT INTO event_guest_registrations (event_id, ticket_id, name, email, amount_cents, status)
+      VALUES (?, ?, ?, ?, ?, 'reserved')
+    `).run(eventId, ticketId, name, email, amountCents);
+  }
+
+  res.status(201).json({
+    ok: true,
+    registration: {
+      id: info.lastInsertRowid,
+      event_id: eventId,
+      ticket_id: ticketId,
+      status: "reserved",
+      amount_cents: amountCents,
+    },
+  });
+});
+
 // Public: prominentes Event fuer den Startseiten-Banner.
 // Bevorzugt ein als "Main Event" getaggtes Event, sonst das naechste upcoming.
 // Nur oeffentliche Events, keine Auth, nur sichere Felder.
