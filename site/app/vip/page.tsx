@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import AuthBadge from "../../components/AuthBadge";
 import Fireworks, { type FireworksHandle } from "../../components/Fireworks";
+import Footer from "../../components/Footer";
 
 type FormState = {
   first_name: string;
@@ -345,18 +346,7 @@ export default function VipPage() {
         </div>
       </main>
 
-      <footer className="dc-vip-footer">
-        <div className="dc-vip-wrap dc-vip-foot-in">
-          <div className="dc-vip-foot-dots">
-            DealCircle Salzburg · Salzburg · Wien · München · Zürich
-          </div>
-          <nav className="dc-vip-foot-links">
-            <a href="/#impressum">Impressum</a>
-            <a href="/#datenschutz">Datenschutz</a>
-            <a href="#anmelden">Aktivieren</a>
-          </nav>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

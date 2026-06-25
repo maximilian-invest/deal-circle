@@ -1,14 +1,32 @@
+// Section-anchor links bekommen einen führenden "/" → funktionieren
+// auch von Unterseiten aus (event/, vip/, impressum/ …).
 export default function Footer() {
   const cols: { h: string; l: [string, string][] }[] = [
-    { h: "Konzept", l: [["Was ist DealCircle", "#konzept"], ["Format & Ablauf", "#format"], ["Mitglieder", "#mitglieder"], ["Werte", "#werte"]] },
-    { h: "Kontakt", l: [["Mitglied werden", "#kontakt"], ["salzburg@deal-circle.at", "mailto:salzburg@deal-circle.at"], ["FAQ", "#faq"]] },
-    { h: "Standort", l: [["Schloss Wiespach", "#"], ["Hallein", "#"], ["Salzburger Land", "#"]] },
-    { h: "Rechtliches", l: [["Impressum", "#impressum"], ["Datenschutz", "#datenschutz"], ["AGB", "#agb"]] },
+    { h: "Konzept", l: [
+      ["Was ist DealCircle", "/#konzept"],
+      ["Format & Ablauf",   "/#format"],
+      ["Rhythmus",          "/#rhythmus"],
+      ["Werte",             "/#werte"],
+    ]},
+    { h: "Kontakt", l: [
+      ["Mitglied werden",        "/#kontakt"],
+      ["event@deal-circle.at",   "mailto:event@deal-circle.at"],
+      ["FAQ",                    "/#faq"],
+    ]},
+    { h: "Standort", l: [
+      ["Schloss Wiespach", "#"],
+      ["Hallein",          "#"],
+      ["Salzburger Land",  "#"],
+    ]},
+    { h: "Rechtliches", l: [
+      ["Impressum",     "/impressum/"],
+      ["Datenschutz",   "/datenschutz/"],
+    ]},
   ];
   return (
     <footer className="dc-footer">
       <div className="dc-footer-top">
-        <a href="#top" className="dc-nav-brand" style={{ textDecoration: "none" }}>
+        <a href="/" className="dc-nav-brand" style={{ textDecoration: "none" }}>
           <img
             src="/assets/logo-dc-white.svg"
             alt=""
@@ -18,7 +36,6 @@ export default function Footer() {
             aria-hidden="true"
           />
           <span className="dc-nav-wordmark">DealCircle</span>
-          <span className="dc-nav-tag">Salzburg</span>
         </a>
         <div className="dc-footer-cols">
           {cols.map((c) => (
@@ -32,7 +49,7 @@ export default function Footer() {
       <hr className="dc-divider" style={{ marginTop: "48px" }} />
       <div className="dc-footer-bottom">
         <span className="dc-micro dc-ink-muted">
-          © 2026 DealCircle Salzburg · Schloss Wiespach · Hallein · Salzburger Land
+          © 2026 PRO ASSETS GmbH · DealCircle Salzburg · Schloss Wiespach · Hallein
         </span>
         <span className="dc-micro dc-ink-muted">Zugang auf persönliche Empfehlung</span>
       </div>

@@ -196,6 +196,12 @@ export default function Sidebar({ active, setActive, user }: Props) {
             <Icon name="logout" />
           </button>
         </div>
+
+        <div className="mb-sidebar-legal">
+          <a href="/impressum/">Impressum</a>
+          <span aria-hidden="true">·</span>
+          <a href="/datenschutz/">Datenschutz</a>
+        </div>
       </aside>
     </>
   );

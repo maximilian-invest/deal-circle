@@ -3395,3 +3395,112 @@ html, body { overflow-x: hidden; }
   .dc-vip-gift,
   .dc-vip-form-card { padding: 28px; }
 }
+
+/* =====================================================================
+   LEGAL-PAGES (Impressum, Datenschutz)
+   ===================================================================== */
+.dc-legal {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  padding: 120px 24px 80px;
+}
+.dc-legal-inner {
+  max-width: 720px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 40px;
+}
+.dc-legal-head { display: flex; flex-direction: column; gap: 14px; }
+.dc-legal-h1 {
+  font-family: var(--font-display); font-weight: 600;
+  color: #fff;
+  font-size: clamp(40px, 6.5vw, 64px);
+  line-height: 0.94; letter-spacing: -0.04em;
+  margin: 0; text-wrap: balance;
+}
+.dc-legal-lede {
+  font: var(--type-body-lg); letter-spacing: var(--tracking-body-lg);
+  color: var(--color-ink-muted);
+  text-wrap: pretty; margin: 0;
+}
+.dc-legal section {
+  display: flex; flex-direction: column; gap: 14px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-hairline-soft);
+}
+.dc-legal section:first-of-type { border-top: 0; padding-top: 0; }
+.dc-legal h2 {
+  font-family: var(--font-display); font-weight: 600;
+  color: #fff;
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 1.15; letter-spacing: -0.02em;
+  margin: 0;
+}
+.dc-legal h3 {
+  font-family: var(--font-display); font-weight: 600;
+  color: #fff;
+  font-size: clamp(17px, 2.4vw, 20px);
+  line-height: 1.2; letter-spacing: -0.01em;
+  margin: 8px 0 0;
+}
+.dc-legal p {
+  font: var(--type-body); letter-spacing: var(--tracking-body);
+  color: var(--color-ink-muted);
+  margin: 0; text-wrap: pretty;
+}
+.dc-legal strong { color: var(--color-ink); font-weight: 600; }
+.dc-legal ul {
+  margin: 0; padding: 0 0 0 20px;
+  display: flex; flex-direction: column; gap: 8px;
+  font: var(--type-body); letter-spacing: var(--tracking-body);
+  color: var(--color-ink-muted);
+}
+.dc-legal a {
+  color: var(--color-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-hairline);
+  transition: border-color 140ms ease;
+}
+.dc-legal a:hover { border-color: var(--color-ink); }
+.dc-legal-stand {
+  margin-top: 24px;
+  font: var(--type-caption); letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  font-style: italic;
+  border-top: 1px solid var(--color-hairline-soft);
+  padding-top: 16px;
+}
+
+/* =====================================================================
+   Login + Sidebar: kleine Impressum/Datenschutz-Links
+   ===================================================================== */
+.mb-login-legal {
+  margin: 14px 0 0; padding-top: 14px;
+  text-align: center;
+  font: var(--type-micro); letter-spacing: var(--tracking-micro);
+  color: var(--color-ink-muted);
+}
+.mb-login-legal a {
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 140ms ease, color 140ms ease;
+}
+.mb-login-legal a:hover {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-hairline);
+}
+.mb-login-legal span { margin: 0 6px; opacity: 0.5; }
+
+.mb-sidebar-legal {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  padding: 12px 4px 0;
+  font: var(--type-micro); letter-spacing: var(--tracking-micro);
+  color: var(--color-ink-muted);
+}
+.mb-sidebar-legal a {
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+.mb-sidebar-legal a:hover { color: var(--color-ink); }
+.mb-sidebar-legal span { opacity: 0.5; }

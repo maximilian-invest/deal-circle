@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
+import Footer from "./Footer";
 import type { Speaker, Ticket, TimelineItem } from "../components/member/types";
 
 export type EventDetail = {
@@ -340,18 +341,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
         )}
       </main>
 
-      <footer className="dc-ev-footer">
-        <div className="dc-ev-wrap dc-ev-foot-in">
-          <div className="dc-ev-foot-dots">
-            DealCircle Salzburg · Salzburg · Wien · München · Zürich
-          </div>
-          <nav className="dc-ev-foot-links">
-            <a href="/#impressum">Impressum</a>
-            <a href="/#datenschutz">Datenschutz</a>
-            <a href="#ticket">Tickets</a>
-          </nav>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

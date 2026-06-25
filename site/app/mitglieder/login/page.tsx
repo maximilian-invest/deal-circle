@@ -143,6 +143,12 @@ export default function LoginPage() {
           <p className="mb-login-foot">
             Noch kein Mitglied? <a href="/#kontakt">Auf Empfehlung beitreten →</a>
           </p>
+
+          <p className="mb-login-legal">
+            <a href="/impressum/">Impressum</a>
+            <span aria-hidden="true"> · </span>
+            <a href="/datenschutz/">Datenschutz</a>
+          </p>
         </div>
       </motion.section>
     </main>
