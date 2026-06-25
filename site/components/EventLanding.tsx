@@ -109,17 +109,6 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   const city = locationCity(event.location);
   const venue = locationVenue(event.location);
 
-  // Marquee-Tokens
-  const speakerNames = event.speakers.map((s) => s.name).slice(0, 4);
-  const marqueeTokens = [
-    "Deal Circle Event",
-    `${d.getDate()}. ${["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"][d.getMonth()]} ${d.getFullYear()}`,
-    city,
-    ...speakerNames,
-    `${fee} €`,
-  ];
-  const marqueeRow = marqueeTokens.join("  ·  ");
-
   // Lede: nimm Beschreibung wenn vorhanden, sonst Fallback
   const lede = event.description?.split("\n")[0]
     ?? "Verbinde dich mit Top-Unternehmern aus Österreich & Deutschland.";
@@ -246,14 +235,6 @@ export default function EventLanding({ event }: { event: EventDetail }) {
             </motion.div>
           </div>
         </section>
-
-        {/* MARQUEE */}
-        <div className="dc-ev-marquee" aria-hidden="true">
-          <div className="dc-ev-marquee-track">
-            <span>{marqueeRow}</span>
-            <span>{marqueeRow}</span>
-          </div>
-        </div>
 
         {/* PROGRAMM */}
         {event.timeline.length > 0 && (
