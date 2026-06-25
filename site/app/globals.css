@@ -3080,7 +3080,7 @@ html, body { overflow-x: hidden; }
   min-height: 100vh;
   overflow-x: hidden;
 }
-.dc-vip a { color: inherit; }
+:where(.dc-vip) a { color: inherit; }
 .dc-vip img { display: block; max-width: 100%; }
 .dc-vip-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
 .dc-vip-grad {
