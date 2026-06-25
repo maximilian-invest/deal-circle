@@ -279,7 +279,7 @@ export default function VipPage() {
                       />
                     </div>
                     <div className="dc-vip-field">
-                      <label htmlFor="phone">WhatsApp-Nummer</label>
+                      <label htmlFor="phone">Telefonnummer</label>
                       <input
                         id="phone"
                         type="tel"
@@ -315,7 +315,7 @@ export default function VipPage() {
                       />
                       <span>
                         Ich möchte meine Gratis-Mitgliedschaft aktivieren und akzeptiere die{" "}
-                        <a href="/#datenschutz">Datenschutzbestimmungen</a>.
+                        <a href="/datenschutz/" target="_blank" rel="noopener noreferrer">Datenschutzbestimmungen</a>.
                       </span>
                     </label>
 
