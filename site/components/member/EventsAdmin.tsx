@@ -491,24 +491,6 @@ export default function EventsAdmin() {
               </div>
             </div>
 
-            <div className="dc-field">
-              <label htmlFor="ev-mdisc">Mitglieder-Rabatt (%)</label>
-              <input
-                id="ev-mdisc"
-                type="number"
-                min="0"
-                max="90"
-                step="1"
-                value={form.member_discount_pct}
-                onChange={(e) => setForm({ ...form, member_discount_pct: e.target.value })}
-                placeholder="z. B. 20"
-              />
-              <p style={{ margin: "6px 2px 0", fontSize: 13, lineHeight: 1.5, color: "var(--color-ink-muted)" }}>
-                0 = kein Rabatt. Eingeloggte Mitglieder sehen automatisch den vergünstigten Preis;
-                Nicht-Mitglieder den regulären Preis plus einen „−X %"-Hinweis-Badge.
-              </p>
-            </div>
-
             <div className="mb-admin-form-row">
               <div className="dc-field">
                 <label htmlFor="ev-visibility">Sichtbarkeit</label>
@@ -654,6 +636,26 @@ export default function EventsAdmin() {
                 <button type="button" className="mb-admin-action mb-admin-action--add" onClick={addTicket}>
                   + Ticket-Variante hinzufügen
                 </button>
+              </div>
+
+              <div className="dc-field" style={{ marginBottom: 18 }}>
+                <label htmlFor="ev-mdisc">Mitglieder-Rabatt auf alle Tickets (%)</label>
+                <input
+                  id="ev-mdisc"
+                  type="number"
+                  min="0"
+                  max="90"
+                  step="1"
+                  value={form.member_discount_pct}
+                  onChange={(e) => setForm({ ...form, member_discount_pct: e.target.value })}
+                  placeholder="z. B. 20"
+                  style={{ maxWidth: 220 }}
+                />
+                <p style={{ margin: "6px 2px 0", fontSize: 13, lineHeight: 1.5, color: "var(--color-ink-muted)" }}>
+                  Gilt für alle Ticket-Preise dieses Events. 0 = kein Rabatt. Eingeloggte Mitglieder
+                  sehen automatisch den vergünstigten Preis; Nicht-Mitglieder den regulären Preis
+                  plus einen „−X %"-Hinweis-Badge.
+                </p>
               </div>
 
               {form.tickets.length === 0 ? (
