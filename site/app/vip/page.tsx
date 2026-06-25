@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import AuthBadge from "../../components/AuthBadge";
+import Fireworks, { type FireworksHandle } from "../../components/Fireworks";
 
 type FormState = {
   first_name: string;
@@ -53,6 +54,13 @@ export default function VipPage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fxRef = useRef<FireworksHandle>(null);
+
+  // Subtiles Welcome-Feuerwerk wenn die Seite geoeffnet wird
+  useEffect(() => {
+    const id = window.setTimeout(() => fxRef.current?.welcome(), 450);
+    return () => clearTimeout(id);
+  }, []);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -93,6 +101,16 @@ export default function VipPage() {
         return;
       }
       setDone(true);
+      // Grosser Knall — Feuerwerk ausgehend von der Form-Card
+      requestAnimationFrame(() => {
+        const el = document.getElementById("anmelden");
+        if (el) {
+          const r = el.getBoundingClientRect();
+          fxRef.current?.celebrate(r.left + r.width / 2, r.top + r.height / 2);
+        } else {
+          fxRef.current?.celebrate(window.innerWidth / 2, window.innerHeight / 2);
+        }
+      });
     } catch {
       setError("Verbindung fehlgeschlagen — bitte später nochmal versuchen.");
     } finally {
@@ -102,6 +120,7 @@ export default function VipPage() {
 
   return (
     <div className="dc-vip">
+      <Fireworks ref={fxRef} />
       <header className="dc-vip-nav">
         <div className="dc-vip-wrap dc-vip-nav-in">
           <a href="/" className="dc-vip-brand" aria-label="DealCircle">
