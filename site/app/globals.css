@@ -215,6 +215,13 @@ img { max-width: 100%; display: block; }
   .dc-nav-links { display: none; }
 }
 
+/* Mobil: nur Logo, kein "DealCircle"-Schriftzug in der Navbar */
+@media (max-width: 560px) {
+  .dc-nav-wordmark,
+  .dc-ev-brand span,
+  .dc-vip-brand span { display: none; }
+}
+
 /* ---------- Section frame ---------- */
 .dc-section { max-width: 1200px; margin: 0 auto; padding: var(--space-section) 30px; }
 .dc-section--tight { padding-top: 60px; padding-bottom: 60px; }

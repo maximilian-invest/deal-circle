@@ -174,9 +174,9 @@ router.post("/:id/register-guest", (req, res) => {
   });
 });
 
-// Public: prominentes Event fuer den Startseiten-Banner.
-// Bevorzugt ein als "Main Event" getaggtes Event, sonst das naechste upcoming.
-// Nur oeffentliche Events, keine Auth, nur sichere Felder.
+// Public: Main-Event fuer den Startseiten-Banner.
+// Zeigt NUR ein als "Main Event" getaggtes (oeffentliches, kommendes) Event.
+// Ist keines getaggt, kommt null zurueck -> der Banner bleibt leer.
 router.get("/public/next", (_req, res) => {
   const row = db
     .prepare(`
@@ -185,7 +185,8 @@ router.get("/public/next", (_req, res) => {
       WHERE starts_at >= datetime('now')
         AND status != 'closed'
         AND visibility = 'public'
-      ORDER BY is_main DESC, starts_at ASC
+        AND is_main = 1
+      ORDER BY starts_at ASC
       LIMIT 1
     `)
     .get();

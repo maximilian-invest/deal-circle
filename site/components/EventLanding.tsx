@@ -3,7 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
 import Footer from "./Footer";
-import { fetchMe, type AuthUser } from "./member/auth";
+import { fetchMe, logout, type AuthUser } from "./member/auth";
 import { registerForEvent, registerGuest } from "./member/events";
 import type { Speaker, Ticket, TimelineItem } from "./member/types";
 
@@ -141,9 +141,13 @@ export default function EventLanding({ event }: { event: EventDetail }) {
           </a>
           <div className="dc-ev-nav-right">
             <AuthBadge variant="dark" />
-            {event.status !== "closed" && (
-              <a className="dc-ev-nav-cta" href="#ticket">
-                <b>{hasMultiTickets ? `Ab ${feeLabel}` : feeLabel}</b> · Platz sichern
+            {isMember && (
+              <a
+                className="dc-ev-nav-cta"
+                href="/"
+                onClick={(e) => { e.preventDefault(); logout(); window.location.reload(); }}
+              >
+                Logout
               </a>
             )}
           </div>
