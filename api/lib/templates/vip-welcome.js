@@ -82,10 +82,11 @@ Datenschutz: ${DATENSCHUTZ}`;
                   <td style="padding:22px 28px;" align="left">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td style="vertical-align:middle;padding-right:12px;">
-                          <div style="width:30px;height:30px;border:2px solid #ffffff;border-radius:50%;position:relative;">
-                            <div style="width:9px;height:9px;background:#ffffff;border-radius:50%;position:absolute;top:8.5px;left:8.5px;"></div>
-                          </div>
+                        <td style="vertical-align:middle;padding-right:14px;">
+                          <img src="${SITE_URL}/assets/logo-dc-white.png"
+                               alt="DealCircle"
+                               width="40" height="32"
+                               style="display:block;width:40px;height:auto;border:0;outline:none;text-decoration:none;" />
                         </td>
                         <td style="vertical-align:middle;font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:21px;letter-spacing:-0.8px;color:#ffffff;">
                           DealCircle
