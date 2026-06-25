@@ -41,28 +41,19 @@ export default function AuthBadge({ variant = "dark" }: Props) {
     );
   }
 
-  // Eingeloggt
-  if (state.role === "admin") {
-    return (
-      <a
-        href="/mitglieder/dashboard/"
-        className="dc-auth-badge dc-auth-badge--admin"
-        title={`Admin: ${state.email}`}
-      >
-        <span className="dc-auth-badge-dot" aria-hidden="true" />
-        <span className="dc-auth-badge-label">Admin</span>
-        <span className="dc-auth-badge-name">{state.name || state.email}</span>
-      </a>
-    );
-  }
-
-  // Member
+  // Eingeloggt — Pill mit "Eingeloggt als <Name>", Admin extra-violet hinterlegt
+  const isAdmin = state.role === "admin";
   return (
     <a
       href="/mitglieder/dashboard/"
-      className={`dc-auth-badge dc-auth-badge--member dc-auth-badge--${variant}`}
+      className={`dc-auth-badge ${isAdmin ? "dc-auth-badge--admin" : "dc-auth-badge--name"} dc-auth-badge--${variant}`}
+      title={isAdmin ? `Admin · ${state.email}` : state.email}
     >
-      Mitgliederbereich
+      <span className="dc-auth-badge-dot" aria-hidden="true" />
+      <span className="dc-auth-badge-text">
+        <span className="dc-auth-badge-prefix">Eingeloggt als</span>
+        <span className="dc-auth-badge-name">{state.name || state.email}</span>
+      </span>
     </a>
   );
 }

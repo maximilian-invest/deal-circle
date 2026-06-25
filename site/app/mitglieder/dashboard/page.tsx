@@ -10,6 +10,7 @@ import PastEvents from "../../../components/member/PastEvents";
 import EventModal from "../../../components/member/EventModal";
 import MembersAdmin from "../../../components/member/MembersAdmin";
 import EventsAdmin from "../../../components/member/EventsAdmin";
+import Profile from "../../../components/member/Profile";
 import { fetchMe, type AuthUser } from "../../../components/member/auth";
 import {
   isPast, listEvents, toNextEventShape, toPastShape, toUpcomingShape,
@@ -289,15 +290,7 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {safeActive === "profil" && (
-          <section className="mb-section">
-            <div style={{ padding: "60px 0", textAlign: "center", color: "var(--color-ink-muted)" }}>
-              <p className="dc-body-lg" style={{ maxWidth: 480, margin: "0 auto" }}>
-                Profil-, Rechnungs- und Mitgliedschaftseinstellungen folgen.
-              </p>
-            </div>
-          </section>
-        )}
+        {safeActive === "profil" && <Profile />}
 
         {safeActive === "verwaltung" && user.role === "admin" && (
           <MembersAdmin currentUserEmail={user.email} />

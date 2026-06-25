@@ -7,6 +7,8 @@ export type AdminUser = {
   email: string;
   name: string;
   role: Role;
+  phone: string | null;
+  company: string | null;
   created_at: string;
   last_login_at: string | null;
 };

@@ -88,6 +88,11 @@ function errorMessage(code: string, status: number): string {
     case "last_admin":          return "Der letzte Admin kann nicht entfernt werden.";
     case "self_delete":         return "Eigener Account kann nicht gelöscht werden.";
     case "network":             return "Keine Verbindung zum Server.";
+    case "token_expired":       return "Der Reset-Link ist abgelaufen — bitte einen neuen anfordern.";
+    case "token_used":          return "Dieser Reset-Link wurde bereits verwendet.";
+    case "invalid_token":       return "Reset-Link ungültig oder abgelaufen.";
+    case "consent_required":    return "Bitte Einwilligung bestätigen.";
+    case "nothing_to_update":   return "Keine Änderungen.";
     default:                    return `Fehler (${status || "?"}): ${code}`;
   }
 }

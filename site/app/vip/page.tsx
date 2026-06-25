@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import AuthBadge from "../../components/AuthBadge";
 import Fireworks, { type FireworksHandle } from "../../components/Fireworks";
 import Footer from "../../components/Footer";
+import { registerMember } from "../../components/member/auth";
 
 type FormState = {
   first_name: string;
@@ -11,6 +12,7 @@ type FormState = {
   email: string;
   phone: string;
   company: string;
+  password: string;
   consent: boolean;
 };
 
@@ -20,6 +22,7 @@ const EMPTY: FormState = {
   email: "",
   phone: "",
   company: "",
+  password: "",
   consent: false,
 };
 
@@ -89,40 +92,31 @@ export default function VipPage() {
       setError("Bitte alle Pflichtfelder ausfüllen und Einwilligung bestätigen.");
       return;
     }
+    if (form.password.length < 8) {
+      setError("Bitte ein Passwort mit mindestens 8 Zeichen wählen.");
+      return;
+    }
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/vip/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          first_name: form.first_name.trim(),
-          last_name: form.last_name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          company: form.company.trim() || null,
-          consent: form.consent,
-        }),
+      await registerMember({
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        company: form.company.trim() || null,
+        password: form.password,
+        consent: form.consent,
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({} as any));
-        if (data.error === "too_many_attempts") {
-          setError("Zu viele Versuche — bitte einen Moment warten.");
-        } else if (data.error === "invalid_input") {
-          setError("Bitte Eingaben prüfen.");
-        } else {
-          setError(`Anmeldung fehlgeschlagen (${res.status}).`);
-        }
-        return;
-      }
       setDone(true);
       setModalOpen(true);
       // Grosser Knall — Feuerwerk ausgehend von der Bildschirmmitte
       requestAnimationFrame(() => {
         fxRef.current?.celebrate(window.innerWidth / 2, window.innerHeight * 0.42);
       });
-    } catch {
-      setError("Verbindung fehlgeschlagen — bitte später nochmal versuchen.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Anmeldung fehlgeschlagen.";
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -305,6 +299,20 @@ export default function VipPage() {
                         disabled={submitting}
                       />
                     </div>
+                    <div className="dc-vip-field">
+                      <label htmlFor="password">Passwort wählen</label>
+                      <input
+                        id="password"
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder="Mindestens 8 Zeichen"
+                        value={form.password}
+                        onChange={(e) => update("password", e.target.value)}
+                        disabled={submitting}
+                        minLength={8}
+                        required
+                      />
+                    </div>
 
                     <label className="dc-vip-consent">
                       <input
@@ -419,19 +427,18 @@ export default function VipPage() {
                 </li>
               </ul>
 
-              <button
-                type="button"
+              <a
+                href="/mitglieder/dashboard/"
                 className="dc-vip-btn-submit dc-vip-modal-cta"
-                onClick={() => setModalOpen(false)}
               >
-                Los geht&apos;s
+                In den Mitgliederbereich
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
-              </button>
+              </a>
 
               <p className="dc-vip-modal-hint">
-                Deine Bestätigung ist unterwegs in dein Postfach
+                Bestätigung ist unterwegs in dein Postfach
                 {form.email.trim() ? <> an <b>{form.email.trim()}</b></> : ""}.
               </p>
             </motion.div>

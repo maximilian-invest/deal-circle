@@ -125,7 +125,7 @@ export default function LoginPage() {
                 />
                 Angemeldet bleiben
               </label>
-              <a href="#" onClick={(e) => e.preventDefault()}>Passwort vergessen?</a>
+              <a href="/mitglieder/passwort-zuruecksetzen/">Passwort vergessen?</a>
             </div>
 
             {error && <div className="mb-login-error" role="alert">{error}</div>}

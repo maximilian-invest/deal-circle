@@ -1,7 +1,9 @@
 import { Router } from "express";
+import bcrypt from "bcryptjs";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import db from "../db.js";
+import { signToken } from "../jwt.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { sendMailAsync } from "../lib/mailer.js";
 import { vipWelcome } from "../lib/templates/vip-welcome.js";
@@ -12,10 +14,8 @@ const router = Router();
 
 // Public: VIP-Signup-Endpoint mit Rate-Limit gegen Spam
 const signupLimiter = rateLimit({
-  windowMs: 60_000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 60_000, max: 5,
+  standardHeaders: true, legacyHeaders: false,
   message: { error: "too_many_attempts" },
 });
 
@@ -25,6 +25,7 @@ const signupSchema = z.object({
   email: z.string().email().max(200).trim().toLowerCase(),
   phone: z.string().min(4).max(40).trim(),
   company: z.string().max(160).nullable().optional(),
+  password: z.string().min(8).max(200),
   consent: z.boolean().refine((v) => v === true, "consent_required"),
 });
 
@@ -34,21 +35,35 @@ router.post("/register", signupLimiter, (req, res) => {
     return res.status(400).json({ error: "invalid_input", details: parsed.error.flatten() });
   }
   const d = parsed.data;
+  const fullName = `${d.first_name} ${d.last_name}`.trim();
 
-  // Idempotent: gleiche E-Mail wird nicht doppelt eingetragen, aber als
-  // success retourniert (frontend soll nichts leaken). Optional: counter.
-  const existing = db
-    .prepare("SELECT id FROM vip_signups WHERE email = ? COLLATE NOCASE")
-    .get(d.email);
-
-  if (existing) {
-    return res.status(200).json({ ok: true, dedupe: true });
+  // Doppelte E-Mail → kein User-Existenz-Leak, aber klare Antwort
+  const existingUser = db.prepare("SELECT id FROM users WHERE email = ?").get(d.email);
+  if (existingUser) {
+    return res.status(409).json({ error: "email_taken" });
   }
 
-  db.prepare(
-    `INSERT INTO vip_signups (first_name, last_name, email, phone, company, consent_at)
-     VALUES (?, ?, ?, ?, ?, datetime('now'))`
-  ).run(d.first_name, d.last_name, d.email, d.phone, d.company ?? null);
+  const passwordHash = bcrypt.hashSync(d.password, 11);
+  const tx = db.transaction(() => {
+    const info = db.prepare(`
+      INSERT INTO users (email, name, password_hash, role, phone, company, last_login_at)
+      VALUES (?, ?, ?, 'member', ?, ?, datetime('now'))
+    `).run(d.email, fullName, passwordHash, d.phone, d.company ?? null);
+
+    // Audit-Trail
+    db.prepare(`
+      INSERT INTO vip_signups (first_name, last_name, email, phone, company, consent_at)
+      VALUES (?, ?, ?, ?, ?, datetime('now'))
+    `).run(d.first_name, d.last_name, d.email, d.phone, d.company ?? null);
+
+    return info.lastInsertRowid;
+  });
+  const userId = tx();
+
+  // Auto-Login: token zurueck damit Frontend direkt in den Mitgliederbereich
+  const token = signToken({
+    sub: userId, email: d.email, name: fullName, role: "member",
+  });
 
   // --- Mail 1/2: Admin-Notify (fire-and-forget) ---
   const ts = new Date().toLocaleString("de-AT", {
@@ -58,15 +73,18 @@ router.post("/register", signupLimiter, (req, res) => {
   sendMailAsync({
     to: NOTIFY_TO,
     replyTo: d.email,
-    subject: `Neue VIP-Anmeldung: ${d.first_name} ${d.last_name}`,
+    subject: `Neue Mitgliedschafts-Anmeldung: ${fullName}`,
     text:
-`Neue Bestandsmitglieder-Anmeldung auf https://deal-circle.at/vip/
+`Neue Mitgliedschafts-Anmeldung über https://deal-circle.at/vip/
 
-Name:        ${d.first_name} ${d.last_name}
+Name:        ${fullName}
 E-Mail:      ${d.email}
-WhatsApp:    ${d.phone}
+Telefon:     ${d.phone}
 Unternehmen: ${d.company || "—"}
 Eingelangt:  ${ts}
+
+Der Account wurde automatisch angelegt und ist eingeloggt. Du siehst
+ihn jetzt im Admin-Tab "Mitglieder verwalten".
 
 Antworten landet direkt beim Mitglied (Reply-To gesetzt).
 
@@ -82,7 +100,11 @@ Antworten landet direkt beim Mitglied (Reply-To gesetzt).
     html: welcome.html,
   });
 
-  res.status(201).json({ ok: true });
+  res.status(201).json({
+    ok: true,
+    token,
+    user: { email: d.email, name: fullName, role: "member" },
+  });
 });
 
 // --- Admin: Signups einsehen + als "verarbeitet" markieren ---

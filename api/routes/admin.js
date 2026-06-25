@@ -10,7 +10,7 @@ router.use(requireAuth, requireAdmin);
 
 router.get("/users", (_req, res) => {
   const rows = db
-    .prepare("SELECT id, email, name, role, created_at, last_login_at FROM users ORDER BY created_at DESC")
+    .prepare("SELECT id, email, name, role, phone, company, created_at, last_login_at FROM users ORDER BY created_at DESC")
     .all();
   res.json({ users: rows });
 });
@@ -40,7 +40,7 @@ router.post("/users", (req, res) => {
     .run(email, name, hash, role);
 
   const row = db
-    .prepare("SELECT id, email, name, role, created_at FROM users WHERE id = ?")
+    .prepare("SELECT id, email, name, role, phone, company, created_at FROM users WHERE id = ?")
     .get(info.lastInsertRowid);
 
   res.status(201).json({ user: row });
@@ -100,7 +100,7 @@ router.patch("/users/:id", (req, res) => {
   db.prepare(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`).run(...values);
 
   const row = db
-    .prepare("SELECT id, email, name, role, created_at, last_login_at FROM users WHERE id = ?")
+    .prepare("SELECT id, email, name, role, phone, company, created_at, last_login_at FROM users WHERE id = ?")
     .get(id);
 
   res.json({ user: row });

@@ -224,6 +224,8 @@ export default function MembersAdmin({ currentUserEmail }: Props) {
                 <tr>
                   <th>E-Mail</th>
                   <th>Name</th>
+                  <th>Telefon</th>
+                  <th>Unternehmen</th>
                   <th>Rolle</th>
                   <th>Angelegt</th>
                   <th>Letzter Login</th>
@@ -241,6 +243,8 @@ export default function MembersAdmin({ currentUserEmail }: Props) {
                         {self && <span className="mb-admin-self">(Sie)</span>}
                       </td>
                       <td>{u.name}</td>
+                      <td>{u.phone || <span style={{ color: "var(--color-ink-muted)" }}>—</span>}</td>
+                      <td>{u.company || <span style={{ color: "var(--color-ink-muted)" }}>—</span>}</td>
                       <td>
                         <span className={`mb-admin-role mb-admin-role--${u.role}`}>
                           {u.role === "admin" ? "Administrator" : "Mitglied"}

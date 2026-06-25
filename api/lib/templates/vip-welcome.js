@@ -42,12 +42,11 @@ Deal Circle. Das erwartet dich:
   ✓ Zugang zu exklusiven Events — vor allen anderen eingeladen.
   ✓ Preis-Ermaessigungen fuer alle zukuenftigen Events des Deal Circle.
 
-Zu deinem Mitgliedsbereich:
+Zum Mitgliederbereich (Login mit Mail + selbst gewaehltem Passwort):
 ${DASHBOARD}
 
 — —
 DealCircle Salzburg · PRO ASSETS GmbH
-Salzburg · Wien · Muenchen · Zuerich
 Impressum: ${IMPRESSUM}
 Datenschutz: ${DATENSCHUTZ}`;
 
@@ -204,11 +203,14 @@ Datenschutz: ${DATENSCHUTZ}`;
                 <tr>
                   <td style="background:#ffffff;border-radius:100px;">
                     <a href="${DASHBOARD}" style="display:inline-block;padding:17px 34px;font-family:'Helvetica Neue',Arial,sans-serif;font-weight:600;font-size:16px;letter-spacing:-0.2px;color:#0A0A0B;text-decoration:none;">
-                      Zu deinem Mitgliedsbereich &nbsp;&rarr;
+                      Zum Mitgliederbereich &nbsp;&rarr;
                     </a>
                   </td>
                 </tr>
               </table>
+              <p style="margin:14px 0 0 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.5;color:#6F6F77;">
+                Login mit deiner E-Mail-Adresse und dem Passwort,<br />das du bei der Registrierung gewählt hast.
+              </p>
             </td>
           </tr>
 
@@ -219,7 +221,7 @@ Datenschutz: ${DATENSCHUTZ}`;
                 <tr>
                   <td style="padding:24px 0 0 0;">
                     <p style="margin:0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.6;color:#6F6F77;">
-                      DealCircle Salzburg &nbsp;&middot;&nbsp; Salzburg &middot; Wien &middot; München &middot; Zürich
+                      DealCircle Salzburg &nbsp;&middot;&nbsp; PRO ASSETS GmbH
                     </p>
                     <p style="margin:12px 0 0 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.6;color:#6F6F77;">
                       <a href="${IMPRESSUM}" style="color:#6F6F77;text-decoration:none;">Impressum</a> &nbsp;&nbsp;

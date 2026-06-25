@@ -21,11 +21,23 @@ db.exec(`
     name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+    phone TEXT,
+    company TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     last_login_at TEXT
   );
 
   CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+
+  CREATE TABLE IF NOT EXISTS password_resets (
+    token TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL,
+    used_at TEXT
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets (user_id);
 
   CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,6 +130,17 @@ function migrateEventsSchema() {
   if (!tcols.includes("featured")) {
     console.log("[migrate] event_tickets: add column featured");
     db.exec("ALTER TABLE event_tickets ADD COLUMN featured INTEGER NOT NULL DEFAULT 0");
+  }
+
+  // users: phone + company
+  const ucols = db.prepare("PRAGMA table_info(users)").all().map((c) => c.name);
+  if (!ucols.includes("phone")) {
+    console.log("[migrate] users: add column phone");
+    db.exec("ALTER TABLE users ADD COLUMN phone TEXT");
+  }
+  if (!ucols.includes("company")) {
+    console.log("[migrate] users: add column company");
+    db.exec("ALTER TABLE users ADD COLUMN company TEXT");
   }
 }
 migrateEventsSchema();
