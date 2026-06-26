@@ -97,6 +97,12 @@ export function wrapDocument({ preheader, title, contentRows }) {
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>${escapeHtml(title)}</title>
 <!--[if mso]><style>* { font-family: Arial, sans-serif !important; }</style><![endif]-->
+<style>
+  @media only screen and (max-width:600px) {
+    .dc-mail-shell { width: 100% !important; }
+    .dc-mail-h1 { font-size: 36px !important; line-height: 1 !important; letter-spacing: -1.2px !important; }
+  }
+</style>
 </head>
 <body style="margin:0;padding:0;background:#0A0A0B;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:#0A0A0B;">
@@ -105,7 +111,7 @@ export function wrapDocument({ preheader, title, contentRows }) {
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0B;">
     <tr>
       <td align="center" style="padding:32px 16px;">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
+        <table role="presentation" width="100%" class="dc-mail-shell" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
           ${header()}
           ${contentRows}
           ${footer()}
@@ -147,7 +153,7 @@ export function hero({ eyebrow, h1Html, lede }) {
       <p style="margin:0 0 18px 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:#9A9AA2;">
         ${escapeHtml(eyebrow)}
       </p>
-      <h1 style="margin:0;font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:48px;line-height:0.92;letter-spacing:-2px;color:#ffffff;">
+      <h1 class="dc-mail-h1" style="margin:0;font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:48px;line-height:0.92;letter-spacing:-2px;color:#ffffff;">
         ${h1Html}
       </h1>
       ${lede ? `<p style="margin:24px 0 0 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:17px;line-height:1.5;color:#9A9AA2;">${lede}</p>` : ""}

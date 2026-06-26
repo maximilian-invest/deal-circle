@@ -37,6 +37,11 @@ function getTransport() {
       secure: SMTP_PORT === 465,   // 465 = SMTPS, 587 = STARTTLS
       auth: { user: SMTP_USER, pass: SMTP_PASS },
       tls: { minVersion: "TLSv1.2" },
+      // Timeouts, damit ein hängender Versand nicht die serialisierte
+      // Mail-Queue (siehe sendMailAsync) blockiert.
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 20_000,
     });
   }
   return transporter;
@@ -67,6 +72,15 @@ export async function sendMail({ to, subject, text, html, replyTo, cc, bcc }) {
 // Fire-and-forget — nie await-bar, fehler werden nur geloggt.
 // Wird im Request-Handler benutzt damit die Response nicht durch
 // Mail-Latenz verzoegert wird.
+//
+// Sends werden SERIALISIERT (eine Verbindung nach der anderen): Wenn ein
+// Request mehrere Mails ausloest (z. B. Kunden-Bestaetigung + Admin-Notify),
+// wuerden parallele SMTP-Verbindungen vom Provider teils oder ganz abgelehnt.
+// Die Promise-Kette stellt sicher, dass immer nur eine Mail gleichzeitig
+// versendet wird.
+let mailChain = Promise.resolve();
 export function sendMailAsync(opts) {
-  sendMail(opts).catch((err) => console.error("[mailer] async unexpected:", err));
+  mailChain = mailChain
+    .then(() => sendMail(opts))
+    .catch((err) => console.error("[mailer] async unexpected:", err));
 }
