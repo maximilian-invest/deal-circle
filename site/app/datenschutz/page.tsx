@@ -16,11 +16,11 @@ export default function DatenschutzPage() {
             <div className="dc-eyebrow">Rechtliches</div>
             <h1 className="dc-legal-h1">Datenschutzerklärung</h1>
             <p className="dc-legal-lede">
-              Der Schutz Ihrer personenbezogenen Daten ist uns ein wichtiges
-              Anliegen. Wir verarbeiten Ihre Daten ausschließlich auf Grundlage
+              Der Schutz deiner personenbezogenen Daten ist uns ein wichtiges
+              Anliegen. Wir verarbeiten deine Daten ausschließlich auf Grundlage
               der gesetzlichen Bestimmungen (Datenschutz-Grundverordnung — DSGVO,
               österreichisches Datenschutzgesetz — DSG, Telekommunikationsgesetz —
-              TKG 2021). In dieser Datenschutzerklärung informieren wir Sie über
+              TKG 2021). In dieser Datenschutzerklärung informieren wir dich über
               die wichtigsten Aspekte der Datenverarbeitung im Rahmen unserer
               Website.
             </p>
@@ -44,7 +44,7 @@ export default function DatenschutzPage() {
               UID-Nummer: ATU82566901
             </p>
             <p>
-              Bei Fragen zum Datenschutz erreichen Sie uns jederzeit unter{" "}
+              Bei Fragen zum Datenschutz erreichst du uns jederzeit unter{" "}
               <a href="mailto:event@deal-circle.at">event@deal-circle.at</a>.
             </p>
             <p>
@@ -58,7 +58,7 @@ export default function DatenschutzPage() {
             <p>
               Wir verarbeiten personenbezogene Daten nur, soweit dies zur
               Bereitstellung einer funktionsfähigen Website sowie unserer Inhalte
-              und Leistungen erforderlich ist oder Sie eingewilligt haben.
+              und Leistungen erforderlich ist oder du eingewilligt hast.
               Personenbezogene Daten sind alle Informationen, die sich auf eine
               identifizierte oder identifizierbare natürliche Person beziehen
               (z.&nbsp;B. Name, Adresse, E-Mail-Adresse).
@@ -67,10 +67,10 @@ export default function DatenschutzPage() {
 
           <section>
             <h2>3. Rechtsgrundlagen der Verarbeitung</h2>
-            <p>Wir verarbeiten Ihre Daten je nach Zweck auf folgenden Rechtsgrundlagen:</p>
+            <p>Wir verarbeiten deine Daten je nach Zweck auf folgenden Rechtsgrundlagen:</p>
             <ul>
               <li><strong>Art. 6 Abs. 1 lit. a DSGVO</strong> — Einwilligung (z.&nbsp;B. Newsletter, optionale Angaben)</li>
-              <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> — Vertrag bzw. vorvertragliche Maßnahmen (z.&nbsp;B. Anmeldung zu einer Veranstaltung, Bearbeitung Ihrer Anfrage)</li>
+              <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> — Vertrag bzw. vorvertragliche Maßnahmen (z.&nbsp;B. Anmeldung zu einer Veranstaltung, Bearbeitung deiner Anfrage)</li>
               <li><strong>Art. 6 Abs. 1 lit. c DSGVO</strong> — rechtliche Verpflichtung (z.&nbsp;B. Aufbewahrungspflichten)</li>
               <li><strong>Art. 6 Abs. 1 lit. f DSGVO</strong> — berechtigtes Interesse (z.&nbsp;B. technischer Betrieb und Sicherheit der Website)</li>
             </ul>
@@ -79,24 +79,24 @@ export default function DatenschutzPage() {
           <section>
             <h2>4. Kontaktaufnahme / Kontaktformular</h2>
             <p>
-              Wenn Sie über unser Kontaktformular oder per E-Mail mit uns Kontakt
-              aufnehmen, werden die von Ihnen übermittelten Daten (insbesondere
-              Name, E-Mail-Adresse, Telefonnummer sowie der Inhalt Ihrer Nachricht)
-              zum Zweck der Bearbeitung Ihrer Anfrage und für den Fall von
+              Wenn du über unser Kontaktformular oder per E-Mail mit uns Kontakt
+              aufnimmst, werden die von dir übermittelten Daten (insbesondere
+              Name, E-Mail-Adresse, Telefonnummer sowie der Inhalt deiner Nachricht)
+              zum Zweck der Bearbeitung deiner Anfrage und für den Fall von
               Anschlussfragen bei uns gespeichert.
             </p>
             <ul>
-              <li><strong>Zweck:</strong> Bearbeitung und Beantwortung Ihrer Anfrage</li>
+              <li><strong>Zweck:</strong> Bearbeitung und Beantwortung deiner Anfrage</li>
               <li><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO (vorvertraglich/vertraglich) bzw. lit. f DSGVO (berechtigtes Interesse an der Kommunikation)</li>
               <li><strong>Speicherdauer:</strong> Die Daten werden gelöscht, sobald sie für die Erreichung des Zwecks nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</li>
             </ul>
-            <p>Diese Daten geben wir nicht ohne Ihre Einwilligung weiter.</p>
+            <p>Diese Daten geben wir nicht ohne deine Einwilligung weiter.</p>
           </section>
 
           <section>
             <h2>5. Anmeldung zu Veranstaltungen / Events</h2>
             <p>
-              Wenn Sie sich über unsere Website zu einer Veranstaltung anmelden,
+              Wenn du dich über unsere Website zu einer Veranstaltung anmeldest,
               verarbeiten wir die im Anmeldeformular angegebenen Daten (z.&nbsp;B.
               Vor- und Nachname, E-Mail-Adresse, Telefonnummer, Unternehmen/Funktion
               sowie ggf. weitere für die jeweilige Veranstaltung erforderliche Angaben).
@@ -112,9 +112,9 @@ export default function DatenschutzPage() {
             <p>
               Bei unseren Veranstaltungen können Foto- oder Videoaufnahmen zu
               Dokumentations- und Werbezwecken angefertigt werden. Soweit Personen
-              erkennbar abgebildet werden, erfolgt dies auf Grundlage Ihrer
+              erkennbar abgebildet werden, erfolgt dies auf Grundlage deiner
               Einwilligung (Art. 6 Abs. 1 lit. a DSGVO) oder unseres berechtigten
-              Interesses (Art. 6 Abs. 1 lit. f DSGVO). Sie können einer Aufnahme
+              Interesses (Art. 6 Abs. 1 lit. f DSGVO). Du kannst einer Aufnahme
               jederzeit vor Ort gegenüber dem Fotografen/den Mitarbeitenden
               widersprechen.
             </p>
@@ -145,17 +145,17 @@ export default function DatenschutzPage() {
             <h2>7. Cookies</h2>
             <p>
               Unsere Website verwendet gegebenenfalls Cookies. Das sind kleine
-              Textdateien, die auf Ihrem Endgerät gespeichert werden. Technisch
+              Textdateien, die auf deinem Endgerät gespeichert werden. Technisch
               notwendige Cookies, die für den Betrieb der Website erforderlich
               sind, werden auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO gesetzt.
               Soweit nicht notwendige Cookies (z.&nbsp;B. für Statistik oder
-              Marketing) eingesetzt werden, erfolgt dies nur mit Ihrer Einwilligung
-              (Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können.
+              Marketing) eingesetzt werden, erfolgt dies nur mit deiner Einwilligung
+              (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit widerrufen kannst.
             </p>
             <p>
-              Sie können Ihren Browser so einstellen, dass Sie über das Setzen
-              von Cookies informiert werden, Cookies nur im Einzelfall erlauben,
-              die Annahme generell ausschließen oder gespeicherte Cookies löschen.
+              Du kannst deinen Browser so einstellen, dass du über das Setzen
+              von Cookies informiert wirst, Cookies nur im Einzelfall erlaubst,
+              die Annahme generell ausschließt oder gespeicherte Cookies löschst.
             </p>
           </section>
 
@@ -163,7 +163,7 @@ export default function DatenschutzPage() {
             <h2>8. Datensicherheit</h2>
             <p>
               Wir treffen angemessene technische und organisatorische
-              Sicherheitsmaßnahmen, um Ihre Daten gegen zufällige oder
+              Sicherheitsmaßnahmen, um deine Daten gegen zufällige oder
               vorsätzliche Manipulation, Verlust, Zerstörung oder den Zugriff
               unberechtigter Personen zu schützen. Die Datenübertragung auf
               unserer Website erfolgt verschlüsselt (SSL/TLS).
@@ -185,9 +185,9 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2>10. Ihre Rechte als betroffene Person</h2>
+            <h2>10. Deine Rechte als betroffene Person</h2>
             <p>
-              Ihnen stehen hinsichtlich der Sie betreffenden personenbezogenen
+              Dir stehen hinsichtlich der dich betreffenden personenbezogenen
               Daten grundsätzlich folgende Rechte zu:
             </p>
             <ul>
@@ -200,7 +200,7 @@ export default function DatenschutzPage() {
               <li><strong>Recht auf Widerruf</strong> einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)</li>
             </ul>
             <p>
-              Zur Ausübung Ihrer Rechte genügt eine Nachricht an{" "}
+              Zur Ausübung deiner Rechte genügt eine Nachricht an{" "}
               <a href="mailto:event@deal-circle.at">event@deal-circle.at</a>.
             </p>
           </section>
@@ -208,10 +208,10 @@ export default function DatenschutzPage() {
           <section>
             <h2>11. Beschwerderecht</h2>
             <p>
-              Wenn Sie der Ansicht sind, dass die Verarbeitung Ihrer Daten gegen
-              das Datenschutzrecht verstößt oder Ihre datenschutzrechtlichen
-              Ansprüche sonst in einer Weise verletzt worden sind, können Sie
-              sich bei der Aufsichtsbehörde beschweren. In Österreich ist dies
+              Wenn du der Ansicht bist, dass die Verarbeitung deiner Daten gegen
+              das Datenschutzrecht verstößt oder deine datenschutzrechtlichen
+              Ansprüche sonst in einer Weise verletzt worden sind, kannst du
+              dich bei der Aufsichtsbehörde beschweren. In Österreich ist dies
               die Datenschutzbehörde:
             </p>
             <p>

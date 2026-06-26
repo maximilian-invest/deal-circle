@@ -24,18 +24,18 @@ const TITLES: Record<TabKey, string> = {
   galerie:       "Bildergalerie.",
   mitglieder:    "Mitglieder.",
   notizen:       "Aus dem Kreis.",
-  profil:        "Ihr Profil.",
+  profil:        "Dein Profil.",
   verwaltung:    "Mitglieder verwalten.",
   "events-admin": "Events verwalten.",
 };
 
 const SUBS: Record<TabKey, string> = {
-  uebersicht:    "Was als nächstes ansteht, was war, und was Sie nicht verpassen sollten.",
+  uebersicht:    "Was als nächstes ansteht, was war, und was du nicht verpassen solltest.",
   events:        "Alle anstehenden Treffen und Anmeldungen auf einen Blick.",
   galerie:       "Bilder aus den vergangenen Treffen — geteilt nur unter Mitgliedern.",
   mitglieder:    "Wer dabei ist. Profile sichtbar nur im Kreis.",
   notizen:       "Notizen, Decks und Materialien aus dem Kreis.",
-  profil:        "Ihre Stammdaten, Rechnungen und Mitgliedschaft.",
+  profil:        "Deine Stammdaten, Rechnungen und Mitgliedschaft.",
   verwaltung:    "Mitglieder-Accounts anlegen, Rollen ändern, Zugänge zurücksetzen.",
   "events-admin": "Events anlegen, bearbeiten und löschen.",
 };
@@ -199,7 +199,7 @@ export default function DashboardPage() {
             {derived?.upcoming && derived.upcoming.length > 0 && (
               <section className="mb-section">
                 <div className="mb-section-head">
-                  <h2 className="mb-section-title">Bald auf Schloss Wiespach.</h2>
+                  <h2 className="mb-section-title">Deine nächsten Treffen.</h2>
                   <a className="mb-section-link" href="#events"
                      onClick={(e) => { e.preventDefault(); setActive("events"); }}>
                     Alle Events

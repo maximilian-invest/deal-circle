@@ -11,6 +11,9 @@ export default function Profile() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
+  const [address, setAddress] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number>(0);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -29,6 +32,9 @@ export default function Profile() {
         setName(p.name);
         setPhone(p.phone ?? "");
         setCompany(p.company ?? "");
+        setAddress(p.address ?? "");
+        setPostalCode(p.postal_code ?? "");
+        setCity(p.city ?? "");
       })
       .catch((e) => setLoadError(e instanceof Error ? e.message : "Profil nicht ladbar."));
   }, []);
@@ -42,6 +48,9 @@ export default function Profile() {
         name: name.trim(),
         phone: phone.trim() || null,
         company: company.trim() || null,
+        address: address.trim() || null,
+        postal_code: postalCode.trim() || null,
+        city: city.trim() || null,
       });
       setProfile(updated);
       setSavedAt(Date.now());
@@ -105,6 +114,23 @@ export default function Profile() {
               <label htmlFor="p-company">Unternehmen</label>
               <input id="p-company" type="text" autoComplete="organization" value={company}
                 onChange={(e) => setCompany(e.target.value)} placeholder="Firma GmbH" />
+            </div>
+          </div>
+          <div className="dc-field">
+            <label htmlFor="p-address">Straße &amp; Hausnummer</label>
+            <input id="p-address" type="text" autoComplete="street-address" value={address}
+              onChange={(e) => setAddress(e.target.value)} placeholder="Musterstraße 1" />
+          </div>
+          <div className="mb-admin-form-row">
+            <div className="dc-field">
+              <label htmlFor="p-postal">PLZ</label>
+              <input id="p-postal" type="text" autoComplete="postal-code" value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)} placeholder="5400" />
+            </div>
+            <div className="dc-field">
+              <label htmlFor="p-city">Ort</label>
+              <input id="p-city" type="text" autoComplete="address-level2" value={city}
+                onChange={(e) => setCity(e.target.value)} placeholder="Hallein" />
             </div>
           </div>
 

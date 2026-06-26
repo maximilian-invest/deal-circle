@@ -58,7 +58,7 @@ export default function LoginPage() {
         <div className="mb-login-brand-inner">
           <h1 className="mb-login-brand-headline">Willkommen<br />im inneren Kreis.</h1>
           <p className="mb-login-brand-quote">
-            Hier finden Sie die nächsten Treffen, die Anmeldungen, vergangene
+            Hier findest du die nächsten Treffen, die Anmeldungen, vergangene
             Abende und alles, was im Raum besprochen wurde — dokumentiert für
             den Kreis, geteilt nur unter Mitgliedern.
           </p>
@@ -83,7 +83,7 @@ export default function LoginPage() {
           </span>
           <h2 className="mb-login-title">Anmelden.</h2>
           <p className="mb-login-sub">
-            Mit Ihren persönlichen Zugangsdaten. Bei Problemen wenden Sie sich
+            Mit deinen persönlichen Zugangsdaten. Bei Problemen wende dich
             bitte an die Organisation.
           </p>
 
@@ -94,7 +94,7 @@ export default function LoginPage() {
                 type="email"
                 id="email"
                 autoComplete="email"
-                placeholder="ihre@adresse.at"
+                placeholder="deine@adresse.at"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={submitting}

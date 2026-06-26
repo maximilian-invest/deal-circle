@@ -66,8 +66,8 @@ export default function EventModal({ event, onClose }: Props) {
               </div>
               <h3 className="mb-modal-title" style={{ margin: 0 }}>Anmeldung bestätigt.</h3>
               <p className="mb-modal-sub" style={{ maxWidth: 380 }}>
-                Eine Bestätigung mit Kalendereintrag ist unterwegs zu Ihrer
-                hinterlegten E-Mail-Adresse. Wir freuen uns auf Sie auf {event.location}.
+                Eine Bestätigung mit Kalendereintrag ist unterwegs zu deiner
+                hinterlegten E-Mail-Adresse. Wir freuen uns auf dich auf {event.location}.
               </p>
               <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                 <button type="button" className="dc-btn dc-btn-primary" onClick={onClose}>Schließen</button>

@@ -240,7 +240,7 @@ export default function MembersAdmin({ currentUserEmail }: Props) {
                     <tr key={u.id}>
                       <td>
                         <span className="mb-admin-email">{u.email}</span>
-                        {self && <span className="mb-admin-self">(Sie)</span>}
+                        {self && <span className="mb-admin-self">(Du)</span>}
                       </td>
                       <td>{u.name}</td>
                       <td>{u.phone || <span style={{ color: "var(--color-ink-muted)" }}>—</span>}</td>

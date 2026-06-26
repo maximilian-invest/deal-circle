@@ -20,11 +20,11 @@ export default function Kontakt() {
 
   const validate = (): Errors => {
     const e: Errors = {};
-    if (!form.name.trim()) e.name = "Bitte Ihren Namen angeben.";
+    if (!form.name.trim()) e.name = "Bitte deinen Namen angeben.";
     if (!form.email.trim()) e.email = "Bitte eine E-Mail-Adresse angeben.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Diese E-Mail-Adresse sieht nicht gültig aus.";
     if (!form.referral.trim()) e.referral = "Eine Empfehlung ist Voraussetzung für die Aufnahme.";
-    if (!form.message.trim() || form.message.trim().length < 20) e.message = "Ein paar Sätze zu Ihrer Person helfen uns weiter (mind. 20 Zeichen).";
+    if (!form.message.trim() || form.message.trim().length < 20) e.message = "Ein paar Sätze zu deiner Person helfen uns weiter (mind. 20 Zeichen).";
     return e;
   };
 
@@ -40,10 +40,10 @@ export default function Kontakt() {
       <div className="dc-kontakt">
         <div className="dc-kontakt-intro dc-reveal">
           <div className="dc-eyebrow" style={{ marginBottom: "20px" }}>Kontakt &amp; Bewerbung</div>
-          <h2 className="dc-section-title" style={{ marginBottom: "28px" }}>Schreiben Sie uns.</h2>
+          <h2 className="dc-section-title" style={{ marginBottom: "28px" }}>Schreib uns.</h2>
           <p>
             Zugang zum DealCircle erfolgt ausschließlich auf persönliche
-            Empfehlung. Wenn Sie bereits über ein Mitglied von uns gehört haben,
+            Empfehlung. Wenn du bereits über ein Mitglied von uns gehört hast,
             ist dieses Formular der richtige erste Schritt.
           </p>
           <p>
@@ -68,7 +68,7 @@ export default function Kontakt() {
               </div>
               <div className="dc-field" data-invalid={errors.email ? "true" : "false"}>
                 <label htmlFor="email">E-Mail</label>
-                <input id="email" type="email" autoComplete="email" value={form.email} onChange={update("email")} placeholder="ihre@adresse.at" />
+                <input id="email" type="email" autoComplete="email" value={form.email} onChange={update("email")} placeholder="deine@adresse.at" />
                 <span className="dc-field-error">{errors.email || ""}</span>
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function Kontakt() {
                 id="message"
                 value={form.message}
                 onChange={update("message")}
-                placeholder="Wer Sie sind, womit Sie unternehmerisch zu tun haben, und was Sie an einem Austausch wie diesem interessiert."
+                placeholder="Wer du bist, womit du unternehmerisch zu tun hast, und was dich an einem Austausch wie diesem interessiert."
                 rows={5}
               />
               <span className="dc-field-error">{errors.message || ""}</span>
@@ -100,7 +100,7 @@ export default function Kontakt() {
 
             <div className="dc-form-footer">
               <p className="dc-micro">
-                Mit dem Absenden bestätigen Sie, dass Ihre Angaben vertraulich
+                Mit dem Absenden bestätigst du, dass deine Angaben vertraulich
                 behandelt werden. Details in der <a href="#datenschutz">Datenschutzerklärung</a>.
               </p>
               <button type="submit" className="dc-btn dc-btn-primary dc-btn--lg">Anfrage senden</button>
@@ -115,7 +115,7 @@ export default function Kontakt() {
             </div>
             <h3 className="dc-headline" style={{ margin: 0 }}>Vielen Dank, {form.name.split(" ")[0]}.</h3>
             <p className="dc-body" style={{ color: "var(--color-ink-muted)", margin: 0, maxWidth: "460px" }}>
-              Ihre Anfrage ist bei uns eingegangen. Wir melden uns innerhalb von
+              Deine Anfrage ist bei uns eingegangen. Wir melden uns innerhalb von
               zehn Tagen persönlich — voraussichtlich bei der Adresse {form.email}.
             </p>
             <p className="dc-caption" style={{ color: "var(--color-ink-muted)", margin: "8px 0 0" }}>

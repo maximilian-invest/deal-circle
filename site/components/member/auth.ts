@@ -16,6 +16,9 @@ export type Profile = {
   role: Role;
   phone: string | null;
   company: string | null;
+  address: string | null;
+  postal_code: string | null;
+  city: string | null;
   created_at: string;
   last_login_at: string | null;
 };
@@ -45,7 +48,14 @@ export async function fetchProfile(): Promise<Profile> {
 }
 
 export async function updateProfile(
-  patch: { name?: string; phone?: string | null; company?: string | null }
+  patch: {
+    name?: string;
+    phone?: string | null;
+    company?: string | null;
+    address?: string | null;
+    postal_code?: string | null;
+    city?: string | null;
+  }
 ): Promise<Profile> {
   const data = await api<{ profile: Profile }>("/auth/me/profile", {
     method: "PATCH",
@@ -83,6 +93,9 @@ export type RegisterInput = {
   email: string;
   phone: string;
   company: string | null;
+  address: string;
+  postal_code: string;
+  city: string;
   password: string;
   consent: boolean;
 };

@@ -25,6 +25,9 @@ const signupSchema = z.object({
   email: z.string().email().max(200).trim().toLowerCase(),
   phone: z.string().min(4).max(40).trim(),
   company: z.string().max(160).nullable().optional(),
+  address: z.string().min(2).max(200).trim(),
+  postal_code: z.string().min(2).max(20).trim(),
+  city: z.string().min(2).max(120).trim(),
   password: z.string().min(8).max(200),
   consent: z.boolean().refine((v) => v === true, "consent_required"),
 });
@@ -46,9 +49,9 @@ router.post("/register", signupLimiter, (req, res) => {
   const passwordHash = bcrypt.hashSync(d.password, 11);
   const tx = db.transaction(() => {
     const info = db.prepare(`
-      INSERT INTO users (email, name, password_hash, role, phone, company, last_login_at)
-      VALUES (?, ?, ?, 'member', ?, ?, datetime('now'))
-    `).run(d.email, fullName, passwordHash, d.phone, d.company ?? null);
+      INSERT INTO users (email, name, password_hash, role, phone, company, address, postal_code, city, last_login_at)
+      VALUES (?, ?, ?, 'member', ?, ?, ?, ?, ?, datetime('now'))
+    `).run(d.email, fullName, passwordHash, d.phone, d.company ?? null, d.address, d.postal_code, d.city);
 
     // Audit-Trail
     db.prepare(`
@@ -81,6 +84,7 @@ Name:        ${fullName}
 E-Mail:      ${d.email}
 Telefon:     ${d.phone}
 Unternehmen: ${d.company || "—"}
+Adresse:     ${d.address}, ${d.postal_code} ${d.city}
 Eingelangt:  ${ts}
 
 Der Account wurde automatisch angelegt und ist eingeloggt. Du siehst

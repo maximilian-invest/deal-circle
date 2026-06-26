@@ -204,7 +204,7 @@ img { max-width: 100%; display: block; }
 }
 .dc-nav-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-ink); text-decoration: none; }
 .dc-nav-logo { display: block; height: 28px; width: auto; flex: 0 0 auto; }
-.dc-nav-wordmark { font-family: var(--font-display); font-weight: 500; font-size: 19px; letter-spacing: -0.9px; }
+.dc-nav-wordmark { font-family: var(--font-display); font-weight: 500; font-size: 19px; letter-spacing: -0.9px; position: relative; top: 2px; }
 .dc-nav-tag { font: var(--type-caption); letter-spacing: var(--tracking-caption); color: var(--color-ink-muted); margin-left: 2px; }
 .dc-nav-links { display: flex; gap: 26px; align-items: center; }
 .dc-nav-links a { font: var(--type-body-sm); letter-spacing: var(--tracking-body-sm); color: var(--color-ink-muted); text-decoration: none; transition: color 160ms ease; }

@@ -23,6 +23,9 @@ db.exec(`
     role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
     phone TEXT,
     company TEXT,
+    address TEXT,
+    postal_code TEXT,
+    city TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     last_login_at TEXT
   );
@@ -200,6 +203,18 @@ function migrateEventsSchema() {
   if (!ucols.includes("company")) {
     console.log("[migrate] users: add column company");
     db.exec("ALTER TABLE users ADD COLUMN company TEXT");
+  }
+  if (!ucols.includes("address")) {
+    console.log("[migrate] users: add column address");
+    db.exec("ALTER TABLE users ADD COLUMN address TEXT");
+  }
+  if (!ucols.includes("postal_code")) {
+    console.log("[migrate] users: add column postal_code");
+    db.exec("ALTER TABLE users ADD COLUMN postal_code TEXT");
+  }
+  if (!ucols.includes("city")) {
+    console.log("[migrate] users: add column city");
+    db.exec("ALTER TABLE users ADD COLUMN city TEXT");
   }
 }
 migrateEventsSchema();

@@ -102,7 +102,7 @@ export default function ImpressumPage() {
               Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{" "}
               <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
                 https://ec.europa.eu/consumers/odr
-              </a>. Unsere E-Mail-Adresse finden Sie oben in diesem Impressum.
+              </a>. Unsere E-Mail-Adresse findest du oben in diesem Impressum.
             </p>
             <p>
               Wir sind nicht verpflichtet und grundsätzlich nicht bereit, an

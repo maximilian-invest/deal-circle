@@ -62,7 +62,7 @@ router.get("/me", requireAuth, (req, res) => {
 // ---------- PROFILE: read + update own ----------
 router.get("/me/profile", requireAuth, (req, res) => {
   const row = db.prepare(`
-    SELECT id, email, name, role, phone, company, created_at, last_login_at
+    SELECT id, email, name, role, phone, company, address, postal_code, city, created_at, last_login_at
     FROM users WHERE id = ?
   `).get(req.user.sub);
   if (!row) return res.status(401).json({ error: "user_gone" });
@@ -73,6 +73,9 @@ const profileUpdateSchema = z.object({
   name: z.string().min(1).max(120).optional(),
   phone: z.string().max(40).nullable().optional(),
   company: z.string().max(160).nullable().optional(),
+  address: z.string().max(200).nullable().optional(),
+  postal_code: z.string().max(20).nullable().optional(),
+  city: z.string().max(120).nullable().optional(),
 });
 
 router.patch("/me/profile", requireAuth, (req, res) => {
@@ -82,7 +85,7 @@ router.patch("/me/profile", requireAuth, (req, res) => {
   }
   const d = parsed.data;
   const updates = [], values = [];
-  for (const k of ["name", "phone", "company"]) {
+  for (const k of ["name", "phone", "company", "address", "postal_code", "city"]) {
     if (d[k] !== undefined) { updates.push(`${k} = ?`); values.push(d[k]); }
   }
   if (updates.length === 0) return res.status(400).json({ error: "nothing_to_update" });
@@ -90,7 +93,7 @@ router.patch("/me/profile", requireAuth, (req, res) => {
   db.prepare(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`).run(...values);
 
   const row = db.prepare(`
-    SELECT id, email, name, role, phone, company, created_at, last_login_at
+    SELECT id, email, name, role, phone, company, address, postal_code, city, created_at, last_login_at
     FROM users WHERE id = ?
   `).get(req.user.sub);
   res.json({ profile: row });
@@ -123,6 +126,9 @@ const registerSchema = z.object({
   email: z.string().email().max(200).trim().toLowerCase(),
   phone: z.string().min(4).max(40).trim(),
   company: z.string().max(160).nullable().optional(),
+  address: z.string().min(2).max(200).trim(),
+  postal_code: z.string().min(2).max(20).trim(),
+  city: z.string().min(2).max(120).trim(),
   password: z.string().min(8).max(200),
   consent: z.boolean().refine((v) => v === true, "consent_required"),
 });
@@ -140,9 +146,9 @@ router.post("/register", loginLimiter, (req, res) => {
 
   const hash = bcrypt.hashSync(d.password, 11);
   const info = db.prepare(`
-    INSERT INTO users (email, name, password_hash, role, phone, company)
-    VALUES (?, ?, ?, 'member', ?, ?)
-  `).run(d.email, fullName, hash, d.phone, d.company ?? null);
+    INSERT INTO users (email, name, password_hash, role, phone, company, address, postal_code, city)
+    VALUES (?, ?, ?, 'member', ?, ?, ?, ?, ?)
+  `).run(d.email, fullName, hash, d.phone, d.company ?? null, d.address, d.postal_code, d.city);
 
   // Auto-login: token zurück, so kann VIP-Modal direkt weiterleiten
   const userId = info.lastInsertRowid;

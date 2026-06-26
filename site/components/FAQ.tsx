@@ -6,7 +6,7 @@ export default function FAQ() {
   const rows = [
     {
       q: "Wie wird man Mitglied?",
-      a: "Ausschließlich auf persönliche Empfehlung. Ein bestehendes Mitglied schlägt einen neuen Namen vor, wir führen ein erstes Gespräch, und am Ende entscheidet die Runde gemeinsam. Es gibt keine Bewerbung im klassischen Sinn — aber das Formular unten ist der richtige erste Schritt, wenn Sie bereits über eine Empfehlung sprechen.",
+      a: "Ausschließlich auf persönliche Empfehlung. Ein bestehendes Mitglied schlägt einen neuen Namen vor, wir führen ein erstes Gespräch, und am Ende entscheidet die Runde gemeinsam. Es gibt keine Bewerbung im klassischen Sinn — aber das Formular unten ist der richtige erste Schritt, wenn du bereits über eine Empfehlung sprichst.",
     },
     {
       q: "Was passiert bei einem typischen Treffen?",

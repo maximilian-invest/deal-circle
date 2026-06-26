@@ -13,6 +13,9 @@ type FormState = {
   email: string;
   phone: string;
   company: string;
+  address: string;
+  postal_code: string;
+  city: string;
   password: string;
   consent: boolean;
 };
@@ -23,6 +26,9 @@ const EMPTY: FormState = {
   email: "",
   phone: "",
   company: "",
+  address: "",
+  postal_code: "",
+  city: "",
   password: "",
   consent: false,
 };
@@ -89,7 +95,9 @@ export default function VipPage() {
     setError(null);
 
     if (!form.first_name.trim() || !form.last_name.trim() ||
-        !form.email.trim() || !form.phone.trim() || !form.consent) {
+        !form.email.trim() || !form.phone.trim() ||
+        !form.address.trim() || !form.postal_code.trim() || !form.city.trim() ||
+        !form.consent) {
       setError("Bitte alle Pflichtfelder ausfüllen und Einwilligung bestätigen.");
       return;
     }
@@ -106,6 +114,9 @@ export default function VipPage() {
         email: form.email.trim(),
         phone: form.phone.trim(),
         company: form.company.trim() || null,
+        address: form.address.trim(),
+        postal_code: form.postal_code.trim(),
+        city: form.city.trim(),
         password: form.password,
         consent: form.consent,
       });
@@ -299,6 +310,47 @@ export default function VipPage() {
                         onChange={(e) => update("company", e.target.value)}
                         disabled={submitting}
                       />
+                    </div>
+                    <div className="dc-vip-field">
+                      <label htmlFor="address">Straße &amp; Hausnummer</label>
+                      <input
+                        id="address"
+                        type="text"
+                        autoComplete="street-address"
+                        placeholder="Musterstraße 1"
+                        value={form.address}
+                        onChange={(e) => update("address", e.target.value)}
+                        disabled={submitting}
+                        required
+                      />
+                    </div>
+                    <div className="dc-vip-field dc-vip-field--row">
+                      <div>
+                        <label htmlFor="postal_code">PLZ</label>
+                        <input
+                          id="postal_code"
+                          type="text"
+                          autoComplete="postal-code"
+                          placeholder="5400"
+                          value={form.postal_code}
+                          onChange={(e) => update("postal_code", e.target.value)}
+                          disabled={submitting}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="city">Ort</label>
+                        <input
+                          id="city"
+                          type="text"
+                          autoComplete="address-level2"
+                          placeholder="Hallein"
+                          value={form.city}
+                          onChange={(e) => update("city", e.target.value)}
+                          disabled={submitting}
+                          required
+                        />
+                      </div>
                     </div>
                     <div className="dc-vip-field">
                       <label htmlFor="password">Passwort wählen</label>

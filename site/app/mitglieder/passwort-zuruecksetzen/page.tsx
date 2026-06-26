@@ -62,7 +62,7 @@ function RequestForm() {
             id="reset-email"
             type="email"
             autoComplete="email"
-            placeholder="ihre@adresse.at"
+            placeholder="deine@adresse.at"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={submitting}

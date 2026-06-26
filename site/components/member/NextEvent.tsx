@@ -98,7 +98,7 @@ export default function NextEvent({ event, onSignup }: Props) {
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              Sie nehmen teil
+              Du nimmst teil
             </span>
           ) : (
             <span className="mb-next-status-chip" style={{ background: "rgba(255,154,168,0.16)", color: "#FFB1BD", borderColor: "rgba(255,154,168,0.32)" }}>
