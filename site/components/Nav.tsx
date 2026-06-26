@@ -34,7 +34,7 @@ export default function Nav() {
         </nav>
         <div className="dc-nav-cta">
           <AuthBadge variant="dark" />
-          <SessionCta joinHref="#kontakt" joinLabel="Mitglied werden" className="dc-btn dc-btn-primary" />
+          <SessionCta joinHref="/mitglied-werden/" joinLabel="Mitglied werden" className="dc-btn dc-btn-primary" />
         </div>
       </div>
     </motion.header>

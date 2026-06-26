@@ -8,6 +8,7 @@ import adminEventsRoutes from "./routes/admin-events.js";
 import eventsRoutes from "./routes/events.js";
 import uploadsRoutes from "./routes/uploads.js";
 import memberRoutes from "./routes/member.js";
+import applicationsRoutes from "./routes/applications.js";
 
 const app = express();
 const PORT = Number(process.env.DC_PORT || 3001);
@@ -23,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/uploads", uploadsRoutes);
 app.use("/api/member", memberRoutes);
+app.use("/api/applications", applicationsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/events", adminEventsRoutes);
 

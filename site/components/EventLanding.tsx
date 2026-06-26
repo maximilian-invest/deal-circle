@@ -331,10 +331,9 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                     <div className="dc-ev-memberbar-t">Als DealCircle-Mitglied {pct}% günstiger.</div>
                     <div className="dc-ev-memberbar-s">Mit dem monatlichen Abo sicherst du dir Spezialpreise auf alle Events.</div>
                   </div>
-                  {/* Noch nicht verlinkt — führt später zur Abo-/Bewerbungsseite. */}
-                  <span className="dc-ev-memberbar-cta" role="button" aria-disabled="true">
+                  <a className="dc-ev-memberbar-cta" href="/mitglied-werden/">
                     Mitglied werden <Arrow />
-                  </span>
+                  </a>
                 </div>
               )}
 

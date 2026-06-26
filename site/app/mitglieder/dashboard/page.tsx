@@ -10,6 +10,7 @@ import PastEvents from "../../../components/member/PastEvents";
 import EventModal from "../../../components/member/EventModal";
 import MembersAdmin from "../../../components/member/MembersAdmin";
 import EventsAdmin from "../../../components/member/EventsAdmin";
+import Applications from "../../../components/member/Applications";
 import Profile from "../../../components/member/Profile";
 import MyRegistrations from "../../../components/member/MyRegistrations";
 import { fetchMe, type AuthUser } from "../../../components/member/auth";
@@ -26,6 +27,7 @@ const TITLES: Record<TabKey, string> = {
   notizen:       "Aus dem Kreis.",
   profil:        "Dein Profil.",
   verwaltung:    "Mitglieder verwalten.",
+  antraege:      "Offene Anträge.",
   "events-admin": "Events verwalten.",
 };
 
@@ -37,6 +39,7 @@ const SUBS: Record<TabKey, string> = {
   notizen:       "Notizen, Decks und Materialien aus dem Kreis.",
   profil:        "Deine Stammdaten, Rechnungen und Mitgliedschaft.",
   verwaltung:    "Mitglieder-Accounts anlegen, Rollen ändern, Zugänge zurücksetzen.",
+  antraege:      "Aufnahme-Anträge prüfen, annehmen oder ablehnen.",
   "events-admin": "Events anlegen, bearbeiten und löschen.",
 };
 
@@ -132,7 +135,7 @@ export default function DashboardPage() {
   // landet (via URL, Bookmarks, alter State), redirect auf Uebersicht.
   // "mitglieder" wurde entfernt — Admin nutzt "verwaltung". Wenn ein
   // alter Bookmark/URL-Hash trotzdem darauf zeigt, rerouten wir.
-  const ADMIN_ONLY_TABS: TabKey[] = ["mitglieder", "verwaltung", "events-admin"];
+  const ADMIN_ONLY_TABS: TabKey[] = ["mitglieder", "verwaltung", "antraege", "events-admin"];
   const REROUTE_TO_ADMIN: TabKey[] = ["mitglieder"];
   const safeActive: TabKey =
     REROUTE_TO_ADMIN.includes(active) && user.role === "admin"
@@ -296,6 +299,10 @@ export default function DashboardPage() {
 
         {safeActive === "verwaltung" && user.role === "admin" && (
           <MembersAdmin currentUserEmail={user.email} />
+        )}
+
+        {safeActive === "antraege" && user.role === "admin" && (
+          <Applications />
         )}
 
         {safeActive === "events-admin" && user.role === "admin" && (

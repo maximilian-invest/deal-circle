@@ -141,7 +141,7 @@ export default function LoginPage() {
           </form>
 
           <p className="mb-login-foot">
-            Noch kein Mitglied? <a href="/#kontakt">Auf Empfehlung beitreten →</a>
+            Noch kein Mitglied? <a href="/mitglied-werden/">Jetzt Antrag stellen →</a>
           </p>
 
           <p className="mb-login-legal">

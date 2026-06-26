@@ -9,7 +9,7 @@ export default function Footer() {
       ["Werte",             "/#werte"],
     ]},
     { h: "Kontakt", l: [
-      ["Mitglied werden",        "/#kontakt"],
+      ["Mitglied werden",        "/mitglied-werden/"],
       ["event@deal-circle.at",   "mailto:event@deal-circle.at"],
       ["FAQ",                    "/#faq"],
     ]},

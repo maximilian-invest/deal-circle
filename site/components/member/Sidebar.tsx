@@ -14,6 +14,7 @@ const PATHS = {
   user:    "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
   logout:  "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
   shield:  "M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z",
+  inbox:   "M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z",
 } as const;
 
 const Icon = ({ name }: { name: keyof typeof PATHS }) => (
@@ -34,6 +35,7 @@ const ACCOUNT: Item[] = [
 ];
 
 const ADMIN: Item[] = [
+  { id: "antraege",     label: "Offene Anträge",       icon: "inbox" },
   { id: "events-admin", label: "Events verwalten",    icon: "cal" },
   { id: "verwaltung",   label: "Mitglieder verwalten", icon: "shield" },
 ];

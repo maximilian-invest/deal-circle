@@ -154,6 +154,31 @@ db.exec(`
   );
 
   CREATE INDEX IF NOT EXISTS idx_event_guest_regs_event ON event_guest_registrations (event_id, created_at DESC);
+
+  CREATE TABLE IF NOT EXISTS membership_applications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL COLLATE NOCASE,
+    phone TEXT NOT NULL,
+    street TEXT NOT NULL,
+    postal_code TEXT NOT NULL,
+    city TEXT NOT NULL,
+    country TEXT NOT NULL DEFAULT 'Österreich',
+    company TEXT NOT NULL,
+    website TEXT,
+    role TEXT,
+    about TEXT NOT NULL,
+    referral TEXT,
+    status TEXT NOT NULL DEFAULT 'pending'
+      CHECK (status IN ('pending', 'accepted', 'rejected')),
+    note TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    reviewed_at TEXT,
+    reviewed_by INTEGER REFERENCES users(id) ON DELETE SET NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_membership_applications_status
+    ON membership_applications (status, created_at DESC);
 `);
 
 // --- Migration: alte Spalten droppen (idempotent) -----------------------------
