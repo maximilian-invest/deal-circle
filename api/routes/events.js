@@ -187,7 +187,7 @@ router.post("/:id/checkout", requireAuth, async (req, res) => {
           event_id: String(eventId),
         },
       },
-      success_url: `${SITE_URL}/event/?id=${eventId}&paid={CHECKOUT_SESSION_ID}`,
+      success_url: `${SITE_URL}/danke/?id=${eventId}`,
       cancel_url:  `${SITE_URL}/event/?id=${eventId}&cancelled=1`,
       expires_at: Math.floor(Date.now() / 1000) + 60 * 60,  // 1h Gültigkeit
     });
@@ -399,7 +399,7 @@ router.post("/:id/checkout-guest", guestCheckoutLimiter, async (req, res) => {
         description: `${event.title} (Gast)`,
         metadata: { kind: "guest", event_id: String(eventId), ticket_id: ticketMeta },
       },
-      success_url: `${SITE_URL}/event/?id=${eventId}&paid={CHECKOUT_SESSION_ID}`,
+      success_url: `${SITE_URL}/danke/?id=${eventId}`,
       cancel_url:  `${SITE_URL}/event/?id=${eventId}&cancelled=1`,
       expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
     });

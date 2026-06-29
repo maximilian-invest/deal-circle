@@ -4327,3 +4327,21 @@ html, body { overflow-x: hidden; }
 .mb-app-about p { margin: 8px 0 0; font: var(--type-body); letter-spacing: var(--tracking-body); color: var(--color-ink); white-space: pre-wrap; }
 .mb-app-actions { display: flex; justify-content: flex-end; gap: 10px; }
 @media (max-width: 640px) { .mb-app-meta { grid-template-columns: 1fr; } }
+
+/* ---------- Danke-Seite (/danke) nach erfolgreicher Zahlung ---------- */
+.dc-thanks { min-height: 100vh; display: flex; flex-direction: column; background: #0A0A0B; color: #fff; }
+.dc-thanks-nav { padding: 24px 30px; }
+.dc-thanks-brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-family: var(--font-display); font-weight: 600; font-size: 20px; letter-spacing: -0.8px; }
+.dc-thanks-brand img { display: block; }
+.dc-thanks-main { position: relative; flex: 1; display: grid; place-items: center; padding: 48px 22px; overflow: hidden; }
+.dc-thanks-aura { position: absolute; top: -220px; left: 50%; transform: translateX(-50%); width: 620px; height: 620px; max-width: 120vw; border-radius: 50%; filter: blur(130px); opacity: 0.22; background: var(--gradient-violet); pointer-events: none; z-index: 0; }
+.dc-thanks-card { position: relative; z-index: 1; max-width: 520px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+.dc-thanks-check { width: 78px; height: 78px; border-radius: 50%; display: grid; place-items: center; color: #0A0A0B; background: var(--gradient-violet); box-shadow: 0 12px 44px rgba(177,76,255,0.42); margin-bottom: 30px; }
+.dc-thanks-eyebrow { font: var(--type-caption); letter-spacing: 0.14em; text-transform: uppercase; color: #9A9AA2; margin-bottom: 14px; }
+.dc-thanks-title { font: var(--type-display-md); letter-spacing: var(--tracking-display-md); margin: 0 0 18px; color: #fff; }
+.dc-thanks-text { font: var(--type-body-lg); letter-spacing: var(--tracking-body-lg); color: #9A9AA2; margin: 0 0 34px; max-width: 440px; }
+.dc-thanks-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.dc-thanks-btn { display: inline-flex; align-items: center; justify-content: center; padding: 14px 26px; border-radius: var(--r-pill); font: var(--type-button); letter-spacing: var(--tracking-button); text-decoration: none; transition: opacity 140ms ease; }
+.dc-thanks-btn--primary { background: #fff; color: #0A0A0B; }
+.dc-thanks-btn--ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.22); }
+.dc-thanks-btn:hover { opacity: 0.88; }
