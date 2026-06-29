@@ -178,24 +178,46 @@ else
   fi
 fi
 
-# ---------- nginx: Upload-Limit fuer bestehende Installs anheben ----------
-# Aeltere Sites hatten im /api/-Block 'client_max_body_size 64k;' — das blockt
-# Bild-Uploads (Speaker-/Titelbilder) mit HTTP 413, bevor sie die API erreichen.
-# Da der /api/-Block bei Bestands-Installs NICHT neu eingefuegt wird (siehe oben),
-# heben wir das Limit hier idempotent auf 10m an.
-step "nginx: Upload-Limit (client_max_body_size) sicherstellen"
-if [ -f "$NGINX_SITE_AVAIL" ] || [ -f "$NGINX_SITE" ]; then
-  CMBS_FILE="$NGINX_SITE_AVAIL"
-  [ -f "$NGINX_SITE_AVAIL" ] || CMBS_FILE="$NGINX_SITE"
-  if grep -qE "client_max_body_size[[:space:]]+64k;" "$CMBS_FILE"; then
-    cp "$CMBS_FILE" "${CMBS_FILE}.bak.cmbs.$TS"
-    sed -i -E "s/client_max_body_size[[:space:]]+64k;/client_max_body_size  10m;/g" "$CMBS_FILE"
-    ok "client_max_body_size 64k → 10m angehoben (Backup: ${CMBS_FILE}.bak.cmbs.$TS)"
-  else
-    ok "client_max_body_size bereits ausreichend (kein 64k gefunden)"
-  fi
+# ---------- nginx: Upload-Limit im echten /api/-Block sicherstellen ----------
+# Auf diesem Server liegt der /api/-Reverse-Proxy NICHT unter
+# sites-available/-enabled/deal-circle.at, sondern in einer anders benannten
+# Datei unter /etc/nginx. Wir suchen die Datei mit 'location /api/' und
+# erzwingen dort ein location-level 'client_max_body_size 10m;' (location-level
+# ueberschreibt server-/http-/Default-Werte). Sonst weist nginx Bild-Uploads
+# (Speaker-/Titelbilder bis 8 MB) mit HTTP 413 ab, bevor sie die API erreichen.
+# Idempotent, mit nginx -t-Absicherung und Rollback.
+step "nginx: Upload-Limit im /api/-Block sicherstellen"
+API_CONF=$(grep -rlsE "location[[:space:]]+/api/" /etc/nginx 2>/dev/null \
+  | grep -vE '\.(bak|orig|save|dpkg-[a-z]+)' \
+  | head -1 || true)
+if [ -z "${API_CONF:-}" ]; then
+  warn "keine nginx-Datei mit 'location /api/' gefunden — Upload-Limit nicht gesetzt"
+elif grep -qF "client_max_body_size  10m;" "$API_CONF"; then
+  ok "Upload-Limit bereits gesetzt (client_max_body_size 10m) in $API_CONF"
 else
-  warn "kein nginx-Site gefunden — Upload-Limit nicht geprueft"
+  cp "$API_CONF" "${API_CONF}.bak.cmbs.$TS"
+  awk '
+    BEGIN { inblock = 0 }
+    {
+      if (inblock == 0 && $0 ~ /location[[:space:]]+\/api\/[[:space:]]*\{/) {
+        print $0
+        print "    client_max_body_size  10m;"
+        inblock = 1
+        next
+      }
+      if (inblock == 1) {
+        if ($0 ~ /^[[:space:]]*\}[[:space:]]*$/) { inblock = 0; print $0; next }
+        if ($0 ~ /client_max_body_size/) { next }
+      }
+      print $0
+    }
+  ' "$API_CONF" > "${API_CONF}.cmbs.new" && mv "${API_CONF}.cmbs.new" "$API_CONF"
+  if nginx -t >/dev/null 2>&1; then
+    ok "client_max_body_size 10m im /api/-Block von $API_CONF gesetzt (Backup: ${API_CONF}.bak.cmbs.$TS)"
+  else
+    cp "${API_CONF}.bak.cmbs.$TS" "$API_CONF"
+    warn "nginx -t nach Patch fehlgeschlagen — $API_CONF zurueckgerollt"
+  fi
 fi
 
 step "nginx konfig pruefen + reload"
