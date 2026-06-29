@@ -178,6 +178,26 @@ else
   fi
 fi
 
+# ---------- nginx: Upload-Limit fuer bestehende Installs anheben ----------
+# Aeltere Sites hatten im /api/-Block 'client_max_body_size 64k;' — das blockt
+# Bild-Uploads (Speaker-/Titelbilder) mit HTTP 413, bevor sie die API erreichen.
+# Da der /api/-Block bei Bestands-Installs NICHT neu eingefuegt wird (siehe oben),
+# heben wir das Limit hier idempotent auf 10m an.
+step "nginx: Upload-Limit (client_max_body_size) sicherstellen"
+if [ -f "$NGINX_SITE_AVAIL" ] || [ -f "$NGINX_SITE" ]; then
+  CMBS_FILE="$NGINX_SITE_AVAIL"
+  [ -f "$NGINX_SITE_AVAIL" ] || CMBS_FILE="$NGINX_SITE"
+  if grep -qE "client_max_body_size[[:space:]]+64k;" "$CMBS_FILE"; then
+    cp "$CMBS_FILE" "${CMBS_FILE}.bak.cmbs.$TS"
+    sed -i -E "s/client_max_body_size[[:space:]]+64k;/client_max_body_size  10m;/g" "$CMBS_FILE"
+    ok "client_max_body_size 64k → 10m angehoben (Backup: ${CMBS_FILE}.bak.cmbs.$TS)"
+  else
+    ok "client_max_body_size bereits ausreichend (kein 64k gefunden)"
+  fi
+else
+  warn "kein nginx-Site gefunden — Upload-Limit nicht geprueft"
+fi
+
 step "nginx konfig pruefen + reload"
 nginx -t 2>&1 | tail -3
 systemctl reload nginx
