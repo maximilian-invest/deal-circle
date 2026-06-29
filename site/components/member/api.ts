@@ -93,6 +93,8 @@ function errorMessage(code: string, status: number): string {
     case "invalid_token":       return "Reset-Link ungültig oder abgelaufen.";
     case "consent_required":    return "Bitte Einwilligung bestätigen.";
     case "nothing_to_update":   return "Keine Änderungen.";
+    case "already_paid":        return "Du hast für dieses Event bereits bezahlt.";
+    case "payments_disabled":   return "Zahlungen sind gerade nicht möglich. Bitte später erneut versuchen.";
     default:                    return `Fehler (${status || "?"}): ${code}`;
   }
 }

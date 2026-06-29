@@ -49,12 +49,14 @@ router.post("/:id/register", requireAuth, (req, res) => {
   if (!event) return res.status(404).json({ error: "not_found" });
   if (event.status === "closed") return res.status(409).json({ error: "event_closed" });
 
-  // Already registered?
+  // Schon bezahlt? → blockieren. Eine offene (reservierte/Warteliste-)Anmeldung
+  // wird dagegen weiter unten auf die NEU gewählte Ticket-Stufe aktualisiert,
+  // damit ein Ticket-Wechsel vor der Zahlung den richtigen Preis ergibt.
   const existing = db.prepare(
     "SELECT id, status FROM event_registrations WHERE event_id = ? AND user_id = ?"
   ).get(eventId, req.user.sub);
-  if (existing && existing.status !== "cancelled") {
-    return res.status(409).json({ error: "already_registered", registration_id: existing.id });
+  if (existing && existing.status === "paid") {
+    return res.status(409).json({ error: "already_paid", registration_id: existing.id });
   }
 
   // Ticket preis ableiten
@@ -76,7 +78,8 @@ router.post("/:id/register", requireAuth, (req, res) => {
 
   let info;
   if (existing) {
-    // Wiederbeleben
+    // Bestehende (reservierte/Warteliste-/stornierte) Anmeldung auf die neu
+    // gewählte Ticket-Stufe + Preis aktualisieren.
     db.prepare(`
       UPDATE event_registrations
       SET status = ?, ticket_id = ?, amount_cents = ?, created_at = datetime('now')
