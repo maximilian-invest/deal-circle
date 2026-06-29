@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
 import Footer from "./Footer";
 import { fetchMe, logout, type AuthUser } from "./member/auth";
-import { registerForEvent, registerGuest } from "./member/events";
+import { registerForEvent, registerGuest, startCheckout } from "./member/events";
 import type { Speaker, Ticket, TimelineItem } from "./member/types";
 
 export type EventDetail = {
@@ -57,6 +57,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   // Auth-Status + Registration-Status
   const [me, setMe] = useState<AuthUser | null | "loading">("loading");
   const [registered, setRegistered] = useState<boolean>(false);
+  const [paid, setPaid] = useState<boolean>(false);
   const [registering, setRegistering] = useState<number | "default" | null>(null);
   const [regError, setRegError] = useState<string | null>(null);
   // Gast-Reservierung (ohne Login) für öffentliche Events
@@ -65,6 +66,14 @@ export default function EventLanding({ event }: { event: EventDetail }) {
 
   useEffect(() => {
     let cancelled = false;
+
+    // Stripe-Rückkehr: ?paid=… → bezahlt, ?cancelled=1 → abgebrochen
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("paid")) { setPaid(true); setRegistered(true); }
+      if (params.get("cancelled")) setRegError("Zahlung abgebrochen. Du kannst es jederzeit erneut versuchen.");
+    }
+
     fetchMe().then((u) => {
       if (cancelled) return;
       setMe(u);
@@ -74,16 +83,39 @@ export default function EventLanding({ event }: { event: EventDetail }) {
           headers: { Authorization: `Bearer ${sessionStorage.getItem("dc-token") || ""}` },
         }).then(r => r.ok ? r.json() : null).then((data) => {
           if (cancelled || !data) return;
-          const has = (data.registrations || []).some(
+          const reg = (data.registrations || []).find(
             (r: { event_id: number; status: string }) =>
               r.event_id === event.id && r.status !== "cancelled"
           );
-          setRegistered(has);
+          if (reg) {
+            setRegistered(true);
+            if (reg.status === "paid") setPaid(true);
+          }
         });
       }
     });
     return () => { cancelled = true; };
   }, [event.id]);
+
+  // Warteliste-Events: nur eintragen, keine Zahlung
+  const isWaitlist = event.status === "waitlist";
+
+  // Stripe-Checkout starten (für eingeloggte Mitglieder)
+  const doPay = async () => {
+    setRegError(null);
+    try {
+      const r = await startCheckout(event.id);
+      if (r.free && r.redirect) {
+        window.location.href = r.redirect;
+      } else if (r.checkout_url) {
+        window.location.href = r.checkout_url;
+      } else {
+        setRegError("Zahlung konnte nicht gestartet werden.");
+      }
+    } catch (err) {
+      setRegError(err instanceof Error ? err.message : "Zahlung fehlgeschlagen.");
+    }
+  };
 
   const doRegister = async (ticketId?: number) => {
     if (!me || me === "loading") return;
@@ -92,8 +124,20 @@ export default function EventLanding({ event }: { event: EventDetail }) {
     try {
       await registerForEvent(event.id, ticketId ?? null);
       setRegistered(true);
+      // Warteliste = keine Zahlung, sonst direkt zu Stripe
+      if (!isWaitlist) {
+        await doPay();
+        return;
+      }
     } catch (err) {
-      setRegError(err instanceof Error ? err.message : "Anmeldung fehlgeschlagen.");
+      const msg = err instanceof Error ? err.message : String(err);
+      // Bereits angemeldet? Direkt zu Stripe.
+      if (/already_registered/i.test(msg) && !isWaitlist) {
+        setRegistered(true);
+        await doPay();
+        return;
+      }
+      setRegError(msg || "Anmeldung fehlgeschlagen.");
     } finally {
       setRegistering(null);
     }
@@ -363,10 +407,13 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                         <TierCta
                           me={me}
                           registered={registered}
+                          paid={paid}
+                          isWaitlist={isWaitlist}
                           registering={registering === (t.id ?? -1)}
                           featured={t.featured}
                           name={t.name}
                           onRegister={() => doRegister(t.id ?? undefined)}
+                          onPay={doPay}
                           guestDone={guestDone}
                           onGuest={() => setGuestFor({ ticketId: t.id ?? null, cents: t.price_cents, label: t.name })}
                         />
@@ -404,9 +451,12 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                   <SoloCta
                     me={me}
                     registered={registered}
+                    paid={paid}
+                    isWaitlist={isWaitlist}
                     registering={registering === "default"}
                     feeLabel={feeLabel}
                     onRegister={() => doRegister()}
+                    onPay={doPay}
                     guestDone={guestDone}
                     onGuest={() => setGuestFor({ ticketId: null, cents: event.fee_cents, label: "Ticket" })}
                   />
@@ -470,33 +520,47 @@ function MemberPriceMeta({ regularCents, pct, isMember, anon }: {
 type CtaCommon = {
   me: AuthUser | null | "loading";
   registered: boolean;
+  paid: boolean;
+  isWaitlist: boolean;
   registering: boolean;
   guestDone: boolean;
   onGuest: () => void;
+  onPay: () => void;
 };
 
 function TierCta({
-  me, registered, registering, featured, name, onRegister, guestDone, onGuest,
+  me, registered, paid, isWaitlist, registering, featured, name, onRegister, guestDone, onGuest, onPay,
 }: CtaCommon & { featured: boolean; name: string; onRegister: () => void }) {
   const cls = `dc-ev-btn-tier ${featured ? "is-dark" : "is-light"}`;
   const label = featured ? `${name}-Platz sichern` : "Platz sichern";
   if (me === "loading") return <button className={cls} disabled>…</button>;
+  // Anonym = Gast-Reservierung (ohne Zahlung)
   if (me === null) {
     if (guestDone) return <span className={`${cls} is-registered`}>✓ Reserviert</span>;
     return <button type="button" className={cls} onClick={onGuest}>{label}</button>;
   }
-  if (registered) return <span className={`${cls} is-registered`}>✓ Angemeldet</span>;
+  if (paid) return <span className={`${cls} is-registered`}>✓ Bezahlt</span>;
+  if (isWaitlist && registered) return <span className={`${cls} is-registered`}>✓ Auf Warteliste</span>;
+  if (isWaitlist) return (
+    <button type="button" className={cls} onClick={onRegister} disabled={registering}>
+      {registering ? "Wird eingetragen …" : "Auf Warteliste setzen"}
+    </button>
+  );
+  if (registered) return (
+    <button type="button" className={cls} onClick={onPay} disabled={registering}>Jetzt bezahlen</button>
+  );
   return (
     <button type="button" className={cls} onClick={onRegister} disabled={registering}>
-      {registering ? "Wird angemeldet …" : label}
+      {registering ? "Wird weitergeleitet …" : (featured ? `${name} buchen` : "Platz sichern & bezahlen")}
     </button>
   );
 }
 
 function SoloCta({
-  me, registered, registering, feeLabel, onRegister, guestDone, onGuest,
+  me, registered, paid, isWaitlist, registering, feeLabel, onRegister, guestDone, onGuest, onPay,
 }: CtaCommon & { feeLabel: string; onRegister: () => void }) {
   if (me === "loading") return <button className="dc-ev-btn-dark" disabled>…</button>;
+  // Anonym = Gast-Reservierung (ohne Zahlung)
   if (me === null) {
     if (guestDone) return (
       <span className="dc-ev-btn-dark is-registered"><Check /> Reserviert</span>
@@ -507,14 +571,29 @@ function SoloCta({
       </button>
     );
   }
-  if (registered) return (
+  if (paid) return (
     <span className="dc-ev-btn-dark is-registered">
-      <Check /> Du bist angemeldet
+      <Check /> Bezahlt — wir sehen uns
     </span>
+  );
+  if (isWaitlist && registered) return (
+    <span className="dc-ev-btn-dark is-registered">
+      <Check /> Du bist auf der Warteliste
+    </span>
+  );
+  if (isWaitlist) return (
+    <button type="button" className="dc-ev-btn-dark" onClick={onRegister} disabled={registering}>
+      {registering ? "Wird eingetragen …" : <>Auf Warteliste setzen <Arrow /></>}
+    </button>
+  );
+  if (registered) return (
+    <button type="button" className="dc-ev-btn-dark" onClick={onPay} disabled={registering}>
+      Jetzt bezahlen ({feeLabel}) <Arrow />
+    </button>
   );
   return (
     <button type="button" className="dc-ev-btn-dark" onClick={onRegister} disabled={registering}>
-      {registering ? "Wird angemeldet …" : <>Ticket für {feeLabel} reservieren <Arrow /></>}
+      {registering ? "Wird weitergeleitet …" : <>Ticket für {feeLabel} buchen <Arrow /></>}
     </button>
   );
 }

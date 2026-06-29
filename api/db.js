@@ -241,6 +241,30 @@ function migrateEventsSchema() {
     console.log("[migrate] users: add column city");
     db.exec("ALTER TABLE users ADD COLUMN city TEXT");
   }
+
+  // event_registrations: stripe columns + invoice link
+  const rcols = db.prepare("PRAGMA table_info(event_registrations)").all().map((c) => c.name);
+  if (!rcols.includes("stripe_session_id")) {
+    console.log("[migrate] event_registrations: add column stripe_session_id");
+    db.exec("ALTER TABLE event_registrations ADD COLUMN stripe_session_id TEXT");
+  }
+  if (!rcols.includes("stripe_payment_intent_id")) {
+    console.log("[migrate] event_registrations: add column stripe_payment_intent_id");
+    db.exec("ALTER TABLE event_registrations ADD COLUMN stripe_payment_intent_id TEXT");
+  }
+  if (!rcols.includes("stripe_invoice_id")) {
+    console.log("[migrate] event_registrations: add column stripe_invoice_id");
+    db.exec("ALTER TABLE event_registrations ADD COLUMN stripe_invoice_id TEXT");
+  }
+  if (!rcols.includes("invoice_url")) {
+    console.log("[migrate] event_registrations: add column invoice_url");
+    db.exec("ALTER TABLE event_registrations ADD COLUMN invoice_url TEXT");
+  }
+  if (!rcols.includes("amount_total_cents")) {
+    console.log("[migrate] event_registrations: add column amount_total_cents (brutto incl. tax)");
+    db.exec("ALTER TABLE event_registrations ADD COLUMN amount_total_cents INTEGER");
+  }
+  db.exec("CREATE INDEX IF NOT EXISTS idx_event_regs_stripe_session ON event_registrations (stripe_session_id)");
 }
 migrateEventsSchema();
 

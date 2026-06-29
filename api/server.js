@@ -9,12 +9,18 @@ import eventsRoutes from "./routes/events.js";
 import uploadsRoutes from "./routes/uploads.js";
 import memberRoutes from "./routes/member.js";
 import applicationsRoutes from "./routes/applications.js";
+import stripeWebhookRoutes from "./routes/stripe-webhook.js";
 
 const app = express();
 const PORT = Number(process.env.DC_PORT || 3001);
 const HOST = process.env.DC_HOST || "127.0.0.1";
 
 app.disable("x-powered-by");
+
+// Stripe-Webhook MUSS vor express.json() kommen — Stripe braucht raw body
+// fuer die Signatur-Verifikation.
+app.use("/api/stripe/webhook", express.raw({ type: "application/json", limit: "1mb" }), stripeWebhookRoutes);
+
 app.use(express.json({ limit: "16kb" }));
 app.use(cors({ origin: process.env.DC_CORS_ORIGIN || true, credentials: true }));
 

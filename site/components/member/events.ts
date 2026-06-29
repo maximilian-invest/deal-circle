@@ -89,6 +89,16 @@ export async function cancelRegistration(eventId: number): Promise<void> {
   await api(`/events/${eventId}/register`, { method: "DELETE" });
 }
 
+export async function startCheckout(eventId: number): Promise<{
+  ok: boolean;
+  checkout_url?: string;
+  session_id?: string;
+  free?: boolean;
+  redirect?: string;
+}> {
+  return api(`/events/${eventId}/checkout`, { method: "POST", body: {} });
+}
+
 // Gast-Reservierung (ohne Login) für öffentliche Events.
 export async function registerGuest(
   eventId: number,

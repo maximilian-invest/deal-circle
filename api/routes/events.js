@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import db from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { getStripe, SITE_URL } from "../lib/stripe.js";
 
 const router = Router();
 
@@ -91,6 +92,107 @@ router.post("/:id/register", requireAuth, (req, res) => {
       amount_cents: amountCents,
     },
   });
+});
+
+// ---------- MEMBER: Stripe Checkout starten ----------
+router.post("/:id/checkout", requireAuth, async (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const stripe = getStripe();
+  if (!stripe) return res.status(503).json({ error: "payments_disabled" });
+
+  const reg = db.prepare(`
+    SELECT r.id, r.status, r.amount_cents, r.ticket_id, r.event_id,
+           e.title AS event_title, e.starts_at,
+           t.name AS ticket_name, t.badge AS ticket_badge,
+           u.email, u.name AS user_name
+    FROM event_registrations r
+    JOIN events e ON e.id = r.event_id
+    LEFT JOIN event_tickets t ON t.id = r.ticket_id
+    JOIN users u ON u.id = r.user_id
+    WHERE r.event_id = ? AND r.user_id = ?
+  `).get(eventId, req.user.sub);
+
+  if (!reg) return res.status(404).json({ error: "no_registration" });
+  if (reg.status === "paid")      return res.status(409).json({ error: "already_paid" });
+  if (reg.status === "cancelled") return res.status(409).json({ error: "registration_cancelled" });
+  if (reg.status === "waitlist")  return res.status(409).json({ error: "on_waitlist" });
+
+  const amountCents = reg.amount_cents ?? 0;
+  if (amountCents <= 0) {
+    // Gratis-Event — direkt auf paid, ohne Stripe
+    db.prepare(`
+      UPDATE event_registrations
+      SET status = 'paid', paid_at = datetime('now'), amount_total_cents = 0
+      WHERE id = ?
+    `).run(reg.id);
+    return res.json({ ok: true, free: true, redirect: `${SITE_URL}/event/?id=${eventId}&paid=1` });
+  }
+
+  const ticketLabel = reg.ticket_name
+    ? `${reg.ticket_name}${reg.ticket_badge ? ` · ${reg.ticket_badge}` : ""}`
+    : "Teilnahme";
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [{
+        price_data: {
+          currency: "eur",
+          unit_amount: amountCents,
+          tax_behavior: "exclusive",
+          product_data: {
+            name: `${reg.event_title} — ${ticketLabel}`,
+            description: `Teilnahme · ${new Date(reg.starts_at).toLocaleDateString("de-AT", { day: "2-digit", month: "long", year: "numeric" })}`,
+            tax_code: "txcd_20030000", // "Live events / Admissions"
+          },
+        },
+        quantity: 1,
+      }],
+      automatic_tax: { enabled: true },
+      tax_id_collection: { enabled: true },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Teilnahme: ${reg.event_title}`,
+          metadata: {
+            registration_id: String(reg.id),
+            event_id: String(eventId),
+          },
+          rendering_options: { amount_tax_display: "include_inclusive_tax" },
+        },
+      },
+      customer_email: reg.email,
+      billing_address_collection: "required",
+      allow_promotion_codes: false,
+      metadata: {
+        registration_id: String(reg.id),
+        event_id: String(eventId),
+        user_id: String(req.user.sub),
+      },
+      payment_intent_data: {
+        description: `${reg.event_title} (Reg #${reg.id})`,
+        metadata: {
+          registration_id: String(reg.id),
+          event_id: String(eventId),
+        },
+      },
+      success_url: `${SITE_URL}/event/?id=${eventId}&paid={CHECKOUT_SESSION_ID}`,
+      cancel_url:  `${SITE_URL}/event/?id=${eventId}&cancelled=1`,
+      expires_at: Math.floor(Date.now() / 1000) + 60 * 60,  // 1h Gültigkeit
+    });
+
+    db.prepare(`
+      UPDATE event_registrations SET stripe_session_id = ? WHERE id = ?
+    `).run(session.id, reg.id);
+
+    res.json({ ok: true, checkout_url: session.url, session_id: session.id });
+  } catch (err) {
+    console.error("[stripe] checkout session create failed:", err);
+    res.status(502).json({ error: "stripe_error", detail: err?.message || "unknown" });
+  }
 });
 
 // ---------- MEMBER: eigene Anmeldung stornieren ----------
