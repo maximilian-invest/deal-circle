@@ -102,7 +102,7 @@ export async function startCheckout(eventId: number): Promise<{
 // Gast-Checkout (ohne Login): legt die Reservierung an und startet Stripe.
 export async function startGuestCheckout(
   eventId: number,
-  body: { name: string; email: string; ticket_id?: number | null }
+  body: { name?: string; email?: string; ticket_id?: number | null }
 ): Promise<{ ok: boolean; checkout_url?: string; free?: boolean; redirect?: string }> {
   return api(`/events/${eventId}/checkout-guest`, { method: "POST", body, auth: false });
 }

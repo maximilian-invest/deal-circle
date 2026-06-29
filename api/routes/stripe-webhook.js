@@ -134,33 +134,65 @@ function handleSessionPaid(session, stripe) {
 }
 
 function handleGuestPaid(session, stripe) {
-  const regId = Number(session.metadata?.guest_registration_id);
-  if (!Number.isInteger(regId) || regId < 1) {
-    console.warn("[stripe-webhook] guest session ohne guest_registration_id:", session.id);
-    return;
-  }
   if (session.payment_status !== "paid") {
     console.log(`[stripe-webhook] guest session ${session.id} payment_status=${session.payment_status} — skip`);
     return;
   }
-
-  const reg = db.prepare(`
-    SELECT g.id, g.event_id, g.status, g.name, g.email,
-           e.title AS event_title, e.starts_at, e.location
-    FROM event_guest_registrations g
-    JOIN events e ON e.id = g.event_id
-    WHERE g.id = ?
-  `).get(regId);
-  if (!reg) {
-    console.warn(`[stripe-webhook] guest registration #${regId} not found`);
+  const eventId = Number(session.metadata?.event_id);
+  if (!Number.isInteger(eventId) || eventId < 1) {
+    console.warn("[stripe-webhook] guest session ohne event_id:", session.id);
     return;
   }
-  if (reg.status === "paid") {
-    console.log(`[stripe-webhook] guest registration #${regId} already paid — skip`);
+  // E-Mail + Name kommen aus dem Stripe-Checkout (kein Vorab-Formular).
+  const email = String(session.customer_details?.email || session.customer_email || "").trim().toLowerCase();
+  if (!email) {
+    console.warn("[stripe-webhook] guest session ohne E-Mail:", session.id);
+    return;
+  }
+  const name = String(session.customer_details?.name || "").trim() || "Gast";
+  const ticketId = session.metadata?.ticket_id ? Number(session.metadata.ticket_id) : null;
+  const totalCents = session.amount_total ?? null;
+
+  const event = db.prepare(
+    "SELECT id, title, starts_at, location FROM events WHERE id = ?"
+  ).get(eventId);
+  if (!event) {
+    console.warn(`[stripe-webhook] guest: event #${eventId} not found`);
     return;
   }
 
-  let invoiceId = session.invoice || null;
+  // Die Gast-Registrierung wird erst hier (nach Zahlung) angelegt bzw. aktualisiert.
+  const existing = db.prepare(
+    "SELECT id, status FROM event_guest_registrations WHERE event_id = ? AND email = ?"
+  ).get(eventId, email);
+  let regId;
+  if (existing) {
+    if (existing.status === "paid") {
+      console.log(`[stripe-webhook] guest registration #${existing.id} already paid — skip`);
+      return;
+    }
+    db.prepare(`
+      UPDATE event_guest_registrations
+      SET status = 'paid', name = ?, ticket_id = ?, amount_cents = ?, amount_total_cents = ?,
+          stripe_session_id = ?, stripe_payment_intent_id = ?, stripe_invoice_id = ?,
+          paid_at = datetime('now')
+      WHERE id = ?
+    `).run(name, ticketId, totalCents, totalCents, session.id,
+           session.payment_intent || null, session.invoice || null, existing.id);
+    regId = existing.id;
+  } else {
+    const info = db.prepare(`
+      INSERT INTO event_guest_registrations
+        (event_id, ticket_id, name, email, amount_cents, status, amount_total_cents,
+         stripe_session_id, stripe_payment_intent_id, stripe_invoice_id, paid_at)
+      VALUES (?, ?, ?, ?, ?, 'paid', ?, ?, ?, ?, datetime('now'))
+    `).run(eventId, ticketId, name, email, totalCents, totalCents, session.id,
+           session.payment_intent || null, session.invoice || null);
+    regId = info.lastInsertRowid;
+  }
+
+  // Invoice-URL nachholen (async, weil Stripe sie erst nach Zahlung generiert)
+  const invoiceId = session.invoice || null;
   if (invoiceId && typeof invoiceId === "string") {
     stripe.invoices.retrieve(invoiceId)
       .then((inv) => {
@@ -170,44 +202,22 @@ function handleGuestPaid(session, stripe) {
       .catch((err) => console.warn(`[stripe-webhook] guest invoice retrieve failed:`, err?.message));
   }
 
-  const totalCents = session.amount_total ?? null;
-
-  db.prepare(`
-    UPDATE event_guest_registrations
-    SET status = 'paid',
-        paid_at = datetime('now'),
-        stripe_payment_intent_id = ?,
-        stripe_invoice_id = ?,
-        amount_total_cents = ?
-    WHERE id = ?
-  `).run(session.payment_intent || null, invoiceId, totalCents, regId);
-
   console.log(`[stripe-webhook] guest registration #${regId} → paid (€ ${(totalCents/100).toFixed(2)})`);
 
   // Bestätigungsmail an den Gast (fire-and-forget)
-  const firstName = (reg.name || "").split(/\s+/)[0] || "";
+  const firstName = name.split(/\s+/)[0] || "";
   const mail = eventPaid({
-    event: {
-      id: reg.event_id,
-      title: reg.event_title,
-      starts_at: reg.starts_at,
-      location: reg.location,
-    },
+    event: { id: event.id, title: event.title, starts_at: event.starts_at, location: event.location },
     firstName,
     amountTotalCents: totalCents,
     invoiceUrl: null,
   });
-  sendMailAsync({ to: reg.email, subject: mail.subject, html: mail.html, text: mail.text });
+  sendMailAsync({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
 }
 
 function handleSessionExpired(session) {
   if ((session.metadata?.kind || "") === "guest") {
-    const gid = Number(session.metadata?.guest_registration_id);
-    if (!Number.isInteger(gid)) return;
-    db.prepare(`
-      UPDATE event_guest_registrations SET stripe_session_id = NULL WHERE id = ? AND status != 'paid'
-    `).run(gid);
-    console.log(`[stripe-webhook] guest session #${session.id} expired — guest reg #${gid} bleibt reserved`);
+    // Gast-Registrierung wird erst bei Zahlung angelegt → bei Ablauf nichts zu tun.
     return;
   }
   const regId = Number(session.metadata?.registration_id);

@@ -285,16 +285,22 @@ router.post("/:id/register-guest", (req, res) => {
 });
 
 // ---------- PUBLIC (Gast): Ticket ohne Login KAUFEN (Stripe) ----------
-// Legt die Gast-Registrierung an und startet direkt Stripe Checkout.
-// Gäste zahlen den regulären Preis (kein Mitglieder-Rabatt).
+// Geht für bezahlte Events DIREKT zu Stripe — Name, E-Mail und Adresse
+// werden dort erfasst. Die Gast-Registrierung wird erst vom Webhook nach
+// erfolgreicher Zahlung aus den Stripe-Daten angelegt (kein Vorab-Formular).
+// Für Gratis-Events (kein Stripe) werden Name + E-Mail im Body erwartet.
+const guestCheckoutSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  email: z.string().email().max(200).optional(),
+  ticket_id: z.number().int().min(1).nullable().optional(),
+});
+
 router.post("/:id/checkout-guest", guestCheckoutLimiter, async (req, res) => {
   const eventId = Number(req.params.id);
   if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
 
-  const parsed = guestRegisterSchema.safeParse(req.body || {});
+  const parsed = guestCheckoutSchema.safeParse(req.body || {});
   if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
-  const name = parsed.data.name.trim();
-  const email = parsed.data.email.trim().toLowerCase();
   const ticketId = parsed.data.ticket_id ?? null;
 
   const event = db.prepare(
@@ -316,44 +322,42 @@ router.post("/:id/checkout-guest", guestCheckoutLimiter, async (req, res) => {
     ticketName = t.name; ticketBadge = t.badge;
   }
 
-  const stripe = getStripe();
-  if (amountCents > 0 && !stripe) return res.status(503).json({ error: "payments_disabled" });
-
-  // Bereits bezahlt? Dann nicht erneut.
-  const existing = db.prepare(
-    "SELECT id, status FROM event_guest_registrations WHERE event_id = ? AND email = ?"
-  ).get(eventId, email);
-  if (existing && existing.status === "paid") return res.status(409).json({ error: "already_paid" });
-
-  let regId;
-  if (existing) {
-    db.prepare(`
-      UPDATE event_guest_registrations
-      SET status = 'reserved', name = ?, ticket_id = ?, amount_cents = ?, created_at = datetime('now')
-      WHERE id = ?
-    `).run(name, ticketId, amountCents, existing.id);
-    regId = existing.id;
-  } else {
-    const info = db.prepare(`
-      INSERT INTO event_guest_registrations (event_id, ticket_id, name, email, amount_cents, status)
-      VALUES (?, ?, ?, ?, ?, 'reserved')
-    `).run(eventId, ticketId, name, email, amountCents);
-    regId = info.lastInsertRowid;
-  }
-
-  // Gratis-Event → direkt bestätigt, ohne Stripe
+  // Gratis-Event → kein Stripe; hier brauchen wir Name + E-Mail (aus dem Formular).
   if (amountCents <= 0) {
-    db.prepare(`
-      UPDATE event_guest_registrations
-      SET status = 'paid', paid_at = datetime('now'), amount_total_cents = 0
-      WHERE id = ?
-    `).run(regId);
+    const name = parsed.data.name?.trim();
+    const email = parsed.data.email?.trim().toLowerCase();
+    if (!name || !email) return res.status(400).json({ error: "name_email_required" });
+
+    const existing = db.prepare(
+      "SELECT id, status FROM event_guest_registrations WHERE event_id = ? AND email = ?"
+    ).get(eventId, email);
+    if (existing && existing.status === "paid") return res.status(409).json({ error: "already_paid" });
+    if (existing) {
+      db.prepare(`
+        UPDATE event_guest_registrations
+        SET status = 'paid', name = ?, ticket_id = ?, amount_cents = 0,
+            amount_total_cents = 0, paid_at = datetime('now')
+        WHERE id = ?
+      `).run(name, ticketId, existing.id);
+    } else {
+      db.prepare(`
+        INSERT INTO event_guest_registrations
+          (event_id, ticket_id, name, email, amount_cents, status, amount_total_cents, paid_at)
+        VALUES (?, ?, ?, ?, 0, 'paid', 0, datetime('now'))
+      `).run(eventId, ticketId, name, email);
+    }
     return res.json({ ok: true, free: true, redirect: `${SITE_URL}/event/?id=${eventId}&paid=1` });
   }
+
+  // Bezahltes Event → direkt Stripe Checkout. E-Mail/Name/Adresse erfasst Stripe;
+  // die Registrierung legt der Webhook bei Zahlung an.
+  const stripe = getStripe();
+  if (!stripe) return res.status(503).json({ error: "payments_disabled" });
 
   const ticketLabel = ticketName
     ? `${ticketName}${ticketBadge ? ` · ${ticketBadge}` : ""}`
     : "Teilnahme";
+  const ticketMeta = ticketId ? String(ticketId) : "";
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -378,29 +382,27 @@ router.post("/:id/checkout-guest", guestCheckoutLimiter, async (req, res) => {
         enabled: true,
         invoice_data: {
           description: `Teilnahme: ${event.title}`,
-          metadata: { guest_registration_id: String(regId), event_id: String(eventId) },
+          metadata: { event_id: String(eventId), ticket_id: ticketMeta },
           rendering_options: { amount_tax_display: "include_inclusive_tax" },
         },
       },
-      customer_email: email,
+      // KEIN customer_email → Stripe fragt E-Mail (und mit billing_address auch
+      // den Namen) selbst ab.
       billing_address_collection: "required",
       allow_promotion_codes: false,
       metadata: {
         kind: "guest",
-        guest_registration_id: String(regId),
         event_id: String(eventId),
+        ticket_id: ticketMeta,
       },
       payment_intent_data: {
-        description: `${event.title} (Gast-Reg #${regId})`,
-        metadata: { kind: "guest", guest_registration_id: String(regId), event_id: String(eventId) },
+        description: `${event.title} (Gast)`,
+        metadata: { kind: "guest", event_id: String(eventId), ticket_id: ticketMeta },
       },
       success_url: `${SITE_URL}/event/?id=${eventId}&paid={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${SITE_URL}/event/?id=${eventId}&cancelled=1`,
       expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
     });
-
-    db.prepare("UPDATE event_guest_registrations SET stripe_session_id = ? WHERE id = ?")
-      .run(session.id, regId);
 
     res.json({ ok: true, checkout_url: session.url, session_id: session.id });
   } catch (err) {

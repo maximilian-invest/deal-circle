@@ -117,6 +117,21 @@ export default function EventLanding({ event }: { event: EventDetail }) {
     }
   };
 
+  // Gast-Kauf (ohne Login): bezahlte Tickets gehen direkt zu Stripe (E-Mail wird
+  // dort erfasst); Gratis-Tickets brauchen kurz Name + E-Mail über das Formular.
+  const doGuestBuy = async (ticketId: number | null, cents: number, label: string) => {
+    setRegError(null);
+    if (cents <= 0) { setGuestFor({ ticketId, cents, label }); return; }
+    try {
+      const r = await startGuestCheckout(event.id, { ticket_id: ticketId });
+      if (r.checkout_url) { window.location.href = r.checkout_url; return; }
+      if (r.free && r.redirect) { window.location.href = r.redirect; return; }
+      setRegError("Zahlung konnte nicht gestartet werden.");
+    } catch (err) {
+      setRegError(err instanceof Error ? err.message : "Zahlung fehlgeschlagen.");
+    }
+  };
+
   const doRegister = async (ticketId?: number) => {
     if (!me || me === "loading") return;
     setRegistering(ticketId ?? "default");
@@ -415,7 +430,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                           onRegister={() => doRegister(t.id ?? undefined)}
                           onPay={doPay}
                           guestDone={guestDone}
-                          onGuest={() => setGuestFor({ ticketId: t.id ?? null, cents: t.price_cents, label: t.name })}
+                          onGuest={() => doGuestBuy(t.id ?? null, t.price_cents, t.name)}
                         />
                       </motion.div>
                     );
@@ -458,7 +473,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                     onRegister={() => doRegister()}
                     onPay={doPay}
                     guestDone={guestDone}
-                    onGuest={() => setGuestFor({ ticketId: null, cents: event.fee_cents, label: "Ticket" })}
+                    onGuest={() => doGuestBuy(null, event.fee_cents, "Ticket")}
                   />
                   {regError && <p className="dc-ev-ticket-note" style={{ color: "#FFB0B0" }}>{regError}</p>}
                   <p className="dc-ev-ticket-note">Sichere Zahlung · Bestätigung per E-Mail</p>
