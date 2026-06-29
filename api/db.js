@@ -265,6 +265,22 @@ function migrateEventsSchema() {
     db.exec("ALTER TABLE event_registrations ADD COLUMN amount_total_cents INTEGER");
   }
   db.exec("CREATE INDEX IF NOT EXISTS idx_event_regs_stripe_session ON event_registrations (stripe_session_id)");
+
+  // event_guest_registrations: stripe columns (Gast-Checkout ohne Login)
+  const gcols = db.prepare("PRAGMA table_info(event_guest_registrations)").all().map((c) => c.name);
+  for (const [col, type] of [
+    ["stripe_session_id", "TEXT"],
+    ["stripe_payment_intent_id", "TEXT"],
+    ["stripe_invoice_id", "TEXT"],
+    ["invoice_url", "TEXT"],
+    ["amount_total_cents", "INTEGER"],
+  ]) {
+    if (!gcols.includes(col)) {
+      console.log(`[migrate] event_guest_registrations: add column ${col}`);
+      db.exec(`ALTER TABLE event_guest_registrations ADD COLUMN ${col} ${type}`);
+    }
+  }
+  db.exec("CREATE INDEX IF NOT EXISTS idx_event_guest_regs_stripe_session ON event_guest_registrations (stripe_session_id)");
 }
 migrateEventsSchema();
 

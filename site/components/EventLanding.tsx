@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
 import Footer from "./Footer";
 import { fetchMe, logout, type AuthUser } from "./member/auth";
-import { registerForEvent, registerGuest, startCheckout } from "./member/events";
+import { registerForEvent, startCheckout, startGuestCheckout } from "./member/events";
 import type { Speaker, Ticket, TimelineItem } from "./member/types";
 
 export type EventDetail = {
@@ -536,6 +536,7 @@ function TierCta({
   if (me === "loading") return <button className={cls} disabled>…</button>;
   // Anonym = Gast-Reservierung (ohne Zahlung)
   if (me === null) {
+    if (paid) return <span className={`${cls} is-registered`}>✓ Bezahlt</span>;
     if (guestDone) return <span className={`${cls} is-registered`}>✓ Reserviert</span>;
     return <button type="button" className={cls} onClick={onGuest}>{label}</button>;
   }
@@ -562,12 +563,15 @@ function SoloCta({
   if (me === "loading") return <button className="dc-ev-btn-dark" disabled>…</button>;
   // Anonym = Gast-Reservierung (ohne Zahlung)
   if (me === null) {
+    if (paid) return (
+      <span className="dc-ev-btn-dark is-registered"><Check /> Bezahlt — wir sehen uns</span>
+    );
     if (guestDone) return (
       <span className="dc-ev-btn-dark is-registered"><Check /> Reserviert</span>
     );
     return (
       <button type="button" className="dc-ev-btn-dark" onClick={onGuest}>
-        Ticket für {feeLabel} sichern <Arrow />
+        Ticket für {feeLabel} kaufen <Arrow />
       </button>
     );
   }
@@ -614,10 +618,12 @@ function GuestForm({ eventId, ticketId, label, cents, onClose, onDone }: {
     if (!name.trim() || !email.trim()) { setErr("Bitte Name und E-Mail angeben."); return; }
     setBusy(true);
     try {
-      await registerGuest(eventId, { name: name.trim(), email: email.trim(), ticket_id: ticketId });
+      const r = await startGuestCheckout(eventId, { name: name.trim(), email: email.trim(), ticket_id: ticketId });
+      if (r.checkout_url) { window.location.href = r.checkout_url; return; }
+      if (r.free && r.redirect) { window.location.href = r.redirect; return; }
       onDone();
     } catch (e2) {
-      setErr(e2 instanceof Error ? e2.message : "Reservierung fehlgeschlagen.");
+      setErr(e2 instanceof Error ? e2.message : "Zahlung konnte nicht gestartet werden.");
       setBusy(false);
     }
   };
@@ -627,8 +633,12 @@ function GuestForm({ eventId, ticketId, label, cents, onClose, onDone }: {
       <form className="dc-ev-guest" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
         <button type="button" className="dc-ev-guest-x" onClick={onClose} aria-label="Schließen">✕</button>
         <div className="dc-ev-guest-eyebrow">{label} · {euro(cents)}</div>
-        <h3 className="dc-ev-guest-title">Platz reservieren</h3>
-        <p className="dc-ev-guest-sub">Trag dich kurz ein — du bekommst deine Bestätigung per E-Mail.</p>
+        <h3 className="dc-ev-guest-title">{cents > 0 ? "Ticket kaufen" : "Platz reservieren"}</h3>
+        <p className="dc-ev-guest-sub">
+          {cents > 0
+            ? "Trag dich kurz ein — danach geht's direkt zur sicheren Zahlung."
+            : "Trag dich kurz ein — du bekommst deine Bestätigung per E-Mail."}
+        </p>
         <label className="dc-ev-guest-field">
           <span>Name</span>
           <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Max Mustermann" disabled={busy} required />
@@ -639,7 +649,7 @@ function GuestForm({ eventId, ticketId, label, cents, onClose, onDone }: {
         </label>
         {err && <p className="dc-ev-guest-err">{err}</p>}
         <button type="submit" className="dc-ev-btn-primary dc-ev-guest-submit" disabled={busy}>
-          {busy ? "Wird reserviert …" : <>Platz reservieren <Arrow /></>}
+          {busy ? "Wird vorbereitet …" : <>{cents > 0 ? "Weiter zur Zahlung" : "Platz reservieren"} <Arrow /></>}
         </button>
         <p className="dc-ev-guest-note">Mitglied im DealCircle? <a href="/mitglieder/login/">Einloggen</a> und günstiger sichern.</p>
       </form>

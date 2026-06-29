@@ -1,10 +1,18 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import db from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 import { getStripe, SITE_URL } from "../lib/stripe.js";
 
 const router = Router();
+
+// Gast-Checkout (öffentlich) gegen Spam absichern.
+const guestCheckoutLimiter = rateLimit({
+  windowMs: 60_000, max: 8,
+  standardHeaders: true, legacyHeaders: false,
+  message: { error: "too_many_attempts" },
+});
 
 // ---------- MEMBER: meine Anmeldungen ----------
 router.get("/me/registrations", requireAuth, (req, res) => {
@@ -274,6 +282,131 @@ router.post("/:id/register-guest", (req, res) => {
       amount_cents: amountCents,
     },
   });
+});
+
+// ---------- PUBLIC (Gast): Ticket ohne Login KAUFEN (Stripe) ----------
+// Legt die Gast-Registrierung an und startet direkt Stripe Checkout.
+// Gäste zahlen den regulären Preis (kein Mitglieder-Rabatt).
+router.post("/:id/checkout-guest", guestCheckoutLimiter, async (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const parsed = guestRegisterSchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
+  const name = parsed.data.name.trim();
+  const email = parsed.data.email.trim().toLowerCase();
+  const ticketId = parsed.data.ticket_id ?? null;
+
+  const event = db.prepare(
+    "SELECT id, title, starts_at, status, fee_cents, visibility FROM events WHERE id = ?"
+  ).get(eventId);
+  if (!event) return res.status(404).json({ error: "not_found" });
+  if (event.visibility !== "public") return res.status(403).json({ error: "members_only" });
+  if (event.status === "closed")   return res.status(409).json({ error: "event_closed" });
+  if (event.status === "waitlist") return res.status(409).json({ error: "on_waitlist" });
+
+  let amountCents = event.fee_cents;
+  let ticketName = null, ticketBadge = null;
+  if (ticketId) {
+    const t = db.prepare(
+      "SELECT id, name, badge, price_cents FROM event_tickets WHERE id = ? AND event_id = ?"
+    ).get(ticketId, eventId);
+    if (!t) return res.status(400).json({ error: "invalid_ticket" });
+    amountCents = t.price_cents;
+    ticketName = t.name; ticketBadge = t.badge;
+  }
+
+  const stripe = getStripe();
+  if (amountCents > 0 && !stripe) return res.status(503).json({ error: "payments_disabled" });
+
+  // Bereits bezahlt? Dann nicht erneut.
+  const existing = db.prepare(
+    "SELECT id, status FROM event_guest_registrations WHERE event_id = ? AND email = ?"
+  ).get(eventId, email);
+  if (existing && existing.status === "paid") return res.status(409).json({ error: "already_paid" });
+
+  let regId;
+  if (existing) {
+    db.prepare(`
+      UPDATE event_guest_registrations
+      SET status = 'reserved', name = ?, ticket_id = ?, amount_cents = ?, created_at = datetime('now')
+      WHERE id = ?
+    `).run(name, ticketId, amountCents, existing.id);
+    regId = existing.id;
+  } else {
+    const info = db.prepare(`
+      INSERT INTO event_guest_registrations (event_id, ticket_id, name, email, amount_cents, status)
+      VALUES (?, ?, ?, ?, ?, 'reserved')
+    `).run(eventId, ticketId, name, email, amountCents);
+    regId = info.lastInsertRowid;
+  }
+
+  // Gratis-Event → direkt bestätigt, ohne Stripe
+  if (amountCents <= 0) {
+    db.prepare(`
+      UPDATE event_guest_registrations
+      SET status = 'paid', paid_at = datetime('now'), amount_total_cents = 0
+      WHERE id = ?
+    `).run(regId);
+    return res.json({ ok: true, free: true, redirect: `${SITE_URL}/event/?id=${eventId}&paid=1` });
+  }
+
+  const ticketLabel = ticketName
+    ? `${ticketName}${ticketBadge ? ` · ${ticketBadge}` : ""}`
+    : "Teilnahme";
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [{
+        price_data: {
+          currency: "eur",
+          unit_amount: amountCents,
+          tax_behavior: "exclusive",
+          product_data: {
+            name: `${event.title} — ${ticketLabel}`,
+            description: `Teilnahme · ${new Date(event.starts_at).toLocaleDateString("de-AT", { day: "2-digit", month: "long", year: "numeric" })}`,
+            tax_code: "txcd_20030000", // "Live events / Admissions"
+          },
+        },
+        quantity: 1,
+      }],
+      automatic_tax: { enabled: true },
+      tax_id_collection: { enabled: true },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Teilnahme: ${event.title}`,
+          metadata: { guest_registration_id: String(regId), event_id: String(eventId) },
+          rendering_options: { amount_tax_display: "include_inclusive_tax" },
+        },
+      },
+      customer_email: email,
+      billing_address_collection: "required",
+      allow_promotion_codes: false,
+      metadata: {
+        kind: "guest",
+        guest_registration_id: String(regId),
+        event_id: String(eventId),
+      },
+      payment_intent_data: {
+        description: `${event.title} (Gast-Reg #${regId})`,
+        metadata: { kind: "guest", guest_registration_id: String(regId), event_id: String(eventId) },
+      },
+      success_url: `${SITE_URL}/event/?id=${eventId}&paid={CHECKOUT_SESSION_ID}`,
+      cancel_url:  `${SITE_URL}/event/?id=${eventId}&cancelled=1`,
+      expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
+    });
+
+    db.prepare("UPDATE event_guest_registrations SET stripe_session_id = ? WHERE id = ?")
+      .run(session.id, regId);
+
+    res.json({ ok: true, checkout_url: session.url, session_id: session.id });
+  } catch (err) {
+    console.error("[stripe] guest checkout session create failed:", err);
+    res.status(502).json({ error: "stripe_error", detail: err?.message || "unknown" });
+  }
 });
 
 // Public: Main-Event fuer den Startseiten-Banner.

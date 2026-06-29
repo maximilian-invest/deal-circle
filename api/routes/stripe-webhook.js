@@ -52,6 +52,11 @@ router.post("/", (req, res) => {
 });
 
 function handleSessionPaid(session, stripe) {
+  // Gast-Checkout (ohne Login) wird separat behandelt.
+  if ((session.metadata?.kind || "") === "guest") {
+    handleGuestPaid(session, stripe);
+    return;
+  }
   const regId = Number(session.metadata?.registration_id);
   if (!Number.isInteger(regId) || regId < 1) {
     console.warn("[stripe-webhook] session ohne registration_id metadata:", session.id);
@@ -128,7 +133,83 @@ function handleSessionPaid(session, stripe) {
   });
 }
 
+function handleGuestPaid(session, stripe) {
+  const regId = Number(session.metadata?.guest_registration_id);
+  if (!Number.isInteger(regId) || regId < 1) {
+    console.warn("[stripe-webhook] guest session ohne guest_registration_id:", session.id);
+    return;
+  }
+  if (session.payment_status !== "paid") {
+    console.log(`[stripe-webhook] guest session ${session.id} payment_status=${session.payment_status} — skip`);
+    return;
+  }
+
+  const reg = db.prepare(`
+    SELECT g.id, g.event_id, g.status, g.name, g.email,
+           e.title AS event_title, e.starts_at, e.location
+    FROM event_guest_registrations g
+    JOIN events e ON e.id = g.event_id
+    WHERE g.id = ?
+  `).get(regId);
+  if (!reg) {
+    console.warn(`[stripe-webhook] guest registration #${regId} not found`);
+    return;
+  }
+  if (reg.status === "paid") {
+    console.log(`[stripe-webhook] guest registration #${regId} already paid — skip`);
+    return;
+  }
+
+  let invoiceId = session.invoice || null;
+  if (invoiceId && typeof invoiceId === "string") {
+    stripe.invoices.retrieve(invoiceId)
+      .then((inv) => {
+        db.prepare(`UPDATE event_guest_registrations SET invoice_url = ? WHERE id = ?`)
+          .run(inv?.hosted_invoice_url || inv?.invoice_pdf || null, regId);
+      })
+      .catch((err) => console.warn(`[stripe-webhook] guest invoice retrieve failed:`, err?.message));
+  }
+
+  const totalCents = session.amount_total ?? null;
+
+  db.prepare(`
+    UPDATE event_guest_registrations
+    SET status = 'paid',
+        paid_at = datetime('now'),
+        stripe_payment_intent_id = ?,
+        stripe_invoice_id = ?,
+        amount_total_cents = ?
+    WHERE id = ?
+  `).run(session.payment_intent || null, invoiceId, totalCents, regId);
+
+  console.log(`[stripe-webhook] guest registration #${regId} → paid (€ ${(totalCents/100).toFixed(2)})`);
+
+  // Bestätigungsmail an den Gast (fire-and-forget)
+  const firstName = (reg.name || "").split(/\s+/)[0] || "";
+  const mail = eventPaid({
+    event: {
+      id: reg.event_id,
+      title: reg.event_title,
+      starts_at: reg.starts_at,
+      location: reg.location,
+    },
+    firstName,
+    amountTotalCents: totalCents,
+    invoiceUrl: null,
+  });
+  sendMailAsync({ to: reg.email, subject: mail.subject, html: mail.html, text: mail.text });
+}
+
 function handleSessionExpired(session) {
+  if ((session.metadata?.kind || "") === "guest") {
+    const gid = Number(session.metadata?.guest_registration_id);
+    if (!Number.isInteger(gid)) return;
+    db.prepare(`
+      UPDATE event_guest_registrations SET stripe_session_id = NULL WHERE id = ? AND status != 'paid'
+    `).run(gid);
+    console.log(`[stripe-webhook] guest session #${session.id} expired — guest reg #${gid} bleibt reserved`);
+    return;
+  }
   const regId = Number(session.metadata?.registration_id);
   if (!Number.isInteger(regId)) return;
   // session_id-Referenz löschen, Registration bleibt "reserved" → User kann erneut bezahlen
