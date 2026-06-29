@@ -532,7 +532,7 @@ function TierCta({
   me, registered, paid, isWaitlist, registering, featured, name, onRegister, guestDone, onGuest, onPay,
 }: CtaCommon & { featured: boolean; name: string; onRegister: () => void }) {
   const cls = `dc-ev-btn-tier ${featured ? "is-dark" : "is-light"}`;
-  const label = featured ? `${name}-Platz sichern` : "Platz sichern";
+  const label = featured ? `${name} kaufen` : "Ticket kaufen";
   if (me === "loading") return <button className={cls} disabled>…</button>;
   // Anonym = Gast-Reservierung (ohne Zahlung)
   if (me === null) {
