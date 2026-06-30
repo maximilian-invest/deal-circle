@@ -1615,6 +1615,17 @@ html, body { overflow-x: hidden; }
 }
 .mb-modal-foot-note { font: var(--type-micro); letter-spacing: var(--tracking-micro); color: var(--color-ink-muted); max-width: 280px; }
 
+/* Anmeldungen löschen — Danger-Aktion im Registrations-Modal */
+.mb-regs-danger { background: transparent; border: 1px solid rgba(255,126,126,0.32); color: #FFB0B0; }
+.mb-regs-danger:hover:not(:disabled) { background: rgba(255,126,126,0.08); border-color: rgba(255,126,126,0.5); }
+.mb-regs-danger:disabled { opacity: 0.4; cursor: default; }
+.dc-btn-danger { background: #E5484D; border: 1px solid #E5484D; color: #fff; }
+.dc-btn-danger:hover:not(:disabled) { background: #d8383d; border-color: #d8383d; }
+.dc-btn-danger:disabled { opacity: 0.6; cursor: default; }
+.mb-regs-confirm { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mb-regs-confirm-q { font: var(--type-body-sm); letter-spacing: var(--tracking-body-sm); color: var(--color-ink-muted); max-width: 360px; }
+.mb-regs-confirm-q b { color: #FFB0B0; font-weight: 600; }
+
 .mb-modal-success {
   padding: 48px 32px;
   display: flex; flex-direction: column; align-items: center; gap: 16px;

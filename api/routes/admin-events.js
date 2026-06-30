@@ -280,6 +280,24 @@ router.patch("/:eventId/registrations/:regId", (req, res) => {
   res.json({ ok: true });
 });
 
+// Admin kann ALLE Anmeldungen eines Events hart loeschen (z. B. Test-Daten vor
+// dem Launch entfernen). Loescht Mitglieder- und Gaeste-Anmeldungen.
+router.delete("/:id/registrations", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const exists = db.prepare("SELECT id FROM events WHERE id = ?").get(id);
+  if (!exists) return res.status(404).json({ error: "not_found" });
+
+  const tx = db.transaction(() => {
+    const m = db.prepare("DELETE FROM event_registrations WHERE event_id = ?").run(id);
+    const g = db.prepare("DELETE FROM event_guest_registrations WHERE event_id = ?").run(id);
+    return { members: m.changes, guests: g.changes };
+  });
+  const out = tx();
+  res.json({ ok: true, deleted_members: out.members, deleted_guests: out.guests });
+});
+
 // ---------- ADMIN: Mail an Mitglieder ----------
 // Lieferanzahl + Verlauf (UI zeigt das, bevor gesendet wird)
 router.get("/:id/mail-stats", (req, res) => {

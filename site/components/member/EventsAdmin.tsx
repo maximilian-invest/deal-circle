@@ -630,7 +630,7 @@ export default function EventsAdmin() {
         <EventMailModal event={mailEvent} onClose={() => setMailEvent(null)} onSent={(msg) => { setMailEvent(null); showToast(msg); }} />
       )}
       {regsEvent && (
-        <EventRegistrationsModal event={regsEvent} onClose={() => setRegsEvent(null)} />
+        <EventRegistrationsModal event={regsEvent} onClose={() => setRegsEvent(null)} onChanged={reload} />
       )}
 
       {toast && <div className="adm-toast"><I d={ic.check} w={16} s={2.4} />{toast}</div>}

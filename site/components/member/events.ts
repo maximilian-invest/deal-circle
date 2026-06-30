@@ -167,6 +167,17 @@ export async function updateRegistration(
   });
 }
 
+// Loescht ALLE Anmeldungen (Mitglieder + Gaeste) eines Events — z. B. Test-Daten
+// vor dem Launch. Gibt die Anzahl geloeschter Eintraege zurueck.
+export async function deleteAllEventRegistrations(
+  eventId: number
+): Promise<{ deleted_members: number; deleted_guests: number }> {
+  return api<{ deleted_members: number; deleted_guests: number }>(
+    `/admin/events/${eventId}/registrations`,
+    { method: "DELETE" }
+  );
+}
+
 export type MailKind = "announcement" | "limited" | "soldout";
 
 export type MailStats = {

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   listEventRegistrations,
   updateRegistration,
+  deleteAllEventRegistrations,
   type AdminRegistration,
   type GuestRegistration,
 } from "./events";
@@ -11,6 +12,9 @@ import type { EventDto } from "./types";
 type Props = {
   event: EventDto;
   onClose: () => void;
+  // Wird nach dem Loeschen aller Anmeldungen aufgerufen, damit die Event-Liste
+  // (Teilnehmerzahl) im Admin neu geladen wird.
+  onChanged?: () => void;
 };
 
 const STATUS_LABELS: Record<AdminRegistration["status"], string> = {
@@ -30,11 +34,13 @@ function fmtTime(iso: string): string {
          d.toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function EventRegistrationsModal({ event, onClose }: Props) {
+export default function EventRegistrationsModal({ event, onClose, onChanged }: Props) {
   const [regs, setRegs] = useState<AdminRegistration[] | null>(null);
   const [guests, setGuests] = useState<GuestRegistration[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<number | null>(null);
+  const [confirmDel, setConfirmDel] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -68,6 +74,21 @@ export default function EventRegistrationsModal({ event, onClose }: Props) {
       setErr(e instanceof Error ? e.message : "Status-Update fehlgeschlagen.");
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const onDeleteAll = async () => {
+    setDeleting(true);
+    setErr(null);
+    try {
+      await deleteAllEventRegistrations(event.id);
+      setConfirmDel(false);
+      await reload();
+      onChanged?.();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Löschen fehlgeschlagen.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -235,9 +256,29 @@ export default function EventRegistrationsModal({ event, onClose }: Props) {
         </div>
 
         <div className="mb-modal-foot">
-          <span className="mb-modal-foot-note">
-            Status-Änderungen wirken sich sofort auf die Sichtbarkeit beim Mitglied aus.
-          </span>
+          {confirmDel ? (
+            <span className="mb-regs-confirm">
+              <span className="mb-regs-confirm-q">
+                Wirklich <b>alle {(regs?.length ?? 0) + guests.length}</b> Anmeldungen löschen? Das lässt sich nicht rückgängig machen.
+              </span>
+              <button type="button" className="dc-btn dc-btn-danger" onClick={onDeleteAll} disabled={deleting}>
+                {deleting ? "Löschen …" : "Ja, alle löschen"}
+              </button>
+              <button type="button" className="dc-btn dc-btn-secondary" onClick={() => setConfirmDel(false)} disabled={deleting}>
+                Abbrechen
+              </button>
+            </span>
+          ) : (
+            <button
+              type="button"
+              className="dc-btn mb-regs-danger"
+              onClick={() => setConfirmDel(true)}
+              disabled={!regs || (regs.length + guests.length === 0)}
+              title="Alle Mitglieder- und Gäste-Anmeldungen dieses Events löschen"
+            >
+              Alle Anmeldungen löschen
+            </button>
+          )}
           <button type="button" className="dc-btn dc-btn-secondary" onClick={onClose}>
             Schließen
           </button>
