@@ -89,14 +89,14 @@ export async function cancelRegistration(eventId: number): Promise<void> {
   await api(`/events/${eventId}/register`, { method: "DELETE" });
 }
 
-export async function startCheckout(eventId: number): Promise<{
+export async function startCheckout(eventId: number, from?: "dashboard"): Promise<{
   ok: boolean;
   checkout_url?: string;
   session_id?: string;
   free?: boolean;
   redirect?: string;
 }> {
-  return api(`/events/${eventId}/checkout`, { method: "POST", body: {} });
+  return api(`/events/${eventId}/checkout`, { method: "POST", body: from ? { from } : {} });
 }
 
 // Gast-Checkout (ohne Login): legt die Reservierung an und startet Stripe.
@@ -301,6 +301,7 @@ export function toUpcomingShape(e: EventDto) {
   const d = new Date(e.starts_at);
   return {
     id: `e${e.id}`,
+    eventId: e.id,
     day: d.getDate(),
     month: MONTH_SHORT[d.getMonth()],
     monthLong: MONTH_LONG[d.getMonth()],

@@ -2,6 +2,7 @@ export type EventStatus = "open" | "paid" | "limited" | "waitlist";
 
 export type UpcomingEvent = {
   id: string;
+  eventId: number;
   day: number;
   month: string;
   monthLong: string;

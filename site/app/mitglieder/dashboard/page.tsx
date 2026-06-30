@@ -7,7 +7,6 @@ import Stats from "../../../components/member/Stats";
 import UpcomingEvents from "../../../components/member/UpcomingEvents";
 import Gallery from "../../../components/member/Gallery";
 import PastEvents from "../../../components/member/PastEvents";
-import EventModal from "../../../components/member/EventModal";
 import MembersAdmin from "../../../components/member/MembersAdmin";
 import EventsAdmin from "../../../components/member/EventsAdmin";
 import Applications from "../../../components/member/Applications";
@@ -15,7 +14,8 @@ import Profile from "../../../components/member/Profile";
 import MyRegistrations from "../../../components/member/MyRegistrations";
 import { fetchMe, type AuthUser } from "../../../components/member/auth";
 import {
-  isPast, listEvents, toNextEventShape, toPastShape, toUpcomingShape,
+  isPast, listEvents, registerForEvent, startCheckout,
+  toNextEventShape, toPastShape, toUpcomingShape,
 } from "../../../components/member/events";
 import type { Album, EventDto, StatItem, TabKey, UpcomingEvent } from "../../../components/member/types";
 
@@ -49,9 +49,63 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null | "loading">("loading");
   const [active, setActive] = useState<TabKey>("uebersicht");
-  const [modalEvent, setModalEvent] = useState<UpcomingEvent | null>(null);
   const [events, setEvents] = useState<EventDto[] | null>(null);
   const [eventsError, setEventsError] = useState<string | null>(null);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<"paid" | "waitlist" | "already" | null>(null);
+
+  // Rueckkehr von Stripe: success_url setzt ?paid=1 → Danke-Pop-up zeigen,
+  // dann die Query-Parameter wieder aus der URL entfernen.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paid = params.get("paid") === "1";
+    if (paid) setNotice("paid");
+    if (paid || params.get("cancelled") === "1") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("paid");
+      url.searchParams.delete("cancelled");
+      url.searchParams.delete("event");
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    }
+  }, []);
+
+  // Event bezahlen: Anmeldung sicherstellen, dann DIREKT zu Stripe (kein
+  // Zwischen-Pop-up). Warteliste-Events werden nur eingetragen (keine Zahlung).
+  const payEvent = async (ev: UpcomingEvent) => {
+    setPayError(null);
+    if (ev.status === "waitlist") {
+      try {
+        await registerForEvent(ev.eventId);
+        setNotice("waitlist");
+      } catch (err) {
+        setPayError(err instanceof Error ? err.message : "Eintragen fehlgeschlagen.");
+      }
+      return;
+    }
+    setPaying(true);
+    try {
+      try {
+        await registerForEvent(ev.eventId);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (/bereits bezahlt|already_paid/i.test(msg)) {
+          setPaying(false);
+          setNotice("already");
+          return;
+        }
+        // andere Hinweise (z. B. schon reserviert) ignorieren — Checkout startet trotzdem
+      }
+      const r = await startCheckout(ev.eventId, "dashboard");
+      if (r.free && r.redirect) { window.location.href = r.redirect; return; }
+      if (r.checkout_url) { window.location.href = r.checkout_url; return; }
+      setPaying(false);
+      setPayError("Zahlung konnte nicht gestartet werden.");
+    } catch (err) {
+      setPaying(false);
+      setPayError(err instanceof Error ? err.message : "Zahlung fehlgeschlagen.");
+    }
+  };
 
   // Auth check
   useEffect(() => {
@@ -185,7 +239,7 @@ export default function DashboardPage() {
             {derived?.nextEvent ? (
               <NextEvent
                 event={derived.nextEvent}
-                onSignup={() => derived.upcoming[0] && setModalEvent(derived.upcoming[0])}
+                onSignup={() => { if (derived.upcoming[0]) payEvent(derived.upcoming[0]); }}
               />
             ) : (
               <section className="mb-section" style={{ background: "var(--color-surface-1)", padding: "40px", borderRadius: "var(--r-xxl)", textAlign: "center" }}>
@@ -208,7 +262,7 @@ export default function DashboardPage() {
                     Alle Events
                   </a>
                 </div>
-                <UpcomingEvents events={derived.upcoming.slice(0, 4)} onSignup={(e) => setModalEvent(e)} />
+                <UpcomingEvents events={derived.upcoming.slice(0, 4)} onSignup={(e) => payEvent(e)} />
               </section>
             )}
 
@@ -245,7 +299,7 @@ export default function DashboardPage() {
             {derived?.nextEvent && (
               <NextEvent
                 event={derived.nextEvent}
-                onSignup={() => derived.upcoming[0] && setModalEvent(derived.upcoming[0])}
+                onSignup={() => { if (derived.upcoming[0]) payEvent(derived.upcoming[0]); }}
               />
             )}
             <section className="mb-section">
@@ -253,7 +307,7 @@ export default function DashboardPage() {
                 <h2 className="mb-section-title">Alle anstehenden Treffen.</h2>
               </div>
               {derived?.upcoming && derived.upcoming.length > 0 ? (
-                <UpcomingEvents events={derived.upcoming} onSignup={(e) => setModalEvent(e)} />
+                <UpcomingEvents events={derived.upcoming} onSignup={(e) => payEvent(e)} />
               ) : (
                 <div className="mb-admin-empty">Aktuell sind keine Treffen geplant.</div>
               )}
@@ -310,7 +364,75 @@ export default function DashboardPage() {
         )}
       </main>
 
-      {modalEvent && <EventModal event={modalEvent} onClose={() => setModalEvent(null)} />}
+      {paying && (
+        <div className="mb-modal-backdrop">
+          <div className="mb-modal" role="dialog" aria-modal="true">
+            <div className="mb-modal-success">
+              <h3 className="mb-modal-title" style={{ margin: 0 }}>Weiterleitung zu Stripe …</h3>
+              <p className="mb-modal-sub" style={{ maxWidth: 360 }}>
+                Du wirst sicher zur Zahlung weitergeleitet. Einen Moment bitte.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {notice && (
+        <div className="mb-modal-backdrop" onClick={() => setNotice(null)}>
+          <div className="mb-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className="mb-modal-header" style={{ paddingTop: 0 }}>
+              <span />
+              <button type="button" className="mb-modal-close" onClick={() => setNotice(null)} aria-label="Schließen">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="mb-modal-success">
+              <div className="mb-modal-success-check">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <h3 className="mb-modal-title" style={{ margin: 0 }}>
+                {notice === "paid" ? "Danke für deine Zahlung." : notice === "already" ? "Du bist bereits angemeldet." : "Du stehst auf der Warteliste."}
+              </h3>
+              <p className="mb-modal-sub" style={{ maxWidth: 380 }}>
+                {notice === "paid"
+                  ? "Deine Zahlung ist eingegangen — du bist für das Event angemeldet. Bestätigung und Rechnung kommen per E-Mail."
+                  : notice === "already"
+                  ? "Für dieses Event liegt bereits eine bezahlte Anmeldung von dir vor."
+                  : "Wir haben dich auf die Warteliste gesetzt und melden uns, sobald ein Platz frei wird."}
+              </p>
+              <button type="button" className="dc-btn dc-btn-primary" onClick={() => setNotice(null)}>Schließen</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {payError && (
+        <div className="mb-modal-backdrop" onClick={() => setPayError(null)}>
+          <div className="mb-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className="mb-modal-header">
+              <div>
+                <span className="mb-modal-eyebrow">Zahlung</span>
+                <h3 className="mb-modal-title">Das hat nicht geklappt.</h3>
+              </div>
+              <button type="button" className="mb-modal-close" onClick={() => setPayError(null)} aria-label="Schließen">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="mb-modal-body">
+              <p className="mb-modal-sub" style={{ margin: 0 }}>{payError}</p>
+            </div>
+            <div className="mb-modal-foot" style={{ justifyContent: "flex-end" }}>
+              <button type="button" className="dc-btn dc-btn-primary" onClick={() => setPayError(null)}>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

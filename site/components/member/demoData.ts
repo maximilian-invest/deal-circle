@@ -23,6 +23,7 @@ export function buildDemoData() {
   const upcoming: UpcomingEvent[] = [
     {
       id: "e1",
+      eventId: 1,
       day: nextDate.getDate(),
       month: nextDate.toLocaleDateString("de-AT", { month: "short" }).replace(".", ""),
       monthLong: nextDate.toLocaleDateString("de-AT", { month: "long" }),
@@ -33,19 +34,19 @@ export function buildDemoData() {
       fee: 380,
     },
     {
-      id: "e2", day: 18, month: "Apr", monthLong: "April",
+      id: "e2", eventId: 2, day: 18, month: "Apr", monthLong: "April",
       title: "Frühjahrsevent · Familienunternehmen & Nachfolge.",
       time: "Ganztägig",   location: "Schloss Wiespach",
       status: "limited",   fee: 980,
     },
     {
-      id: "e3", day: 12, month: "Jun", monthLong: "Juni",
+      id: "e3", eventId: 3, day: 12, month: "Jun", monthLong: "Juni",
       title: "Wiespach LXVIII · Energie & Infrastruktur.",
       time: "18:30 – 22:30", location: "Schloss Wiespach",
       status: "open",        fee: 380,
     },
     {
-      id: "e4", day: 22, month: "Aug", monthLong: "August",
+      id: "e4", eventId: 4, day: 22, month: "Aug", monthLong: "August",
       title: "Sommerevent · Drei Tage am See.",
       time: "Mehrtägig", location: "St. Wolfgang",
       status: "waitlist", fee: 1480,

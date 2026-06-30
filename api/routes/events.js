@@ -110,6 +110,15 @@ router.post("/:id/checkout", requireAuth, async (req, res) => {
   const eventId = Number(req.params.id);
   if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
 
+  // Rueckkehr-Ziel nach der Zahlung: aus dem Mitglieder-Dashboard zurueck ins
+  // Dashboard (mit Danke-Pop-up), sonst auf die oeffentliche Danke-Seite.
+  const fromDashboard = req.body?.from === "dashboard";
+  const paidUrl = `${SITE_URL}/mitglieder/dashboard/?paid=1&event=${eventId}`;
+  const successUrl = fromDashboard ? paidUrl : `${SITE_URL}/danke/?id=${eventId}`;
+  const cancelUrl  = fromDashboard
+    ? `${SITE_URL}/mitglieder/dashboard/?cancelled=1`
+    : `${SITE_URL}/event/?id=${eventId}&cancelled=1`;
+
   const stripe = getStripe();
   if (!stripe) return res.status(503).json({ error: "payments_disabled" });
 
@@ -138,7 +147,7 @@ router.post("/:id/checkout", requireAuth, async (req, res) => {
       SET status = 'paid', paid_at = datetime('now'), amount_total_cents = 0
       WHERE id = ?
     `).run(reg.id);
-    return res.json({ ok: true, free: true, redirect: `${SITE_URL}/event/?id=${eventId}&paid=1` });
+    return res.json({ ok: true, free: true, redirect: fromDashboard ? paidUrl : `${SITE_URL}/event/?id=${eventId}&paid=1` });
   }
 
   const ticketLabel = reg.ticket_name
@@ -190,8 +199,8 @@ router.post("/:id/checkout", requireAuth, async (req, res) => {
           event_id: String(eventId),
         },
       },
-      success_url: `${SITE_URL}/danke/?id=${eventId}`,
-      cancel_url:  `${SITE_URL}/event/?id=${eventId}&cancelled=1`,
+      success_url: successUrl,
+      cancel_url:  cancelUrl,
       expires_at: Math.floor(Date.now() / 1000) + 60 * 60,  // 1h Gültigkeit
     });
 
