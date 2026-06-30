@@ -15,6 +15,11 @@ const app = express();
 const PORT = Number(process.env.DC_PORT || 3001);
 const HOST = process.env.DC_HOST || "127.0.0.1";
 
+// Läuft hinter nginx auf 127.0.0.1 → dem lokalen Proxy vertrauen, damit
+// req.ip / X-Forwarded-For die echte Besucher-IP liefern (sonst sieht
+// express-rate-limit nur 127.0.0.1 und wirft ERR_ERL_UNEXPECTED_X_FORWARDED_FOR).
+app.set("trust proxy", "loopback");
+
 app.disable("x-powered-by");
 
 // Stripe-Webhook MUSS vor express.json() kommen — Stripe braucht raw body
