@@ -195,11 +195,71 @@ export async function sendEventMail(
   });
 }
 
+// Bereitet ein (oft riesiges Handy-)Foto fuer den Upload vor: skaliert auf eine
+// maximale Kantenlaenge herunter und kodiert es als JPEG neu. Das loest drei
+// typische Handy-Foto-Probleme auf einmal:
+//  • Groesse: 4000px/8MB-Fotos werden zu ~200-700 KB (klar unter dem 8MB-Limit).
+//  • Format: iPhone-HEIC wird ueber die Canvas zu JPEG — der Browser dekodiert
+//    das Original (Safari kann HEIC), toBlob() liefert immer JPEG zurueck.
+//  • Tempo: deutlich kleinerer Upload, auch ueber Mobilfunk.
+// Bei jedem Fehler (nicht dekodierbar, keine Canvas, …) wird die Originaldatei
+// unveraendert zurueckgegeben.
+async function prepareImageForUpload(file: File, maxDim: number, quality = 0.85): Promise<File> {
+  if (typeof document === "undefined") return file;
+  const looksLikeImage = file.type.startsWith("image/") || file.type === "";
+  if (!looksLikeImage) return file;
+
+  let url: string | null = null;
+  try {
+    url = URL.createObjectURL(file);
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const im = new Image();
+      im.decoding = "async";
+      im.onload = () => resolve(im);
+      im.onerror = () => reject(new Error("decode_failed"));
+      im.src = url as string;
+    });
+
+    const width = img.naturalWidth || img.width;
+    const height = img.naturalHeight || img.height;
+    if (!width || !height) return file;
+
+    const scale = Math.min(1, maxDim / Math.max(width, height));
+    const w = Math.max(1, Math.round(width * scale));
+    const h = Math.max(1, Math.round(height * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    // Weisser Hintergrund, falls die Quelle Transparenz hat (JPEG kann das nicht).
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob((b) => resolve(b), "image/jpeg", quality)
+    );
+    if (!blob || blob.size === 0) return file;
+    // Bereits ein kleineres JPEG? Dann nicht unnoetig neu kodieren.
+    if (file.type === "image/jpeg" && blob.size >= file.size) return file;
+
+    return new File([blob], "photo.jpg", { type: "image/jpeg" });
+  } catch {
+    return file;
+  } finally {
+    if (url) URL.revokeObjectURL(url);
+  }
+}
+
 // Bild-Upload (kind = "speaker" oder "cover") — multipart/form-data
 export async function uploadImage(kind: "speaker" | "cover", file: File): Promise<string> {
   const token = getToken();
+  // Cover wird gross dargestellt (16:9-Hero), Speaker nur klein in Karten.
+  const prepared = await prepareImageForUpload(file, kind === "cover" ? 2000 : 1400);
   const fd = new FormData();
-  fd.append("photo", file);
+  fd.append("photo", prepared);
 
   const res = await fetch(`/api/uploads/${kind}`, {
     method: "POST",

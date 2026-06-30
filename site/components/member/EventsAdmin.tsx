@@ -149,16 +149,18 @@ function AdmDrop({ kind, photo, onUpload, onRemove, small, title, sub }: {
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setErr(null);
     setBusy(true);
     try {
       const path = await uploadImage(kind, file);
       onUpload(path);
-    } catch {
-      /* ignore — Upload-Fehler still */
+    } catch (uploadErr) {
+      setErr(uploadErr instanceof Error ? uploadErr.message : "Upload fehlgeschlagen");
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -177,8 +179,10 @@ function AdmDrop({ kind, photo, onUpload, onRemove, small, title, sub }: {
     <>
       <button type="button" className={cls} onClick={() => inputRef.current?.click()} disabled={busy}>
         <I d={ic.image} w={small ? 20 : 26} s={1.6} />
-        {!small && <span className="adm-drop-t">{busy ? "Lädt …" : (title || "Titelbild wählen")}</span>}
-        <span className="adm-drop-d">{busy ? "…" : (small ? "Foto" : (sub || "16:9 · JPG/PNG · max. 8 MB"))}</span>
+        {!small && <span className="adm-drop-t">{busy ? "Lädt …" : (err ? "Upload fehlgeschlagen" : (title || "Titelbild wählen"))}</span>}
+        <span className="adm-drop-d" style={!busy && err ? { color: "#ff6b6b", whiteSpace: "normal" } : undefined}>
+          {busy ? "…" : (err || (small ? "Foto" : (sub || "16:9 · JPG/PNG · max. 8 MB")))}
+        </span>
       </button>
       <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={onFile} style={{ display: "none" }} />
     </>
