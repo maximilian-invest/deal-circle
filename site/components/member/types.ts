@@ -101,6 +101,9 @@ export type EventDto = {
   member_discount_pct: number;
   // Anzahl nicht-stornierter Anmeldungen (Mitglieder + Gäste); von GET /events.
   registered?: number;
+  // Anmeldestatus des eingeloggten Mitglieds für dieses Event (von GET /events).
+  // "paid" => bereits bezahlt → kein Anmelde-Button mehr.
+  my_status?: "reserved" | "paid" | "waitlist" | "cancelled" | null;
   timeline: TimelineItem[];
   speakers: Speaker[];
   tickets: Ticket[];

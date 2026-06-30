@@ -320,7 +320,10 @@ export function toUpcomingShape(e: EventDto) {
     title: e.title,
     time: fmtTime(d),
     location: e.location,
-    status: e.status === "closed" ? ("paid" as const) : (e.status as "open" | "limited" | "waitlist"),
+    // Hat das Mitglied bereits bezahlt → als "paid" anzeigen (kein Anmelde-Button).
+    status: e.my_status === "paid" || e.status === "closed"
+      ? ("paid" as const)
+      : (e.status as "open" | "limited" | "waitlist"),
     fee: Math.round(e.fee_cents / 100),
   };
 }
@@ -341,7 +344,7 @@ export function toNextEventShape(e: EventDto) {
     dateLabel,
     location: e.location,
     attendees: e.max_attendees ?? 0,
-    userStatus: "open" as const,
+    userStatus: e.my_status === "paid" ? ("paid" as const) : ("open" as const),
     checkoutUrl: e.checkout_url ?? null,
   };
 }

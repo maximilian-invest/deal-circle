@@ -521,12 +521,17 @@ router.get("/", requireAuth, (req, res) => {
              (SELECT COUNT(*) FROM event_registrations r
                 WHERE r.event_id = events.id AND r.status != 'cancelled')
              + (SELECT COUNT(*) FROM event_guest_registrations g
-                WHERE g.event_id = events.id AND g.status != 'cancelled') AS registered
+                WHERE g.event_id = events.id AND g.status != 'cancelled') AS registered,
+             (SELECT r2.status FROM event_registrations r2
+                WHERE r2.event_id = events.id AND r2.user_id = ?
+                ORDER BY CASE r2.status WHEN 'paid' THEN 0 WHEN 'reserved' THEN 1
+                                        WHEN 'waitlist' THEN 2 ELSE 3 END
+                LIMIT 1) AS my_status
       FROM events
       ${isAdmin ? "" : "WHERE hidden = 0"}
       ORDER BY starts_at ASC
     `)
-    .all();
+    .all(req.user.sub);
 
   const timelineByEvent = new Map();
   const speakersByEvent = new Map();
