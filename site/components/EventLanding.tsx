@@ -56,6 +56,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   const feeLabel = `${fee.toLocaleString("de-AT")} €`;
   const hasMultiTickets = event.tickets.length > 1;
   const pct = event.member_discount_pct ?? 0;
+  // Höchster Mitglieder-Rabatt über alle Preiskategorien (für den Hinweis-Banner).
+  const maxPct = Math.max(pct, 0, ...event.tickets.map((t) => t.member_discount_pct ?? 0));
 
   // Auth-Status + Registration-Status
   const [me, setMe] = useState<AuthUser | null | "loading">("loading");
@@ -386,11 +388,11 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                 {event.tickets.length > 1 ? "Wähle deinen Platz." : "Sichere dir deinen Platz."}
               </h2>
 
-              {pct > 0 && anon && (
+              {maxPct > 0 && anon && (
                 <div className="dc-ev-memberbar">
-                  <span className="dc-ev-memberbar-pct">−{pct}%</span>
+                  <span className="dc-ev-memberbar-pct">−{maxPct}%</span>
                   <div className="dc-ev-memberbar-text">
-                    <div className="dc-ev-memberbar-t">Als DealCircle-Mitglied {pct}% günstiger.</div>
+                    <div className="dc-ev-memberbar-t">Als DealCircle-Mitglied bis zu {maxPct}% günstiger.</div>
                     <div className="dc-ev-memberbar-s">Mit dem monatlichen Abo sicherst du dir Spezialpreise auf alle Events.</div>
                   </div>
                   <a className="dc-ev-memberbar-cta" href="/mitglied-werden/">
@@ -402,7 +404,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
               {event.tickets.length > 0 ? (
                 <div className="dc-ev-tickets" data-count={Math.min(event.tickets.length, 3)}>
                   {event.tickets.map((t, i) => {
-                    const showCents = (pct > 0 && isMember) ? memberCents(t.price_cents, pct) : t.price_cents;
+                    const tpct = t.member_discount_pct ?? 0;
+                    const showCents = (tpct > 0 && isMember) ? memberCents(t.price_cents, tpct) : t.price_cents;
                     return (
                       <motion.div
                         key={t.id ?? i}
@@ -415,7 +418,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                         {t.badge && <span className="dc-ev-tier-badge">{t.badge}</span>}
                         <div className="dc-ev-tier-name">{t.name}</div>
                         <div className="dc-ev-tier-price">{euro(showCents)}</div>
-                        <MemberPriceMeta regularCents={t.price_cents} pct={pct} isMember={isMember} anon={anon} />
+                        <MemberPriceMeta regularCents={t.price_cents} pct={tpct} isMember={isMember} anon={anon} />
                         <div className="dc-ev-tier-sub">pro Person</div>
                         <div className="dc-ev-price-note">{PRICE_NOTE}</div>
                         <ul className="dc-ev-tier-incl">

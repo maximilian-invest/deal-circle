@@ -58,7 +58,7 @@ function hhmm(iso: string) {
 /* ---------- editor form shape + mappers ---------- */
 type EvProgram = { id?: number; t: string; v: string };
 type EvSpeaker = { id?: number; name: string; bio: string; photo_path: string | null };
-type EvTicket = { id?: number; name: string; price: string; vip: boolean; incl: string[]; badge: string | null };
+type EvTicket = { id?: number; name: string; price: string; discount: string; vip: boolean; incl: string[]; badge: string | null };
 type EvForm = {
   id?: number;
   title: string;
@@ -98,6 +98,7 @@ function toForm(e: EventDto): EvForm {
     speakers: e.speakers.map((s) => ({ id: s.id, name: s.name, bio: s.bio ?? "", photo_path: s.photo_path })),
     tickets: (e.tickets ?? []).map((t) => ({
       id: t.id, name: t.name, price: String(Math.round(t.price_cents / 100)),
+      discount: String(t.member_discount_pct ?? 0),
       vip: !!t.featured, incl: [...t.perks], badge: t.badge ?? null,
     })),
   };
@@ -109,7 +110,7 @@ function blankForm(): EvForm {
     status: "open", fee: "380", max: "60", visibility: "members", featured: false,
     member_discount_pct: "0", description: "", cover_path: null,
     program: [{ t: "18:30", v: "" }], speakers: [],
-    tickets: [{ name: "Standard", price: "380", vip: false, incl: ["Zugang zu allen Keynotes"], badge: null }],
+    tickets: [{ name: "Standard", price: "380", discount: "0", vip: false, incl: ["Zugang zu allen Keynotes"], badge: null }],
   };
 }
 
@@ -118,6 +119,7 @@ function fromForm(f: EvForm): CreateEventInput {
   const tickets = f.tickets.filter((t) => t.name.trim()).map((t) => ({
     name: t.name.trim(), badge: t.badge, featured: t.vip,
     price_cents: Math.round(Number(t.price || "0") * 100),
+    member_discount_pct: clamp(Math.round(Number(t.discount || "0")), 0, 90),
     perks: t.incl.map((p) => p.trim()).filter(Boolean),
   }));
   // Der Basis-Beitrag ergibt sich aus den Ticketpreisen (günstigste Kategorie) —
@@ -306,7 +308,7 @@ function Editor({ initial, isNew, onCancel, onSave }: {
   const delSpk = (i: number) => setEv((s) => ({ ...s, speakers: s.speakers.filter((_, x) => x !== i) }));
 
   const setTick = (i: number, k: keyof EvTicket, v: EvTicket[keyof EvTicket]) => setEv((s) => { const tickets = s.tickets.slice(); tickets[i] = { ...tickets[i], [k]: v }; return { ...s, tickets }; });
-  const addTick = () => setEv((s) => ({ ...s, tickets: [...s.tickets, { name: "", price: "0", vip: false, incl: [], badge: null }] }));
+  const addTick = () => setEv((s) => ({ ...s, tickets: [...s.tickets, { name: "", price: "0", discount: "0", vip: false, incl: [], badge: null }] }));
   const delTick = (i: number) => setEv((s) => ({ ...s, tickets: s.tickets.filter((_, x) => x !== i) }));
   const setIncl = (ti: number, ii: number, v: string) => setEv((s) => { const tickets = s.tickets.slice(); const incl = tickets[ti].incl.slice(); incl[ii] = v; tickets[ti] = { ...tickets[ti], incl }; return { ...s, tickets }; });
   const addIncl = (ti: number) => setEv((s) => { const tickets = s.tickets.slice(); tickets[ti] = { ...tickets[ti], incl: [...tickets[ti].incl, ""] }; return { ...s, tickets }; });
@@ -403,12 +405,6 @@ function Editor({ initial, isNew, onCancel, onSave }: {
               <button className="adm-add" onClick={addTick}><I d={ic.plus} w={15} /> Variante</button>
             </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <Field label="Mitglieder-Rabatt auf alle Tickets (%)" hint="Gilt für alle Ticket-Preise. 0 = kein Rabatt. Eingeloggte Mitglieder zahlen weniger; Gäste den regulären Preis.">
-                <input className="adm-input" type="number" min={0} max={90} value={ev.member_discount_pct} onChange={(e) => set("member_discount_pct", e.target.value)} style={{ maxWidth: 180 }} />
-              </Field>
-            </div>
-
             <div className="adm-rep" style={{ gap: 14 }}>
               {ev.tickets.map((tk, ti) => (
                 <div className="adm-tick" data-vip={tk.vip ? "true" : "false"} key={ti}>
@@ -418,6 +414,12 @@ function Editor({ initial, isNew, onCancel, onSave }: {
                       <input className="adm-input" type="number" value={tk.price} onChange={(e) => setTick(ti, "price", e.target.value)} />
                     </div>
                     <button className="adm-x" onClick={() => delTick(ti)} aria-label="Variante entfernen"><I d={ic.trash} w={15} s={1.7} /></button>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 4 }}>
+                    <span style={{ fontSize: 13, opacity: 0.75 }}>Mitglieder-Rabatt</span>
+                    <input className="adm-input" type="number" min={0} max={90} value={tk.discount}
+                      onChange={(e) => setTick(ti, "discount", e.target.value)} placeholder="0" style={{ maxWidth: 90 }} />
+                    <span style={{ fontSize: 13, opacity: 0.75 }}>%</span>
                   </div>
                   <div className="adm-tick-vip" onClick={() => setTick(ti, "vip", !tk.vip)}>
                     <span className="adm-check" data-on={tk.vip ? "true" : "false"}><I d={ic.check} w={13} s={2.6} /></span>

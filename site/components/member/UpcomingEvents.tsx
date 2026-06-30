@@ -40,13 +40,13 @@ export default function UpcomingEvents({ events, onSignup }: Props) {
           </div>
           <div className="mb-event-status">
             <Chip status={e.status} />
-            {e.status === "paid" ? (
-              <button type="button" className="dc-btn dc-btn-secondary mb-event-cta">Details</button>
-            ) : e.status === "waitlist" ? (
-              <button type="button" className="dc-btn dc-btn-secondary mb-event-cta" onClick={() => onSignup(e)}>Auf Warteliste</button>
-            ) : (
-              <button type="button" className="dc-btn dc-btn-primary mb-event-cta" onClick={() => onSignup(e)}>Anmelden</button>
-            )}
+            <a className="dc-btn dc-btn-secondary mb-event-cta" href={`/event/?id=${e.eventId}#programm`}>Programm ansehen</a>
+            {e.status === "paid" ? null
+              : e.status === "waitlist" ? (
+                <button type="button" className="dc-btn dc-btn-secondary mb-event-cta" onClick={() => onSignup(e)}>Auf Warteliste</button>
+              ) : (
+                <button type="button" className="dc-btn dc-btn-primary mb-event-cta" onClick={() => onSignup(e)}>Anmelden</button>
+              )}
           </div>
         </article>
       ))}

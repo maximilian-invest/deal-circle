@@ -90,6 +90,7 @@ db.exec(`
     badge TEXT,
     featured INTEGER NOT NULL DEFAULT 0,
     price_cents INTEGER NOT NULL,
+    member_discount_pct INTEGER NOT NULL DEFAULT 0,
     perks_json TEXT NOT NULL DEFAULT '[]'
   );
 
@@ -217,6 +218,12 @@ function migrateEventsSchema() {
   if (!tcols.includes("featured")) {
     console.log("[migrate] event_tickets: add column featured");
     db.exec("ALTER TABLE event_tickets ADD COLUMN featured INTEGER NOT NULL DEFAULT 0");
+  }
+  if (!tcols.includes("member_discount_pct")) {
+    console.log("[migrate] event_tickets: add column member_discount_pct");
+    db.exec("ALTER TABLE event_tickets ADD COLUMN member_discount_pct INTEGER NOT NULL DEFAULT 0");
+    // Bestehende Tickets erben den bisherigen event-weiten Mitglieder-Rabatt.
+    db.exec("UPDATE event_tickets SET member_discount_pct = COALESCE((SELECT member_discount_pct FROM events WHERE events.id = event_tickets.event_id), 0)");
   }
 
   // users: phone + company

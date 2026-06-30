@@ -408,8 +408,8 @@ export default function DashboardPage() {
                 <span className="mb-modal-eyebrow">Ticket wählen</span>
                 <h3 className="mb-modal-title">{ticketPick.title}</h3>
                 <p className="mb-modal-sub" style={{ marginTop: 6 }}>
-                  {ticketPick.pct > 0
-                    ? `Mitglieder-Preise — −${ticketPick.pct}% sind bereits abgezogen.`
+                  {ticketPick.tickets.some((t) => (t.member_discount_pct ?? 0) > 0)
+                    ? "Mitglieder-Preise — der Rabatt ist je Kategorie bereits abgezogen."
                     : "Wähle deine Kategorie."}
                 </p>
               </div>
@@ -420,8 +420,9 @@ export default function DashboardPage() {
             <div className="mb-modal-body">
               <div className="mb-ticketpick">
                 {ticketPick.tickets.map((t, i) => {
-                  const net = memberCents(t.price_cents, ticketPick.pct);
-                  const discounted = ticketPick.pct > 0 && net !== t.price_cents;
+                  const tpct = t.member_discount_pct ?? 0;
+                  const net = memberCents(t.price_cents, tpct);
+                  const discounted = tpct > 0 && net !== t.price_cents;
                   return (
                     <button
                       key={t.id ?? i}

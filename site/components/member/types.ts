@@ -72,6 +72,7 @@ export type Ticket = {
   badge: string | null;
   featured: boolean;
   price_cents: number;
+  member_discount_pct: number;
   perks: string[];
 };
 

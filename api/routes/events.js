@@ -59,18 +59,20 @@ router.post("/:id/register", requireAuth, (req, res) => {
     return res.status(409).json({ error: "already_paid", registration_id: existing.id });
   }
 
-  // Ticket preis ableiten
+  // Ticket-Preis + Rabatt ableiten. Pro Preiskategorie kann ein eigener
+  // Mitglieder-Rabatt gesetzt sein; ohne Ticket greift der Event-Rabatt.
   let amountCents = event.fee_cents;
+  let pct = event.member_discount_pct || 0;
   if (ticketId) {
     const t = db.prepare(
-      "SELECT id, price_cents FROM event_tickets WHERE id = ? AND event_id = ?"
+      "SELECT id, price_cents, member_discount_pct FROM event_tickets WHERE id = ? AND event_id = ?"
     ).get(ticketId, eventId);
     if (!t) return res.status(400).json({ error: "invalid_ticket" });
     amountCents = t.price_cents;
+    pct = t.member_discount_pct || 0;
   }
 
-  // Eingeloggte Mitglieder bekommen den Mitglieder-Rabatt des Events.
-  const pct = event.member_discount_pct || 0;
+  // Eingeloggte Mitglieder bekommen den Mitglieder-Rabatt der Kategorie.
   if (pct > 0) amountCents = Math.round((amountCents * (100 - pct)) / 100);
 
   // Status: bei waitlist-Event automatisch auf Warteliste, sonst 'reserved'
@@ -471,7 +473,7 @@ function loadLandingEvent(id) {
     .all(id);
   ev.tickets = db
     .prepare(`
-      SELECT id, name, badge, featured, price_cents, perks_json FROM event_tickets
+      SELECT id, name, badge, featured, price_cents, member_discount_pct, perks_json FROM event_tickets
       WHERE event_id = ? ORDER BY position ASC
     `)
     .all(id)
@@ -481,6 +483,7 @@ function loadLandingEvent(id) {
       badge: t.badge,
       featured: t.featured === 1,
       price_cents: t.price_cents,
+      member_discount_pct: t.member_discount_pct,
       perks: safeJson(t.perks_json),
     }));
   return ev;
@@ -555,7 +558,7 @@ router.get("/", requireAuth, (_req, res) => {
 
     const tkRows = db
       .prepare(`
-        SELECT event_id, id, name, badge, featured, price_cents, perks_json
+        SELECT event_id, id, name, badge, featured, price_cents, member_discount_pct, perks_json
         FROM event_tickets
         WHERE event_id IN (${placeholders})
         ORDER BY event_id, position
@@ -567,6 +570,7 @@ router.get("/", requireAuth, (_req, res) => {
         id: r.id, name: r.name,
         badge: r.badge, featured: r.featured === 1,
         price_cents: r.price_cents,
+        member_discount_pct: r.member_discount_pct,
         perks: safeJson(r.perks_json),
       });
     }
