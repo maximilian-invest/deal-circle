@@ -220,6 +220,56 @@ else
   fi
 fi
 
+# ---------- DIAGNOSE + Fix: Auslieferung von Upload-Bildern ueber /api/ ----------
+# Symptom: hochgeladene Bilder zeigen nur das kaputte Bild-Icon. Typische Ursache:
+# eine Regex-location fuer Bilddateien (location ~* \.(jpg|png|...)$) faengt
+# *.jpg-URLs ab, bevor sie an die API gehen — in nginx schlagen Regex-locations
+# den Prefix 'location /api/'. Dann sucht nginx die Datei im statischen Webroot
+# statt bei der API → 404 → kaputtes Bild.
+# Fix: 'location /api/' auf den '^~'-Prefix heben — dann werden Regex-locations
+# fuer /api/* NICHT mehr ausgewertet, alle /api/*-Requests gehen an die API.
+step "nginx: Auslieferung von /api/-Uploads pruefen + absichern (^~)"
+DIAG_CONF=$(grep -rlsE "location[[:space:]]+\^?~?[[:space:]]*/api/" /etc/nginx 2>/dev/null \
+  | grep -vE '\.(bak|orig|save|dpkg-[a-z]+)' | head -1 || true)
+if [ -z "${DIAG_CONF:-}" ]; then
+  warn "keine nginx-Datei mit 'location /api/' gefunden — uebersprungen"
+else
+  echo "  --- relevante Zeilen aus $DIAG_CONF ---"
+  grep -nE "location|root[[:space:]]|proxy_pass|try_files|client_max_body_size|\.(jpg|jpeg|png|webp|gif|svg|ico)" "$DIAG_CONF" 2>/dev/null | head -60 || true
+  echo "  --- Dateien in /var/lib/dealcircle-api/uploads ---"
+  ls -laR /var/lib/dealcircle-api/uploads 2>/dev/null | head -40 || true
+  DIAG_SUB=""; DIAG_FILE=""
+  for s in speakers covers; do
+    f=$(ls -t "/var/lib/dealcircle-api/uploads/$s" 2>/dev/null | head -1 || true)
+    if [ -n "$f" ]; then DIAG_SUB="$s"; DIAG_FILE="$f"; break; fi
+  done
+  if [ -n "$DIAG_FILE" ]; then
+    echo "  --- Auslieferungs-Test /api/uploads/$DIAG_SUB/$DIAG_FILE ---"
+    curl -s -o /dev/null -w "    backend(3001): %{http_code} %{content_type}\n" \
+      "http://127.0.0.1:3001/api/uploads/$DIAG_SUB/$DIAG_FILE" || true
+    curl -sk -o /dev/null -w "    nginx(443):    %{http_code} %{content_type}\n" \
+      --resolve "deal-circle.at:443:127.0.0.1" \
+      "https://deal-circle.at/api/uploads/$DIAG_SUB/$DIAG_FILE" || true
+  else
+    warn "keine Dateien in uploads/ — der Upload schreibt nichts auf die Platte (anderer Fehler)"
+  fi
+
+  # Fix: ^~ vor /api/ setzen (idempotent), damit Regex-Bild-locations /api/ nicht kapern.
+  if grep -qE "location[[:space:]]+/api/[[:space:]]*\{" "$DIAG_CONF" \
+     && ! grep -qE "location[[:space:]]+\^~[[:space:]]*/api/" "$DIAG_CONF"; then
+    cp "$DIAG_CONF" "${DIAG_CONF}.bak.apiprefix.$TS"
+    sed -i -E "s#location([[:space:]]+)/api/#location\1^~ /api/#" "$DIAG_CONF"
+    if nginx -t >/dev/null 2>&1; then
+      ok "location ^~ /api/ gesetzt in $DIAG_CONF (schlaegt jetzt Regex-Bild-locations)"
+    else
+      cp "${DIAG_CONF}.bak.apiprefix.$TS" "$DIAG_CONF"
+      warn "nginx -t nach ^~-Aenderung fehlgeschlagen — zurueckgerollt"
+    fi
+  else
+    ok "location /api/ ist bereits mit ^~ abgesichert (oder nicht im erwarteten Format)"
+  fi
+fi
+
 step "nginx konfig pruefen + reload"
 nginx -t 2>&1 | tail -3
 systemctl reload nginx
