@@ -175,6 +175,13 @@ export default function DashboardPage() {
 
     const nextEvent = firstUpcoming ? toNextEventShape(firstUpcoming) : null;
 
+    // Main-Event (gross oben im Events-Tab): das naechste als is_main markierte Event.
+    const mainEventRaw = events
+      .filter((e) => !isPast(e, now) && e.is_main)
+      .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0];
+    const mainEvent = mainEventRaw ? toNextEventShape(mainEventRaw) : null;
+    const mainEventId = mainEventRaw ? mainEventRaw.id : null;
+
     const visited = events.filter((e) => isPast(e, now)).length;
     const stats: StatItem[] = [
       { label: "Treffen besucht",   value: String(visited),                    note: visited > 0 ? "Stand heute" : "noch keines" },
@@ -194,7 +201,7 @@ export default function DashboardPage() {
         tone: ALBUM_TONES[i % ALBUM_TONES.length],
       }));
 
-    return { upcoming, past, nextEvent, stats, albums };
+    return { upcoming, past, nextEvent, mainEvent, mainEventId, stats, albums };
   }, [events]);
 
   if (user === "loading" || user === null) {
@@ -316,26 +323,33 @@ export default function DashboardPage() {
           </>
         )}
 
-        {safeActive === "events" && (
-          <>
-            {derived?.nextEvent && (
-              <NextEvent
-                event={derived.nextEvent}
-                onSignup={() => { if (derived.upcoming[0]) payEvent(derived.upcoming[0]); }}
-              />
-            )}
-            <section className="mb-section">
-              <div className="mb-section-head">
-                <h2 className="mb-section-title">Alle anstehenden Treffen.</h2>
-              </div>
-              {derived?.upcoming && derived.upcoming.length > 0 ? (
-                <UpcomingEvents events={derived.upcoming} onSignup={(e) => payEvent(e)} />
-              ) : (
-                <div className="mb-admin-empty">Aktuell sind keine Treffen geplant.</div>
+        {safeActive === "events" && derived && (() => {
+          // Oben gross: das anstehende Main-Event (Fallback: naechstes Treffen).
+          const big = derived.mainEvent ?? derived.nextEvent;
+          const bigId = derived.mainEventId ?? derived.nextEvent?.id ?? null;
+          const others = derived.upcoming.filter((u) => u.eventId !== bigId);
+          const bigUpcoming = derived.upcoming.find((u) => u.eventId === bigId);
+          return (
+            <>
+              {big && (
+                <NextEvent
+                  event={big}
+                  onSignup={() => { if (bigUpcoming) payEvent(bigUpcoming); }}
+                />
               )}
-            </section>
-          </>
-        )}
+              <section className="mb-section">
+                <div className="mb-section-head">
+                  <h2 className="mb-section-title">{big ? "Weitere Treffen." : "Alle anstehenden Treffen."}</h2>
+                </div>
+                {others.length > 0 ? (
+                  <UpcomingEvents events={others} onSignup={(e) => payEvent(e)} />
+                ) : (
+                  <div className="mb-admin-empty">{big ? "Keine weiteren Treffen geplant." : "Aktuell sind keine Treffen geplant."}</div>
+                )}
+              </section>
+            </>
+          );
+        })()}
 
         {safeActive === "galerie" && (
           <>
