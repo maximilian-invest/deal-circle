@@ -24,10 +24,9 @@ ${event.title}
 ${dateLong}
 ${event.location}
 
-${totalEur ? `Betrag (inkl. MwSt): € ${totalEur}\n` : ""}${invoiceUrl ? `Rechnung: ${invoiceUrl}\n` : ""}
+${totalEur ? `Betrag (inkl. MwSt): € ${totalEur}\n` : ""}${invoiceUrl ? `Rechnung (PDF): ${invoiceUrl}\n` : ""}
 Event-Seite: ${url}
 
-Die Rechnung kommt zusätzlich automatisch von Stripe in dein Postfach.
 Bei Fragen einfach auf diese Mail antworten.
 
 Wir freuen uns auf dich.
@@ -64,7 +63,7 @@ DealCircle Salzburg`;
       ${invoiceUrl ? `
       <tr><td style="padding:14px 6px 0 6px;">
         <p style="margin:0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:#C8C8CC;">
-          📄 Deine <a href="${escapeHtml(invoiceUrl)}" style="color:#ffffff;text-decoration:underline;">Rechnung als PDF</a> ist bereit — sie kommt zusätzlich automatisch von Stripe in dein Postfach.
+          📄 Deine <a href="${escapeHtml(invoiceUrl)}" style="color:#ffffff;text-decoration:underline;">Rechnung als PDF</a> ist bereit — du kannst sie jederzeit ansehen und herunterladen.
         </p>
       </td></tr>` : `
       <tr><td style="padding:14px 6px 0 6px;">

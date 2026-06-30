@@ -37,7 +37,8 @@ router.post("/", (req, res) => {
     switch (event.type) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded":
-        handleSessionPaid(event.data.object, stripe);
+        handleSessionPaid(event.data.object, stripe)
+          .catch((err) => console.error("[stripe-webhook] paid handler error:", err));
         break;
       case "checkout.session.expired":
         handleSessionExpired(event.data.object);
@@ -51,11 +52,10 @@ router.post("/", (req, res) => {
   }
 });
 
-function handleSessionPaid(session, stripe) {
+async function handleSessionPaid(session, stripe) {
   // Gast-Checkout (ohne Login) wird separat behandelt.
   if ((session.metadata?.kind || "") === "guest") {
-    handleGuestPaid(session, stripe);
-    return;
+    return handleGuestPaid(session, stripe);
   }
   const regId = Number(session.metadata?.registration_id);
   if (!Number.isInteger(regId) || regId < 1) {
@@ -85,17 +85,17 @@ function handleSessionPaid(session, stripe) {
     return;
   }
 
-  // Invoice URL nachholen (async, weil Stripe sie erst nach session.create generiert)
-  // Wir versuchen es; wenn nicht da, leer lassen.
+  // Invoice-URL SYNCHRON holen, damit die Bestaetigungsmail sie auch enthaelt.
+  // (Stripe generiert die Rechnung erst nach der Zahlung.)
   let invoiceUrl = null;
-  let invoiceId = session.invoice || null;
+  const invoiceId = session.invoice || null;
   if (invoiceId && typeof invoiceId === "string") {
-    stripe.invoices.retrieve(invoiceId)
-      .then((inv) => {
-        db.prepare(`UPDATE event_registrations SET invoice_url = ? WHERE id = ?`)
-          .run(inv?.hosted_invoice_url || inv?.invoice_pdf || null, regId);
-      })
-      .catch((err) => console.warn(`[stripe-webhook] invoice retrieve failed:`, err?.message));
+    try {
+      const inv = await stripe.invoices.retrieve(invoiceId);
+      invoiceUrl = inv?.hosted_invoice_url || inv?.invoice_pdf || null;
+    } catch (err) {
+      console.warn(`[stripe-webhook] invoice retrieve failed:`, err?.message);
+    }
   }
 
   const totalCents = session.amount_total ?? null;
@@ -106,9 +106,10 @@ function handleSessionPaid(session, stripe) {
         paid_at = datetime('now'),
         stripe_payment_intent_id = ?,
         stripe_invoice_id = ?,
+        invoice_url = ?,
         amount_total_cents = ?
     WHERE id = ?
-  `).run(session.payment_intent || null, invoiceId, totalCents, regId);
+  `).run(session.payment_intent || null, invoiceId, invoiceUrl, totalCents, regId);
 
   console.log(`[stripe-webhook] registration #${regId} → paid (€ ${(totalCents/100).toFixed(2)})`);
 
@@ -133,7 +134,7 @@ function handleSessionPaid(session, stripe) {
   });
 }
 
-function handleGuestPaid(session, stripe) {
+async function handleGuestPaid(session, stripe) {
   if (session.payment_status !== "paid") {
     console.log(`[stripe-webhook] guest session ${session.id} payment_status=${session.payment_status} — skip`);
     return;
@@ -152,6 +153,18 @@ function handleGuestPaid(session, stripe) {
   const name = String(session.customer_details?.name || "").trim() || "Gast";
   const ticketId = session.metadata?.ticket_id ? Number(session.metadata.ticket_id) : null;
   const totalCents = session.amount_total ?? null;
+
+  // Invoice-URL SYNCHRON holen (fuer DB + Bestaetigungsmail an den Gast).
+  let invoiceUrl = null;
+  const invoiceId = session.invoice || null;
+  if (invoiceId && typeof invoiceId === "string") {
+    try {
+      const inv = await stripe.invoices.retrieve(invoiceId);
+      invoiceUrl = inv?.hosted_invoice_url || inv?.invoice_pdf || null;
+    } catch (err) {
+      console.warn(`[stripe-webhook] guest invoice retrieve failed:`, err?.message);
+    }
+  }
 
   const event = db.prepare(
     "SELECT id, title, starts_at, location FROM events WHERE id = ?"
@@ -175,31 +188,21 @@ function handleGuestPaid(session, stripe) {
       UPDATE event_guest_registrations
       SET status = 'paid', name = ?, ticket_id = ?, amount_cents = ?, amount_total_cents = ?,
           stripe_session_id = ?, stripe_payment_intent_id = ?, stripe_invoice_id = ?,
+          invoice_url = ?,
           paid_at = datetime('now')
       WHERE id = ?
     `).run(name, ticketId, totalCents, totalCents, session.id,
-           session.payment_intent || null, session.invoice || null, existing.id);
+           session.payment_intent || null, session.invoice || null, invoiceUrl, existing.id);
     regId = existing.id;
   } else {
     const info = db.prepare(`
       INSERT INTO event_guest_registrations
         (event_id, ticket_id, name, email, amount_cents, status, amount_total_cents,
-         stripe_session_id, stripe_payment_intent_id, stripe_invoice_id, paid_at)
-      VALUES (?, ?, ?, ?, ?, 'paid', ?, ?, ?, ?, datetime('now'))
+         stripe_session_id, stripe_payment_intent_id, stripe_invoice_id, invoice_url, paid_at)
+      VALUES (?, ?, ?, ?, ?, 'paid', ?, ?, ?, ?, ?, datetime('now'))
     `).run(eventId, ticketId, name, email, totalCents, totalCents, session.id,
-           session.payment_intent || null, session.invoice || null);
+           session.payment_intent || null, session.invoice || null, invoiceUrl);
     regId = info.lastInsertRowid;
-  }
-
-  // Invoice-URL nachholen (async, weil Stripe sie erst nach Zahlung generiert)
-  const invoiceId = session.invoice || null;
-  if (invoiceId && typeof invoiceId === "string") {
-    stripe.invoices.retrieve(invoiceId)
-      .then((inv) => {
-        db.prepare(`UPDATE event_guest_registrations SET invoice_url = ? WHERE id = ?`)
-          .run(inv?.hosted_invoice_url || inv?.invoice_pdf || null, regId);
-      })
-      .catch((err) => console.warn(`[stripe-webhook] guest invoice retrieve failed:`, err?.message));
   }
 
   console.log(`[stripe-webhook] guest registration #${regId} → paid (€ ${(totalCents/100).toFixed(2)})`);
@@ -210,7 +213,7 @@ function handleGuestPaid(session, stripe) {
     event: { id: event.id, title: event.title, starts_at: event.starts_at, location: event.location },
     firstName,
     amountTotalCents: totalCents,
-    invoiceUrl: null,
+    invoiceUrl,
   });
   sendMailAsync({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
 }
