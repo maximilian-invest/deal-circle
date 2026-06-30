@@ -393,7 +393,7 @@ function Editor({ initial, isNew, onCancel, onSave }: {
             <div className="adm-fs-head">
               <div>
                 <div className="adm-fs-title">Tickets &amp; Preise</div>
-                <div className="adm-fs-hint">Eine Karte je Variante. Markiere eine als VIP-Highlight.</div>
+                <div className="adm-fs-hint">Eine Karte je Variante. Markiere eine als VIP-Highlight. Alle Preise <b>netto</b> eingeben — exkl. MwSt. (Stripe weist die MwSt. automatisch aus).</div>
               </div>
               <button className="adm-add" onClick={addTick}><I d={ic.plus} w={15} /> Variante</button>
             </div>
@@ -452,7 +452,7 @@ function Editor({ initial, isNew, onCancel, onSave }: {
               </select>
             </Field>
             <div className="adm-grid2" style={{ marginTop: 16 }}>
-              <Field label="Beitrag ab"><div className="adm-money"><input className="adm-input" type="number" value={ev.fee} onChange={(e) => set("fee", e.target.value)} /></div></Field>
+              <Field label={<span>Beitrag ab <small>(netto)</small></span>}><div className="adm-money"><input className="adm-input" type="number" value={ev.fee} onChange={(e) => set("fee", e.target.value)} /></div></Field>
               <Field label={<span>Max. <small>Teilnehmer</small></span>}><input className="adm-input" type="number" value={ev.max} onChange={(e) => set("max", e.target.value)} /></Field>
             </div>
           </div>

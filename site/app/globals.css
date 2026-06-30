@@ -2913,6 +2913,17 @@ html, body { overflow-x: hidden; }
 }
 .dc-ev-tier.is-featured .dc-ev-tier-sub { color: rgba(10, 10, 11, 0.66); }
 
+/* Preis-Ausweisung (exkl. MwSt. · exkl. Getränke · inkl. Dinner & Aperitif) */
+.dc-ev-price-note {
+  margin-top: 4px;
+  font: 500 11.5px/1.4 var(--font-body); letter-spacing: -0.1px;
+  color: var(--color-ink-muted);
+  opacity: 0.82;
+}
+.dc-ev-price-note--solo { margin-top: 8px; opacity: 0.92; }
+.dc-ev-tier.is-featured .dc-ev-price-note,
+.dc-ev-ticket-card.is-featured .dc-ev-price-note { color: rgba(10, 10, 11, 0.6); opacity: 1; }
+
 .dc-ev-tier-incl {
   list-style: none; margin: 26px 0 0; padding: 26px 0 0;
   border-top: 1px solid var(--color-hairline-soft);

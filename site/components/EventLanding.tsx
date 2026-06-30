@@ -28,6 +28,9 @@ const WEEKDAY_LONG = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag",
 
 function pad(n: number) { return String(n).padStart(2, "0"); }
 function euro(cents: number): string { return `${Math.round(cents / 100).toLocaleString("de-AT")} €`; }
+
+// Preis-Ausweisung — erscheint überall, wo ein Event-Preis steht.
+const PRICE_NOTE = "exkl. MwSt. · exkl. Getränke · inkl. Dinner & Aperitif";
 function memberCents(regularCents: number, pct: number): number {
   return Math.round((regularCents * (100 - pct)) / 100);
 }
@@ -242,7 +245,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                 <div className="dc-ev-price-chip" aria-hidden="true">
                   <div className="dc-ev-price-chip-k">{hasMultiTickets ? "Ab" : "Ticket"}</div>
                   <div className="dc-ev-price-chip-v">{feeLabel}</div>
-                  <div className="dc-ev-price-chip-n">pro Person · inkl. Dinner</div>
+                  <div className="dc-ev-price-chip-n">pro Person · exkl. MwSt.</div>
                 </div>
               )}
             </motion.div>
@@ -413,7 +416,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                         <div className="dc-ev-tier-name">{t.name}</div>
                         <div className="dc-ev-tier-price">{euro(showCents)}</div>
                         <MemberPriceMeta regularCents={t.price_cents} pct={pct} isMember={isMember} anon={anon} />
-                        <div className="dc-ev-tier-sub">pro Person · inkl. Dinner und Getränke</div>
+                        <div className="dc-ev-tier-sub">pro Person</div>
+                        <div className="dc-ev-price-note">{PRICE_NOTE}</div>
                         <ul className="dc-ev-tier-incl">
                           {t.perks.map((p, pi) => (
                             <li key={pi}><Check />{p}</li>
@@ -449,15 +453,16 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                     <div className="dc-ev-ticket-k">Ticket</div>
                     <div className="dc-ev-ticket-price">
                       {euro((pct > 0 && isMember) ? memberCents(event.fee_cents, pct) : event.fee_cents)}
-                      <small>pro Person · inkl. Dinner und Getränke</small>
+                      <small>pro Person</small>
                     </div>
                   </div>
+                  <div className="dc-ev-price-note dc-ev-price-note--solo">{PRICE_NOTE}</div>
                   <MemberPriceMeta regularCents={event.fee_cents} pct={pct} isMember={isMember} anon={anon} />
                   <ul className="dc-ev-incl">
                     {event.speakers.length > 0 && (
                       <li><Check />Zugang zu {event.speakers.length === 1 ? "der Keynote" : `${event.speakers.length} Keynotes`}</li>
                     )}
-                    <li><Check />Mehrgang-Dinner & Getränke</li>
+                    <li><Check />Mehrgang-Dinner & Aperitif</li>
                     <li><Check />Kuratiertes Networking</li>
                     {event.max_attendees && (
                       <li><Check />Limitiert auf {event.max_attendees} Plätze</li>

@@ -290,6 +290,7 @@ export function ticketsSection(event) {
               ${t.badge ? `<p style="margin:0 0 4px 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:${subInk};">${escapeHtml(t.badge)}</p>` : ""}
               <p style="margin:0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:600;color:${ink};">${escapeHtml(t.name)}</p>
               <p style="margin:6px 0 0 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:30px;font-weight:700;letter-spacing:-1px;color:${ink};font-feature-settings:'tnum';">${price} €</p>
+              <p style="margin:5px 0 0 0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.4;color:${subInk};">exkl. MwSt. · exkl. Getränke · inkl. Dinner &amp; Aperitif</p>
               ${perks ? `<ul style="margin:14px 0 0 0;padding:0 0 0 18px;list-style:disc;">${perks}</ul>` : ""}
             </td>
           </tr>
@@ -354,6 +355,7 @@ export function plaintextFor(event, intro, ctaLabel, ctaUrl) {
       lines.push(`  - ${t.name}: ${p} €${t.badge ? " · " + t.badge : ""}`);
       for (const pk of (t.perks || [])) lines.push(`    · ${pk}`);
     }
+    lines.push("  (alle Preise exkl. MwSt. · exkl. Getränke · inkl. Dinner & Aperitif)");
     lines.push("");
   }
   lines.push(`${ctaLabel}: ${ctaUrl}`);
