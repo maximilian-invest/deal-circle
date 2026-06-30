@@ -9,6 +9,7 @@ import Gallery from "../../../components/member/Gallery";
 import PastEvents from "../../../components/member/PastEvents";
 import MembersAdmin from "../../../components/member/MembersAdmin";
 import EventsAdmin from "../../../components/member/EventsAdmin";
+import FinanceAdmin from "../../../components/member/FinanceAdmin";
 import Applications from "../../../components/member/Applications";
 import Profile from "../../../components/member/Profile";
 import MyRegistrations from "../../../components/member/MyRegistrations";
@@ -29,6 +30,7 @@ const TITLES: Record<TabKey, string> = {
   verwaltung:    "Mitglieder verwalten.",
   antraege:      "Offene Anträge.",
   "events-admin": "Events verwalten.",
+  dashboard:     "Einnahmen.",
 };
 
 const SUBS: Record<TabKey, string> = {
@@ -41,6 +43,7 @@ const SUBS: Record<TabKey, string> = {
   verwaltung:    "Mitglieder-Accounts anlegen, Rollen ändern, Zugänge zurücksetzen.",
   antraege:      "Aufnahme-Anträge prüfen, annehmen oder ablehnen.",
   "events-admin": "Events anlegen, bearbeiten und löschen.",
+  dashboard:     "Umsatz je Event, Ticket-Mix und wer gezahlt hat.",
 };
 
 const ALBUM_TONES = ["violet", "magenta", "orange", "coral", "dusk"] as const;
@@ -218,7 +221,7 @@ export default function DashboardPage() {
   // landet (via URL, Bookmarks, alter State), redirect auf Uebersicht.
   // "mitglieder" wurde entfernt — Admin nutzt "verwaltung". Wenn ein
   // alter Bookmark/URL-Hash trotzdem darauf zeigt, rerouten wir.
-  const ADMIN_ONLY_TABS: TabKey[] = ["mitglieder", "verwaltung", "antraege", "events-admin"];
+  const ADMIN_ONLY_TABS: TabKey[] = ["mitglieder", "verwaltung", "antraege", "events-admin", "dashboard"];
   const REROUTE_TO_ADMIN: TabKey[] = ["mitglieder"];
   const safeActive: TabKey =
     REROUTE_TO_ADMIN.includes(active) && user.role === "admin"
@@ -233,8 +236,8 @@ export default function DashboardPage() {
   return (
     <div className="mb-shell">
       <Sidebar active={safeActive} setActive={setActive} user={user} />
-      <main className={`mb-main${safeActive === "events-admin" ? " mb-main--bleed" : ""}`}>
-        {safeActive !== "events-admin" && (
+      <main className={`mb-main${safeActive === "events-admin" || safeActive === "dashboard" ? " mb-main--bleed" : ""}`}>
+        {safeActive !== "events-admin" && safeActive !== "dashboard" && (
         <header className="mb-main-header">
           <div className="mb-main-header-left">
             <h1 className="mb-main-header-title">{headerTitle}</h1>
@@ -397,6 +400,10 @@ export default function DashboardPage() {
 
         {safeActive === "events-admin" && user.role === "admin" && (
           <EventsAdmin />
+        )}
+
+        {safeActive === "dashboard" && user.role === "admin" && (
+          <FinanceAdmin />
         )}
       </main>
 

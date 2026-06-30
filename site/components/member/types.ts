@@ -49,7 +49,8 @@ export type TabKey =
   | "profil"
   | "verwaltung"
   | "antraege"
-  | "events-admin";
+  | "events-admin"
+  | "dashboard";
 
 export type EventStatusApi = "open" | "limited" | "waitlist" | "closed";
 
