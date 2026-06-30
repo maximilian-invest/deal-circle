@@ -1080,8 +1080,13 @@ html, body { overflow-x: hidden; }
   border-right: 1px solid var(--color-hairline-soft);
   padding: 28px 20px;
   display: flex; flex-direction: column; gap: 28px;
-  position: sticky; top: 0;
+  /* Fest fixiert: bleibt beim Scrollen immer sichtbar. position:sticky würde
+     hier durch das globale overflow-x:hidden auf <body> brechen. */
+  position: fixed; top: 0; left: 0;
+  width: 240px;
   height: 100vh;
+  overflow-y: auto;
+  z-index: 20;
 }
 .mb-sidebar-brand {
   display: flex; align-items: center; gap: 10px;
@@ -1160,6 +1165,7 @@ html, body { overflow-x: hidden; }
 
 /* ========== MAIN ========== */
 .mb-main {
+  grid-column: 2;
   padding: 32px 40px 80px;
   display: flex; flex-direction: column; gap: 56px;
   min-width: 0;
@@ -1750,7 +1756,7 @@ html, body { overflow-x: hidden; }
   .mb-sidebar-profile { margin-top: auto; padding: 14px; }
   .mb-sidebar-profile-info { display: flex; }
 
-  .mb-main { padding: 20px 16px 60px; }
+  .mb-main { grid-column: auto; padding: 20px 16px 60px; }
   .mb-main-header { flex-direction: column; align-items: flex-start; }
   .mb-search { width: 100%; min-width: 0; }
   .mb-stats { grid-template-columns: 1fr; }
