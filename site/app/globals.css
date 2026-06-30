@@ -368,12 +368,15 @@ img { max-width: 100%; display: block; }
   display: flex; flex-direction: column; gap: 6px;
 }
 .dc-format-image-label .dc-caption { color: rgba(255,255,255,0.78); }
-.dc-format-image-placeholder {
-  font: var(--type-micro); letter-spacing: var(--tracking-micro);
-  color: var(--color-ink-muted);
-  position: absolute; top: 24px; right: 24px;
-  background: rgba(0,0,0,0.45); padding: 4px 10px; border-radius: var(--r-pill);
-  border: 1px solid var(--color-hairline-soft);
+.dc-format-image-photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+/* Dunkler Verlauf unten, damit das weiße Label auf dem hellen Foto lesbar bleibt. */
+.dc-format-image-scrim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0) 52%);
 }
 .dc-format-list {
   display: flex; flex-direction: column;
