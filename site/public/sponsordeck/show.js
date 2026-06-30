@@ -93,7 +93,7 @@
       var inner = panel.querySelector(".panel-inner");
       if (!inner) continue;
       inner.style.transform = ""; inner.style.transformOrigin = "center center";
-      var h = inner.offsetHeight, avail = (window.innerHeight || vh) - 6;
+      var h = inner.scrollHeight, avail = (window.innerHeight || vh) - 6;
       if (h > avail) inner.style.transform = "scale(" + (avail / h).toFixed(4) + ")";
     }
   }
