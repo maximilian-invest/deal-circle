@@ -1,0 +1,181 @@
+/* ============================================================
+   DealCircle Salzburg — Design Tokens
+   A Framer-inspired dark, poster-grade system for an M&A platform.
+   ============================================================ */
+
+/* ---- Fonts ---- */
+/* Display: GT Walsheim Medium (proprietary). Substitute: Mona Sans 500.
+   Body:    Inter Variable (open source, used as-is with OpenType variants). */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Mona+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  /* ============ COLORS ============ */
+
+  /* Brand & Accent */
+  --color-primary: #FFFFFF;          /* Pure white — primary CTAs, display type */
+  --color-on-primary: #0A0A0B;       /* Ink on white pill */
+  --color-accent-blue: #0099FF;      /* Single chromatic accent — links, focus, selection */
+
+  /* Surfaces (dark, with faint warmth) */
+  --color-canvas: #0A0A0B;           /* Near-black page surface */
+  --color-surface-1: #161618;        /* +1 lift — cards, secondary pills */
+  --color-surface-2: #1F1F22;        /* +2 lift — featured card, selected tab */
+  --color-hairline: rgba(255,255,255,0.10);
+  --color-hairline-soft: rgba(255,255,255,0.06);
+  --color-inverse-canvas: #FFFFFF;   /* Light tile surface (rare) */
+
+  /* Text */
+  --color-ink: #FFFFFF;
+  --color-ink-muted: #999999;
+
+  /* Semantic */
+  --color-success: #21C97A;          /* Pricing checkmarks */
+
+  /* Brand gradients — spotlight card grounds */
+  --gradient-violet:  linear-gradient(135deg, #6E2BFF 0%, #B14CFF 60%, #FF6FD8 100%);
+  --gradient-magenta: linear-gradient(135deg, #FF2D87 0%, #FF6FA8 50%, #FFA8C7 100%);
+  --gradient-orange:  linear-gradient(135deg, #FF6A2C 0%, #FF994A 55%, #FFC07A 100%);
+  --gradient-coral:   linear-gradient(135deg, #FF7E7E 0%, #FF9AA8 50%, #FFC5C8 100%);
+
+  /* Anchor stops (for swatches / tokens) */
+  --color-gradient-violet: #B14CFF;
+  --color-gradient-magenta: #FF2D87;
+  --color-gradient-orange: #FF6A2C;
+  --color-gradient-coral: #FF9AA8;
+
+  /* ============ TYPOGRAPHY ============ */
+  --font-display: "Mona Sans", "GT Walsheim Medium Placeholder", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-feat: "cv01", "cv05", "cv09", "cv11", "ss03", "ss07", "dlig";
+
+  /* Type scale — token : size / line-height / tracking */
+  --type-display-xxl: 500 110px/0.85 var(--font-display);
+  --type-display-xl:  500  85px/0.95 var(--font-display);
+  --type-display-lg:  500  62px/1.00 var(--font-display);
+  --type-display-md:  500  32px/1.13 var(--font-display);
+  --type-headline:    700  22px/1.20 var(--font-body);
+  --type-subhead:     400  24px/1.30 var(--font-body);
+  --type-body-lg:     400  18px/1.30 var(--font-body);
+  --type-body:        400  15px/1.30 var(--font-body);
+  --type-body-sm:     500  14px/1.40 var(--font-body);
+  --type-caption:     500  13px/1.20 var(--font-body);
+  --type-micro:       400  12px/1.20 var(--font-body);
+  --type-button:      500  14px/1.0  var(--font-body);
+
+  --tracking-display-xxl: -5.5px;
+  --tracking-display-xl:  -4.25px;
+  --tracking-display-lg:  -3.1px;
+  --tracking-display-md:  -1px;
+  --tracking-headline:    -0.8px;
+  --tracking-subhead:     -0.01em;
+  --tracking-body-lg:     -0.18px;
+  --tracking-body:        -0.15px;
+  --tracking-body-sm:     -0.14px;
+  --tracking-caption:     -0.13px;
+  --tracking-micro:       -0.12px;
+  --tracking-button:      -0.14px;
+
+  /* ============ SPACING (5px base) ============ */
+  --space-hair: 1px;
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 15px;
+  --space-lg: 20px;
+  --space-xl: 30px;
+  --space-xxl: 40px;
+  --space-section: 96px;
+
+  /* ============ RADII ============ */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 15px;
+  --r-xl: 20px;
+  --r-xxl: 30px;
+  --r-pill: 100px;
+  --r-full: 9999px;
+
+  /* ============ ELEVATION ============ */
+  --elev-1: 0 0 0 1px var(--color-hairline);
+  --elev-2: inset 0 0.5px 0 rgba(255,255,255,0.10), 0 10px 30px rgba(0,0,0,0.25);
+  --elev-3: 0 0 0 1px rgba(0,153,255,0.50), 0 0 0 4px rgba(0,153,255,0.15);
+}
+
+/* ---- Global resets & body voice ---- */
+html, body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font: var(--type-body);
+  letter-spacing: var(--tracking-body);
+  font-feature-settings: var(--font-feat);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  margin: 0;
+}
+
+::selection { background: rgba(0,153,255,0.35); color: #fff; }
+
+a { color: var(--color-accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ============ SEMANTIC TYPE CLASSES ============ */
+.dc-display-xxl { font: var(--type-display-xxl); letter-spacing: var(--tracking-display-xxl); }
+.dc-display-xl  { font: var(--type-display-xl);  letter-spacing: var(--tracking-display-xl); }
+.dc-display-lg  { font: var(--type-display-lg);  letter-spacing: var(--tracking-display-lg); }
+.dc-display-md  { font: var(--type-display-md);  letter-spacing: var(--tracking-display-md); }
+.dc-headline    { font: var(--type-headline);    letter-spacing: var(--tracking-headline); }
+.dc-subhead     { font: var(--type-subhead);     letter-spacing: var(--tracking-subhead); }
+.dc-body-lg     { font: var(--type-body-lg);     letter-spacing: var(--tracking-body-lg); }
+.dc-body        { font: var(--type-body);        letter-spacing: var(--tracking-body); }
+.dc-body-sm     { font: var(--type-body-sm);     letter-spacing: var(--tracking-body-sm); }
+.dc-caption     { font: var(--type-caption);     letter-spacing: var(--tracking-caption); text-transform: none; }
+.dc-micro       { font: var(--type-micro);       letter-spacing: var(--tracking-micro); }
+.dc-eyebrow     { font: var(--type-caption);     letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-ink-muted); }
+
+.dc-ink-muted   { color: var(--color-ink-muted); }
+
+/* ============ PRIMITIVE COMPONENTS ============ */
+/* Pill buttons — the only CTA shape */
+.dc-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font: var(--type-button); letter-spacing: var(--tracking-button);
+  padding: 10px 15px; border-radius: var(--r-pill);
+  border: 0; cursor: pointer; user-select: none;
+  transition: transform 120ms ease, background 120ms ease;
+}
+.dc-btn:active { transform: scale(0.97); }
+.dc-btn-primary    { background: var(--color-primary); color: var(--color-on-primary); }
+.dc-btn-secondary  { background: var(--color-surface-1); color: var(--color-ink); }
+.dc-btn-translucent{ background: var(--color-surface-2); color: var(--color-ink); border-radius: var(--r-xxl); padding: 8px 14px; }
+.dc-btn-icon       { width: 40px; height: 40px; padding: 0; border-radius: var(--r-full); background: var(--color-surface-1); color: var(--color-ink); }
+
+/* Inputs */
+.dc-input {
+  background: var(--color-surface-1); color: var(--color-ink);
+  font: var(--type-body); letter-spacing: var(--tracking-body);
+  padding: 10px 14px; border-radius: var(--r-md);
+  border: 1px solid transparent; outline: none;
+}
+.dc-input::placeholder { color: var(--color-ink-muted); }
+.dc-input:focus { box-shadow: var(--elev-3); }
+
+/* Cards */
+.dc-card           { background: var(--color-surface-1); border-radius: var(--r-xl); padding: 24px; }
+.dc-card-featured  { background: var(--color-surface-2); border-radius: var(--r-xl); padding: 24px; }
+.dc-card-template  { background: var(--color-surface-1); border-radius: var(--r-lg); padding: 12px; }
+
+/* Gradient spotlight cards — the brand signature */
+.dc-spotlight        { border-radius: var(--r-xxl); padding: 32px; color: var(--color-ink); }
+.dc-spotlight-violet { background: var(--gradient-violet); }
+.dc-spotlight-magenta{ background: var(--gradient-magenta); }
+.dc-spotlight-orange { background: var(--gradient-orange); }
+.dc-spotlight-coral  { background: var(--gradient-coral); }
+
+/* Pricing tab pill */
+.dc-tab          { padding: 10px 16px; border-radius: var(--r-pill); background: var(--color-canvas); color: var(--color-ink-muted); font: var(--type-button); letter-spacing: var(--tracking-button); cursor: pointer; }
+.dc-tab-selected { background: var(--color-surface-2); color: var(--color-ink); }
+
+/* Hairline divider */
+.dc-divider { height: 1px; background: var(--color-hairline-soft); border: 0; }
