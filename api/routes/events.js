@@ -436,6 +436,7 @@ router.get("/public/next", (_req, res) => {
       WHERE starts_at >= datetime('now')
         AND status != 'closed'
         AND visibility = 'public'
+        AND hidden = 0
         AND is_main = 1
       ORDER BY starts_at ASC
       LIMIT 1
@@ -452,7 +453,7 @@ function loadLandingEvent(id) {
   const ev = db
     .prepare(`
       SELECT id, title, starts_at, location, status,
-             fee_cents, max_attendees, description, cover_path, visibility,
+             fee_cents, max_attendees, description, cover_path, visibility, hidden,
              member_discount_pct
       FROM events WHERE id = ?
     `)
@@ -496,8 +497,9 @@ router.get("/public/:id", (req, res) => {
   if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
 
   const ev = loadLandingEvent(id);
-  if (!ev || ev.visibility !== "public") return res.status(404).json({ error: "not_found" });
+  if (!ev || ev.visibility !== "public" || ev.hidden === 1) return res.status(404).json({ error: "not_found" });
   delete ev.visibility;
+  delete ev.hidden;
   res.json({ event: ev });
 });
 
@@ -507,17 +509,21 @@ function safeJson(s) {
 }
 
 // Member: alle Events mit nested timeline + speakers
-router.get("/", requireAuth, (_req, res) => {
+router.get("/", requireAuth, (req, res) => {
+  // Versteckte Events ("hidden") sind fuer normale Mitglieder unsichtbar;
+  // Admins sehen sie weiterhin, um sie im Admin verwalten zu koennen.
+  const isAdmin = req.user?.role === "admin";
   const events = db
     .prepare(`
       SELECT id, title, starts_at, location, status,
              fee_cents, max_attendees, description, cover_path,
-             is_main, visibility, member_discount_pct, created_at, updated_at,
+             is_main, visibility, hidden, member_discount_pct, created_at, updated_at,
              (SELECT COUNT(*) FROM event_registrations r
                 WHERE r.event_id = events.id AND r.status != 'cancelled')
              + (SELECT COUNT(*) FROM event_guest_registrations g
                 WHERE g.event_id = events.id AND g.status != 'cancelled') AS registered
       FROM events
+      ${isAdmin ? "" : "WHERE hidden = 0"}
       ORDER BY starts_at ASC
     `)
     .all();
@@ -578,6 +584,7 @@ router.get("/", requireAuth, (_req, res) => {
 
   for (const e of events) {
     e.is_main = e.is_main === 1;
+    e.hidden = e.hidden === 1;
     e.timeline = timelineByEvent.get(e.id) || [];
     e.speakers = speakersByEvent.get(e.id) || [];
     e.tickets  = ticketsByEvent.get(e.id)  || [];
@@ -593,8 +600,10 @@ router.get("/:id", requireAuth, (req, res) => {
   if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
 
   const ev = loadLandingEvent(id);
-  if (!ev) return res.status(404).json({ error: "not_found" });
+  const isAdmin = req.user?.role === "admin";
+  if (!ev || (ev.hidden === 1 && !isAdmin)) return res.status(404).json({ error: "not_found" });
   delete ev.visibility;
+  delete ev.hidden;
   res.json({ event: ev });
 });
 

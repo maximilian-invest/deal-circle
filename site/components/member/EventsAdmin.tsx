@@ -68,7 +68,7 @@ type EvForm = {
   status: EventStatusApi;
   fee: string;
   max: string;
-  visibility: "public" | "members";
+  visibility: "public" | "members" | "hidden";
   featured: boolean;
   member_discount_pct: string;
   description: string;
@@ -89,7 +89,7 @@ function toForm(e: EventDto): EvForm {
     status: e.status,
     fee: String(Math.round(e.fee_cents / 100)),
     max: e.max_attendees == null ? "" : String(e.max_attendees),
-    visibility: e.visibility,
+    visibility: e.hidden ? "hidden" : e.visibility,
     featured: e.is_main,
     member_discount_pct: String(e.member_discount_pct ?? 0),
     description: e.description ?? "",
@@ -132,7 +132,10 @@ function fromForm(f: EvForm): CreateEventInput {
     location: f.location.trim(),
     status: f.status,
     is_main: f.featured,
-    visibility: f.visibility,
+    // "Nicht sichtbar" wird über das hidden-Flag gespeichert; der darunter
+    // liegende visibility-Wert bleibt "members", falls später wieder sichtbar.
+    visibility: f.visibility === "hidden" ? "members" : f.visibility,
+    hidden: f.visibility === "hidden",
     member_discount_pct: clamp(Math.round(Number(f.member_discount_pct || "0")), 0, 90),
     fee_cents: ticketCents.length ? Math.min(...ticketCents) : 0,
     max_attendees: f.max.trim() === "" ? null : Number(f.max),
@@ -257,7 +260,8 @@ function EventRow({ ev, onEdit, onView, onMail, onReg, onDup, onDelete }: {
           <span>{ev.location}</span>
           <span className="dot" />
           <span>ab <b>€ {fee}</b></span>
-          {ev.visibility === "members" && <><span className="dot" /><span>Nur Mitglieder</span></>}
+          {ev.visibility === "members" && !ev.hidden && <><span className="dot" /><span>Nur Mitglieder</span></>}
+          {ev.hidden && <><span className="dot" /><span style={{ color: "#FFB0B0", fontWeight: 600 }}>Nicht sichtbar</span></>}
           {max > 0 && (
             <>
               <span className="dot" />
@@ -466,9 +470,10 @@ function Editor({ initial, isNew, onCancel, onSave }: {
           <div className="adm-fs">
             <div className="adm-fs-head"><div className="adm-fs-title">Sichtbarkeit</div></div>
             <Field label="Wer sieht das Event">
-              <select className="adm-select" value={ev.visibility} onChange={(e) => set("visibility", e.target.value as "public" | "members")}>
+              <select className="adm-select" value={ev.visibility} onChange={(e) => set("visibility", e.target.value as "public" | "members" | "hidden")}>
                 <option value="public">Öffentlich — für alle sichtbar</option>
                 <option value="members">Nur Mitglieder</option>
+                <option value="hidden">Nicht sichtbar — für niemanden</option>
               </select>
             </Field>
             <div style={{ marginTop: 14 }} className="adm-toggle-row" onClick={() => set("featured", !ev.featured)}>

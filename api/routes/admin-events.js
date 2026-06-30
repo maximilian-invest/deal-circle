@@ -42,6 +42,7 @@ const eventCreateSchema = z.object({
   cover_path: z.string().max(500).nullable().optional().default(null),
   is_main: z.boolean().default(false),
   visibility: z.enum(["public", "members"]).default("public"),
+  hidden: z.boolean().default(false),
   member_discount_pct: z.number().int().min(0).max(90).default(0),
   timeline: z.array(timelineItemSchema).max(50).optional().default([]),
   speakers: z.array(speakerSchema).max(20).optional().default([]),
@@ -55,13 +56,14 @@ function fetchEventFull(id) {
   const ev = db
     .prepare(`
       SELECT id, title, starts_at, location, status, fee_cents,
-             max_attendees, description, cover_path, is_main, visibility,
+             max_attendees, description, cover_path, is_main, visibility, hidden,
              member_discount_pct, created_at, updated_at
       FROM events WHERE id = ?
     `)
     .get(id);
   if (!ev) return null;
   ev.is_main = ev.is_main === 1;
+  ev.hidden = ev.hidden === 1;
   ev.timeline = db
     .prepare(`
       SELECT id, time_label, label FROM event_timeline
@@ -150,12 +152,12 @@ router.post("/", (req, res) => {
     const info = db
       .prepare(`
         INSERT INTO events (title, starts_at, location, status, fee_cents,
-                            max_attendees, description, cover_path, is_main, visibility,
+                            max_attendees, description, cover_path, is_main, visibility, hidden,
                             member_discount_pct)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `)
       .run(d.title, d.starts_at, d.location, d.status, d.fee_cents,
-           d.max_attendees, d.description, d.cover_path, d.is_main ? 1 : 0, d.visibility,
+           d.max_attendees, d.description, d.cover_path, d.is_main ? 1 : 0, d.visibility, d.hidden ? 1 : 0,
            d.member_discount_pct);
     replaceTimeline(info.lastInsertRowid, d.timeline);
     replaceSpeakers(info.lastInsertRowid, d.speakers);
@@ -194,6 +196,10 @@ router.patch("/:id", (req, res) => {
   if (d.is_main !== undefined) {
     updates.push("is_main = ?");
     values.push(d.is_main ? 1 : 0);
+  }
+  if (d.hidden !== undefined) {
+    updates.push("hidden = ?");
+    values.push(d.hidden ? 1 : 0);
   }
 
   const tx = db.transaction(() => {

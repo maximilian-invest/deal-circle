@@ -54,6 +54,7 @@ db.exec(`
     cover_path TEXT,
     is_main INTEGER NOT NULL DEFAULT 0,
     visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'members')),
+    hidden INTEGER NOT NULL DEFAULT 0,
     member_discount_pct INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT
@@ -203,6 +204,10 @@ function migrateEventsSchema() {
   if (!cols.includes("visibility")) {
     console.log("[migrate] events: add column visibility");
     db.exec("ALTER TABLE events ADD COLUMN visibility TEXT NOT NULL DEFAULT 'public'");
+  }
+  if (!cols.includes("hidden")) {
+    console.log("[migrate] events: add column hidden");
+    db.exec("ALTER TABLE events ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0");
   }
   if (!cols.includes("member_discount_pct")) {
     console.log("[migrate] events: add column member_discount_pct");

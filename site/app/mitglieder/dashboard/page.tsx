@@ -167,25 +167,28 @@ export default function DashboardPage() {
   const derived = useMemo(() => {
     if (!events) return null;
     const now = Date.now();
-    const upcoming = events.filter((e) => !isPast(e, now)).map(toUpcomingShape);
-    const past = events.filter((e) => isPast(e, now))
+    // Versteckte Events ("Nicht sichtbar") auch in der eigenen Mitglieder-Ansicht
+    // ausblenden — verwaltet werden sie nur unter "Events verwalten".
+    const visible = events.filter((e) => !e.hidden);
+    const upcoming = visible.filter((e) => !isPast(e, now)).map(toUpcomingShape);
+    const past = visible.filter((e) => isPast(e, now))
       .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())
       .map(toPastShape);
 
-    const firstUpcoming = events
+    const firstUpcoming = visible
       .filter((e) => !isPast(e, now))
       .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0];
 
     const nextEvent = firstUpcoming ? toNextEventShape(firstUpcoming) : null;
 
     // Main-Event (gross oben im Events-Tab): das naechste als is_main markierte Event.
-    const mainEventRaw = events
+    const mainEventRaw = visible
       .filter((e) => !isPast(e, now) && e.is_main)
       .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0];
     const mainEvent = mainEventRaw ? toNextEventShape(mainEventRaw) : null;
     const mainEventId = mainEventRaw ? mainEventRaw.id : null;
 
-    const visited = events.filter((e) => isPast(e, now)).length;
+    const visited = visible.filter((e) => isPast(e, now)).length;
     const stats: StatItem[] = [
       { label: "Treffen besucht",   value: String(visited),                    note: visited > 0 ? "Stand heute" : "noch keines" },
       { label: "Nächste Anmeldung", value: nextEvent ? "offen" : "—",          note: firstUpcoming?.title ?? "Kein Treffen geplant" },
@@ -193,7 +196,7 @@ export default function DashboardPage() {
     ];
 
     // Album-Platzhalter aus den letzten 5 vergangenen Events ableiten
-    const albums: Album[] = events
+    const albums: Album[] = visible
       .filter((e) => isPast(e, now))
       .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())
       .slice(0, 5)

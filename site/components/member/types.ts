@@ -93,6 +93,9 @@ export type EventDto = {
   // Event öffentlich ist oder nur eingeloggten Mitgliedern angezeigt wird.
   is_main: boolean;
   visibility: "public" | "members";
+  // true = "Nicht sichtbar": Event ist für normale Mitglieder komplett
+  // ausgeblendet (nur Admins sehen es im Admin-Bereich).
+  hidden: boolean;
   // Mitglieder-Rabatt in Prozent (0–90). Eingeloggte Mitglieder zahlen
   // entsprechend weniger; 0 = kein Rabatt.
   member_discount_pct: number;
