@@ -115,6 +115,15 @@ function blankForm(): EvForm {
 
 function fromForm(f: EvForm): CreateEventInput {
   const iso = new Date(`${f.date}T${(f.time || "00:00")}:00`).toISOString();
+  const tickets = f.tickets.filter((t) => t.name.trim()).map((t) => ({
+    name: t.name.trim(), badge: t.badge, featured: t.vip,
+    price_cents: Math.round(Number(t.price || "0") * 100),
+    perks: t.incl.map((p) => p.trim()).filter(Boolean),
+  }));
+  // Der Basis-Beitrag ergibt sich aus den Ticketpreisen (günstigste Kategorie) —
+  // kein eigenes Feld mehr. fee_cents dient nur noch als Fallback ohne Tickets
+  // und als "ab"-Preis in der Übersicht.
+  const ticketCents = tickets.map((t) => t.price_cents).filter((c) => c > 0);
   return {
     title: f.title.trim(),
     starts_at: iso,
@@ -123,17 +132,13 @@ function fromForm(f: EvForm): CreateEventInput {
     is_main: f.featured,
     visibility: f.visibility,
     member_discount_pct: clamp(Math.round(Number(f.member_discount_pct || "0")), 0, 90),
-    fee_cents: Math.round(Number(f.fee || "0") * 100),
+    fee_cents: ticketCents.length ? Math.min(...ticketCents) : 0,
     max_attendees: f.max.trim() === "" ? null : Number(f.max),
     description: f.description.trim() ? f.description.trim() : null,
     cover_path: f.cover_path,
     timeline: f.program.filter((p) => p.t.trim() && p.v.trim()).map((p) => ({ time_label: p.t.trim(), label: p.v.trim() })),
     speakers: f.speakers.filter((s) => s.name.trim()).map((s) => ({ name: s.name.trim(), bio: s.bio.trim() ? s.bio.trim() : null, photo_path: s.photo_path })),
-    tickets: f.tickets.filter((t) => t.name.trim()).map((t) => ({
-      name: t.name.trim(), badge: t.badge, featured: t.vip,
-      price_cents: Math.round(Number(t.price || "0") * 100),
-      perks: t.incl.map((p) => p.trim()).filter(Boolean),
-    })),
+    tickets,
   };
 }
 
@@ -451,9 +456,8 @@ function Editor({ initial, isNew, onCancel, onSave }: {
                 {STATUS_KEYS.map((k) => <option key={k} value={k}>{STATUS_LABELS[k]}</option>)}
               </select>
             </Field>
-            <div className="adm-grid2" style={{ marginTop: 16 }}>
-              <Field label={<span>Beitrag ab <small>(netto)</small></span>}><div className="adm-money"><input className="adm-input" type="number" value={ev.fee} onChange={(e) => set("fee", e.target.value)} /></div></Field>
-              <Field label={<span>Max. <small>Teilnehmer</small></span>}><input className="adm-input" type="number" value={ev.max} onChange={(e) => set("max", e.target.value)} /></Field>
+            <div style={{ marginTop: 16 }}>
+              <Field label={<span>Max. <small>Teilnehmer</small></span>}><input className="adm-input" type="number" value={ev.max} onChange={(e) => set("max", e.target.value)} style={{ maxWidth: 180 }} /></Field>
             </div>
           </div>
 

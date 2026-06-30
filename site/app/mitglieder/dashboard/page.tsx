@@ -17,7 +17,7 @@ import {
   isPast, listEvents, registerForEvent, startCheckout,
   toNextEventShape, toPastShape, toUpcomingShape,
 } from "../../../components/member/events";
-import type { Album, EventDto, StatItem, TabKey, UpcomingEvent } from "../../../components/member/types";
+import type { Album, EventDto, StatItem, TabKey, Ticket, UpcomingEvent } from "../../../components/member/types";
 
 const TITLES: Record<TabKey, string> = {
   uebersicht:    "",
@@ -45,6 +45,10 @@ const SUBS: Record<TabKey, string> = {
 
 const ALBUM_TONES = ["violet", "magenta", "orange", "coral", "dusk"] as const;
 
+const euroFromCents = (cents: number) => `${Math.round(cents / 100).toLocaleString("de-AT")} €`;
+// Mitglieder-Preis: Rabatt vom Listenpreis abziehen (wie auf der Event-Seite).
+const memberCents = (cents: number, pct: number) => Math.round((cents * (100 - (pct || 0))) / 100);
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null | "loading">("loading");
@@ -54,6 +58,7 @@ export default function DashboardPage() {
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
   const [notice, setNotice] = useState<"paid" | "waitlist" | "already" | null>(null);
+  const [ticketPick, setTicketPick] = useState<{ eventId: number; title: string; pct: number; tickets: Ticket[] } | null>(null);
 
   // Rueckkehr von Stripe: success_url setzt ?paid=1 → Danke-Pop-up zeigen,
   // dann die Query-Parameter wieder aus der URL entfernen.
@@ -70,8 +75,10 @@ export default function DashboardPage() {
     }
   }, []);
 
-  // Event bezahlen: Anmeldung sicherstellen, dann DIREKT zu Stripe (kein
-  // Zwischen-Pop-up). Warteliste-Events werden nur eingetragen (keine Zahlung).
+  // Event kaufen: bei mehreren Ticket-Kategorien zuerst die Auswahl zeigen
+  // (mit rabattiertem Mitglieder-Preis), sonst direkt zu Stripe. Mitglieder
+  // bekommen den Rabatt automatisch — das Backend wendet member_discount_pct
+  // an. Warteliste-Events werden nur eingetragen (keine Zahlung).
   const payEvent = async (ev: UpcomingEvent) => {
     setPayError(null);
     if (ev.status === "waitlist") {
@@ -83,10 +90,25 @@ export default function DashboardPage() {
       }
       return;
     }
+    const raw = (events || []).find((e) => e.id === ev.eventId);
+    const tickets = raw?.tickets ?? [];
+    if (tickets.length >= 2) {
+      // Mehrere Preiskategorien → Auswahl zeigen (Preise inkl. Mitglieder-Rabatt).
+      setTicketPick({ eventId: ev.eventId, title: ev.title, pct: raw?.member_discount_pct ?? 0, tickets });
+      return;
+    }
+    // Genau 1 Kategorie → diese nehmen; keine → Basis-Beitrag (null).
+    await buyTicket(ev.eventId, tickets.length === 1 ? (tickets[0].id ?? null) : null);
+  };
+
+  // Mit gewählter Ticket-Kategorie anmelden und direkt zu Stripe.
+  const buyTicket = async (eventId: number, ticketId: number | null) => {
+    setTicketPick(null);
+    setPayError(null);
     setPaying(true);
     try {
       try {
-        await registerForEvent(ev.eventId);
+        await registerForEvent(eventId, ticketId);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         if (/bereits bezahlt|already_paid/i.test(msg)) {
@@ -96,7 +118,7 @@ export default function DashboardPage() {
         }
         // andere Hinweise (z. B. schon reserviert) ignorieren — Checkout startet trotzdem
       }
-      const r = await startCheckout(ev.eventId, "dashboard");
+      const r = await startCheckout(eventId, "dashboard");
       if (r.free && r.redirect) { window.location.href = r.redirect; return; }
       if (r.checkout_url) { window.location.href = r.checkout_url; return; }
       setPaying(false);
@@ -363,6 +385,54 @@ export default function DashboardPage() {
           <EventsAdmin />
         )}
       </main>
+
+      {ticketPick && (
+        <div className="mb-modal-backdrop" onClick={() => setTicketPick(null)}>
+          <div className="mb-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className="mb-modal-header">
+              <div>
+                <span className="mb-modal-eyebrow">Ticket wählen</span>
+                <h3 className="mb-modal-title">{ticketPick.title}</h3>
+                <p className="mb-modal-sub" style={{ marginTop: 6 }}>
+                  {ticketPick.pct > 0
+                    ? `Mitglieder-Preise — −${ticketPick.pct}% sind bereits abgezogen.`
+                    : "Wähle deine Kategorie."}
+                </p>
+              </div>
+              <button type="button" className="mb-modal-close" onClick={() => setTicketPick(null)} aria-label="Schließen">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            </div>
+            <div className="mb-modal-body">
+              <div className="mb-ticketpick">
+                {ticketPick.tickets.map((t, i) => {
+                  const net = memberCents(t.price_cents, ticketPick.pct);
+                  const discounted = ticketPick.pct > 0 && net !== t.price_cents;
+                  return (
+                    <button
+                      key={t.id ?? i}
+                      type="button"
+                      className="mb-ticketpick-opt"
+                      data-featured={t.featured ? "true" : "false"}
+                      onClick={() => buyTicket(ticketPick.eventId, t.id ?? null)}
+                    >
+                      <span className="mb-ticketpick-main">
+                        {t.badge && <span className="mb-ticketpick-badge">{t.badge}</span>}
+                        <span className="mb-ticketpick-name">{t.name}</span>
+                        <span className="mb-ticketpick-note">exkl. MwSt. · exkl. Getränke · inkl. Dinner &amp; Aperitif</span>
+                      </span>
+                      <span className="mb-ticketpick-price">
+                        <span className="mb-ticketpick-eur">{euroFromCents(net)}</span>
+                        {discounted && <span className="mb-ticketpick-was">{euroFromCents(t.price_cents)}</span>}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {paying && (
         <div className="mb-modal-backdrop">

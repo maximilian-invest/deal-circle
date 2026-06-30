@@ -1626,6 +1626,28 @@ html, body { overflow-x: hidden; }
   display: grid; place-items: center;
 }
 
+/* Ticket-Auswahl im Mitgliederbereich (mehrere Preiskategorien) */
+.mb-ticketpick { display: flex; flex-direction: column; gap: 10px; }
+.mb-ticketpick-opt {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  width: 100%; text-align: left; cursor: pointer;
+  padding: 16px 18px; border-radius: var(--r-lg);
+  background: var(--color-canvas); border: 1px solid var(--color-hairline-soft);
+  transition: border-color .18s ease, transform .18s ease;
+}
+.mb-ticketpick-opt:hover { border-color: var(--color-ink-muted); transform: translateY(-1px); }
+.mb-ticketpick-opt[data-featured="true"] { border-color: var(--color-accent, #8b5cf6); }
+.mb-ticketpick-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.mb-ticketpick-badge {
+  align-self: flex-start; font: var(--type-micro); letter-spacing: var(--tracking-micro);
+  text-transform: uppercase; color: var(--color-ink-muted);
+}
+.mb-ticketpick-name { font: 600 16px/1.25 var(--font-body); color: var(--color-ink); }
+.mb-ticketpick-note { font: var(--type-micro); letter-spacing: var(--tracking-micro); color: var(--color-ink-muted); }
+.mb-ticketpick-price { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
+.mb-ticketpick-eur { font: 700 18px/1 var(--font-body); color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.mb-ticketpick-was { font: 500 12px/1 var(--font-body); color: var(--color-ink-muted); text-decoration: line-through; }
+
 /* ========== Mobile-Topbar + Drawer (default: hidden auf Desktop) ========== */
 .mb-mobile-topbar,
 .mb-mobile-backdrop,
