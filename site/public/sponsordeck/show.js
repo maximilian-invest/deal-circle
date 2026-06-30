@@ -121,14 +121,97 @@
     for (var i = 0; i < dots.length; i++) dots[i].classList.toggle("active", i === idx);
   }
 
+  /* ---- DNA double-helix backdrop (subtle, twists with scroll) ---- */
+  function setupDNA() {
+    var cv = document.getElementById("dna");
+    if (!cv || !cv.getContext) return null;
+    var ctx = cv.getContext("2d");
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var W = 0, H = 0, last = 0;
+    function size() {
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      cv.style.width = W + "px"; cv.style.height = H + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(last);
+    }
+    // The helix lives in "world" space along its axis; scrolling advances a
+    // travel offset so you move ALONG an endless strand (new DNA keeps entering)
+    // instead of watching one segment twist in place.
+    function draw(progress) {
+      last = progress;
+      ctx.clearRect(0, 0, W, H);
+      var L = horizontal ? W : H;          // visible length of the axis
+      var Cc = (horizontal ? H : W) * 0.5; // cross-axis center
+      var span = horizontal ? H : W;
+      var pitch = span * 0.95;             // axis distance per full helix twist
+      var waveLen = span * 2.3;            // meander wavelength (gentle up/down)
+      var meanderA = span * 0.17;          // how far the spine swings
+      var helixA = span * 0.085;           // helix radius around the spine
+      var travel = (reduce ? 0 : progress) * L * 6; // distance travelled along the strand
+      var spin = (reduce ? 0 : progress) * Math.PI * 2 * 7; // helix also rotates in place as you scroll
+      var N = 240;
+      // sample the flowing spine (+ perpendicular normal) at a screen position
+      function samp(pos) {
+        var world = pos + travel;
+        var m = Math.sin(world / waveLen * Math.PI * 2) * meanderA;
+        var dm = Math.cos(world / waveLen * Math.PI * 2) * meanderA * (Math.PI * 2 / waveLen);
+        var tx = horizontal ? 1 : dm, ty = horizontal ? dm : 1;
+        var tl = Math.hypot(tx, ty) || 1;
+        return { cx: horizontal ? pos : Cc + m, cy: horizontal ? Cc + m : pos, nx: -ty / tl, ny: tx / tl, world: world };
+      }
+      function sp(pos, s) {
+        var p = samp(pos);
+        var ang = p.world / pitch * Math.PI * 2 + spin + s * Math.PI;
+        var off = Math.sin(ang) * helixA;
+        return { x: p.cx + p.nx * off, y: p.cy + p.ny * off, depth: Math.cos(ang) * 0.5 + 0.5 };
+      }
+      // two strands across the visible axis
+      for (var s = 0; s < 2; s++) {
+        ctx.beginPath();
+        for (var k = 0; k <= N; k++) {
+          var pt = sp(k / N * L, s);
+          if (k === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+        }
+        ctx.strokeStyle = s ? "rgba(255,255,255,0.11)" : "rgba(150,80,255,0.16)";
+        ctx.lineWidth = 1.6; ctx.stroke();
+      }
+      // rungs anchored in world space → they scroll across as travel advances
+      var rungSpacing = pitch / 6;
+      for (var world = Math.ceil(travel / rungSpacing) * rungSpacing; world < travel + L; world += rungSpacing) {
+        var pos = world - travel;
+        var pa = sp(pos, 0), pb = sp(pos, 1), front = Math.max(pa.depth, pb.depth);
+        ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y);
+        ctx.strokeStyle = "rgba(150,80,255," + (0.04 + 0.08 * front).toFixed(3) + ")";
+        ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(pa.x, pa.y, 1.3 + 3 * pa.depth, 0, 6.2832);
+        ctx.fillStyle = "rgba(184,124,255," + (0.06 + 0.26 * pa.depth).toFixed(3) + ")"; ctx.fill();
+        ctx.beginPath(); ctx.arc(pb.x, pb.y, 1.3 + 3 * pb.depth, 0, 6.2832);
+        ctx.fillStyle = "rgba(255,255,255," + (0.06 + 0.2 * pb.depth).toFixed(3) + ")"; ctx.fill();
+      }
+    }
+    window.addEventListener("resize", size);
+    size();
+    return { draw: draw, size: size };
+  }
+  var dna = setupDNA();
+  var dnaProg = 0, dnaTick = false;
+  function dnaRequest(p) {
+    dnaProg = p;
+    if (!dna || dnaTick) return;
+    dnaTick = true;
+    requestAnimationFrame(function () { dnaTick = false; dna.draw(dnaProg); });
+  }
+
   function update() {
     var y = window.pageYOffset || root.scrollTop || 0;
-    var active = 0;
+    var active = 0, prog = 0;
 
     if (horizontal && htrack) {
       var scrolled = clamp(y - hstageTop, 0, distance);
       htrack.style.transform = "translate3d(" + (-scrolled) + "px,0,0)";
       if (progress) progress.style.transform = "scaleX(" + (distance > 0 ? scrolled / distance : 0) + ")";
+      prog = distance > 0 ? scrolled / distance : 0;
       active = Math.round(scrolled / vw);
       for (var i = 0; i < panels.length; i++) {
         var t = (i * vw - scrolled) / vw;          // 0 = centered
@@ -145,6 +228,7 @@
     } else {
       var max = root.scrollHeight - vh;
       if (progress) progress.style.transform = "scaleX(" + (max > 0 ? y / max : 0) + ")";
+      prog = max > 0 ? y / max : 0;
       var best = 1e9;
       for (var j = 0; j < panels.length; j++) {
         var r = panels[j].getBoundingClientRect();
@@ -161,6 +245,7 @@
       if (topbar) topbar.classList.toggle("is-on", y > vh * 0.6);
     }
     setActiveDot(active);
+    dnaRequest(prog);
   }
 
   function onScroll() { update(); }
