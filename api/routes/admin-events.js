@@ -313,9 +313,13 @@ router.get("/:id/mail-stats", (req, res) => {
   const memberCount = db.prepare(
     "SELECT COUNT(*) AS n FROM users WHERE role = 'member'"
   ).get().n;
-  const registeredCount = db.prepare(
-    "SELECT COUNT(*) AS n FROM event_registrations WHERE event_id = ? AND status != 'cancelled'"
-  ).get(id).n;
+  // Mitglieder, die dieses Event bereits gekauft (bezahlt) haben — sie werden
+  // bei der Einladung/Erinnerung ausgeschlossen.
+  const registeredCount = db.prepare(`
+    SELECT COUNT(*) AS n FROM event_registrations r
+    JOIN users u ON u.id = r.user_id
+    WHERE r.event_id = ? AND r.status = 'paid' AND u.role = 'member'
+  `).get(id).n;
   const history = db.prepare(`
     SELECT s.id, s.kind, s.recipient_count, s.created_at,
            u.name AS triggered_by_name
@@ -362,12 +366,13 @@ router.post("/:id/mail", (req, res) => {
     const me = db.prepare("SELECT email, name FROM users WHERE id = ?").get(req.user.sub);
     recipients = me ? [me] : [];
   } else if (exclude_registered) {
+    // Nur Mitglieder, die dieses Event noch nicht gekauft (bezahlt) haben.
     recipients = db.prepare(`
       SELECT u.email, u.name FROM users u
       WHERE u.role = 'member'
         AND NOT EXISTS (
           SELECT 1 FROM event_registrations r
-          WHERE r.event_id = ? AND r.user_id = u.id AND r.status != 'cancelled'
+          WHERE r.event_id = ? AND r.user_id = u.id AND r.status = 'paid'
         )
     `).all(eventId);
   } else {

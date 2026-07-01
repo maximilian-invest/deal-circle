@@ -224,7 +224,7 @@ function RowMenu({ onView, onMail, onReg, onDup, onDelete }: {
       {open && (
         <div className="adm-menu">
           <Item icon="users" label="Anmeldungen" onClick={onReg} />
-          <Item icon="mail" label="Teilnehmer mailen" onClick={onMail} />
+          <Item icon="mail" label="Mitglieder einladen" onClick={onMail} />
           <Item icon="eye" label="Öffentliche Seite" onClick={onView} />
           <Item icon="copy" label="Duplizieren" onClick={onDup} />
           <div className="adm-menu-sep" />

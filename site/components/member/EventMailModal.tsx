@@ -12,12 +12,12 @@ type Props = {
 const KIND_INFO: Record<MailKind, { title: string; sub: string; icon: string }> = {
   announcement: {
     title: "Anmeldung jetzt möglich",
-    sub: "Standard-Einladung mit Programm, Speakern und Preisen",
+    sub: "Einladung an Mitglieder, die noch nicht gekauft haben",
     icon: "📨",
   },
   limited: {
     title: "Nur noch wenige Plätze",
-    sub: "Knappheits-Reminder · Default: nur an noch nicht Angemeldete",
+    sub: "Knappheits-Reminder · an noch nicht gekaufte Mitglieder",
     icon: "⚠️",
   },
   soldout: {
@@ -38,7 +38,9 @@ function suggestedKind(status: EventDto["status"]): MailKind {
 export default function EventMailModal({ event, onClose, onSent }: Props) {
   const [stats, setStats] = useState<MailStats | null>(null);
   const [kind, setKind] = useState<MailKind>(suggestedKind(event.status));
-  const [excludeRegistered, setExcludeRegistered] = useState(kind === "limited");
+  // Standard: nur an Mitglieder, die noch nicht gekauft haben (Einladung/Reminder).
+  // Bei "Ausgebucht"-Update geht es bewusst an alle Mitglieder.
+  const [excludeRegistered, setExcludeRegistered] = useState(kind !== "soldout");
   const [testToSelf, setTestToSelf] = useState(false);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -60,7 +62,7 @@ export default function EventMailModal({ event, onClose, onSent }: Props) {
 
   // Re-trigger exclude default wenn kind sich ändert
   useEffect(() => {
-    setExcludeRegistered(kind === "limited");
+    setExcludeRegistered(kind !== "soldout");
   }, [kind]);
 
   const recipientCount = (() => {
@@ -142,7 +144,7 @@ export default function EventMailModal({ event, onClose, onSent }: Props) {
           <div className="mb-mailopts">
             <label className="mb-mailopt">
               <input type="checkbox" checked={excludeRegistered} onChange={(e) => setExcludeRegistered(e.target.checked)} />
-              <span>Schon Angemeldete ausschließen</span>
+              <span>Nur an Mitglieder, die noch nicht gekauft haben</span>
             </label>
             <label className="mb-mailopt">
               <input type="checkbox" checked={testToSelf} onChange={(e) => setTestToSelf(e.target.checked)} />
@@ -158,7 +160,7 @@ export default function EventMailModal({ event, onClose, onSent }: Props) {
             </span>
             {stats && !testToSelf && (
               <span className="mb-mailcount-info">
-                ({stats.member_count} insg., {stats.registered_count} bereits angemeldet)
+                ({stats.member_count} Mitglieder, {stats.registered_count} haben schon gekauft)
               </span>
             )}
           </div>
