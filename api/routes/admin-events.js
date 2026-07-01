@@ -6,6 +6,7 @@ import { sendMailAsync } from "../lib/mailer.js";
 import { eventAnnouncement } from "../lib/templates/event-announcement.js";
 import { eventLimited } from "../lib/templates/event-limited.js";
 import { eventSoldout } from "../lib/templates/event-soldout.js";
+import { eventRegistered } from "../lib/templates/event-registered.js";
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -284,6 +285,54 @@ router.patch("/:eventId/registrations/:regId", (req, res) => {
   db.prepare(`UPDATE event_registrations SET ${updates.join(", ")}
               WHERE id = ? AND event_id = ?`).run(...values);
   res.json({ ok: true });
+});
+
+// Admin fuegt ein Mitglied manuell zu einem Event hinzu (gilt als angemeldet /
+// bezahlt, Betrag 0 = eingeladen/comp). Das Mitglied bekommt eine
+// Bestaetigungsmail ("Du bist angemeldet") mit Link zur Event-Seite.
+const addMemberSchema = z.object({ user_id: z.number().int().positive() });
+router.post("/:id/registrations", (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const parsed = addMemberSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
+  const { user_id } = parsed.data;
+
+  const event = fetchEventFull(eventId);
+  if (!event) return res.status(404).json({ error: "not_found" });
+
+  const user = db.prepare("SELECT id, email, name, role FROM users WHERE id = ?").get(user_id);
+  if (!user || user.role !== "member") return res.status(404).json({ error: "member_not_found" });
+
+  const existing = db.prepare(
+    "SELECT id, status FROM event_registrations WHERE event_id = ? AND user_id = ?"
+  ).get(eventId, user_id);
+  if (existing && existing.status === "paid") {
+    return res.status(409).json({ error: "already_registered" });
+  }
+
+  if (existing) {
+    db.prepare(`
+      UPDATE event_registrations
+      SET status = 'paid', amount_cents = 0, amount_total_cents = 0,
+          paid_at = datetime('now'), note = ?
+      WHERE id = ?
+    `).run("Manuell hinzugefügt", existing.id);
+  } else {
+    db.prepare(`
+      INSERT INTO event_registrations
+        (event_id, user_id, ticket_id, amount_cents, amount_total_cents, status, paid_at, note)
+      VALUES (?, ?, NULL, 0, 0, 'paid', datetime('now'), ?)
+    `).run(eventId, user_id, "Manuell hinzugefügt");
+  }
+
+  // Bestaetigungsmail an das Mitglied
+  const firstName = (user.name || "").split(/\s+/)[0] || "";
+  const mail = eventRegistered({ event, firstName });
+  sendMailAsync({ to: user.email, subject: mail.subject, text: mail.text, html: mail.html });
+
+  res.status(201).json({ ok: true, name: user.name, email: user.email });
 });
 
 // Admin kann ALLE Anmeldungen eines Events hart loeschen (z. B. Test-Daten vor

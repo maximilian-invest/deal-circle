@@ -179,6 +179,17 @@ export async function deleteAllEventRegistrations(
   );
 }
 
+// Fuegt ein Mitglied manuell zu einem Event hinzu (gilt als angemeldet); das
+// Mitglied bekommt eine Bestaetigungsmail mit Link zur Event-Seite.
+export async function addMemberToEvent(
+  eventId: number, userId: number
+): Promise<{ ok: boolean; name: string; email: string }> {
+  return api<{ ok: boolean; name: string; email: string }>(
+    `/admin/events/${eventId}/registrations`,
+    { method: "POST", body: { user_id: userId } }
+  );
+}
+
 export type MailKind = "announcement" | "limited" | "soldout";
 
 export type MailStats = {

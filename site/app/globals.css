@@ -3896,6 +3896,12 @@ html, body { overflow-x: hidden; }
 .mb-regs-count--waitlist strong { color: #BFA8FF; }
 .mb-regs-count--cancelled strong { color: var(--color-ink-muted); }
 
+/* Mitglied manuell hinzufügen (Registrations-Modal) */
+.mb-regs-add { margin: 4px 0 20px; padding: 16px; border: 1px solid var(--color-hairline-soft); border-radius: var(--r-lg); background: var(--color-surface-1); }
+.mb-regs-add-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.mb-regs-add-row .mb-admin-select { flex: 1; min-width: 200px; }
+.mb-regs-add-note { margin: 10px 0 0; font: var(--type-micro); letter-spacing: var(--tracking-micro); color: var(--color-ink-muted); }
+
 .mb-regs-list {
   display: flex; flex-direction: column; gap: 20px;
 }

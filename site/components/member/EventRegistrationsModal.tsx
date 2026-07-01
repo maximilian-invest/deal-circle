@@ -4,9 +4,11 @@ import {
   listEventRegistrations,
   updateRegistration,
   deleteAllEventRegistrations,
+  addMemberToEvent,
   type AdminRegistration,
   type GuestRegistration,
 } from "./events";
+import { listUsers, type AdminUser } from "./admin";
 import type { EventDto } from "./types";
 
 type Props = {
@@ -41,6 +43,10 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
   const [savingId, setSavingId] = useState<number | null>(null);
   const [confirmDel, setConfirmDel] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [members, setMembers] = useState<AdminUser[] | null>(null);
+  const [pickUserId, setPickUserId] = useState<string>("");
+  const [adding, setAdding] = useState(false);
+  const [addMsg, setAddMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -64,6 +70,13 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
   };
 
   useEffect(() => { reload(); }, [event.id]);
+
+  // Mitgliederliste für den "Mitglied hinzufügen"-Picker laden.
+  useEffect(() => {
+    listUsers()
+      .then((us) => setMembers(us.filter((u) => u.role === "member")))
+      .catch(() => setMembers([]));
+  }, []);
 
   const onStatusChange = async (r: AdminRegistration, status: AdminRegistration["status"]) => {
     setSavingId(r.id);
@@ -92,6 +105,26 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
     }
   };
 
+  const onAddMember = async () => {
+    const uid = Number(pickUserId);
+    if (!Number.isInteger(uid) || uid < 1) return;
+    setAdding(true);
+    setErr(null);
+    setAddMsg(null);
+    try {
+      const r = await addMemberToEvent(event.id, uid);
+      setPickUserId("");
+      await reload();
+      onChanged?.();
+      setAddMsg(`${r.name || "Mitglied"} hinzugefügt — Bestätigungsmail gesendet.`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErr(/already_registered/i.test(msg) ? "Dieses Mitglied ist bereits angemeldet." : "Hinzufügen fehlgeschlagen.");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   const grouped = (() => {
     if (!regs) return null;
     const byStatus: Record<string, AdminRegistration[]> = {};
@@ -111,6 +144,10 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
       total: regs.length,
     };
   })();
+
+  // Mitglieder, die noch nicht (bezahlt) angemeldet sind — nur die sind wählbar.
+  const paidUserIds = new Set((regs ?? []).filter((r) => r.status === "paid").map((r) => r.user_id));
+  const addableMembers = (members ?? []).filter((m) => !paidUserIds.has(m.id));
 
   return (
     <div className="mb-modal-backdrop" onClick={onClose}>
@@ -142,6 +179,39 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
               <div className="mb-regs-count mb-regs-count--cancelled"><span>Storniert</span><strong>{counts.cancelled}</strong></div>
             </div>
           )}
+
+          {/* Mitglied manuell hinzufügen */}
+          <div className="mb-regs-add">
+            <span className="mb-admin-eyebrow" style={{ display: "block", marginBottom: 8 }}>
+              Mitglied hinzufügen
+            </span>
+            <div className="mb-regs-add-row">
+              <select
+                className="mb-admin-select"
+                value={pickUserId}
+                onChange={(e) => setPickUserId(e.target.value)}
+                disabled={adding || members === null}
+                style={{ flex: 1, minWidth: 0 }}
+              >
+                <option value="">{members === null ? "Mitglieder werden geladen …" : "Mitglied wählen …"}</option>
+                {addableMembers.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name} · {m.email}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="dc-btn dc-btn-primary"
+                onClick={onAddMember}
+                disabled={adding || !pickUserId}
+              >
+                {adding ? "Füge hinzu …" : "Hinzufügen"}
+              </button>
+            </div>
+            <p className="mb-regs-add-note">
+              Das Mitglied gilt als angemeldet und bekommt eine Bestätigungsmail mit Link zur Event-Seite.
+            </p>
+            {addMsg && <div className="mb-admin-alert mb-admin-alert--ok" style={{ marginTop: 10 }}>{addMsg}</div>}
+          </div>
 
           {err && <div className="mb-admin-alert mb-admin-alert--error">{err}</div>}
 
