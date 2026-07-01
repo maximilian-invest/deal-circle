@@ -71,10 +71,10 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
 
   useEffect(() => { reload(); }, [event.id]);
 
-  // Mitgliederliste für den "Mitglied hinzufügen"-Picker laden.
+  // Personen-Liste für den "Person hinzufügen"-Picker laden (Mitglieder + Admins).
   useEffect(() => {
     listUsers()
-      .then((us) => setMembers(us.filter((u) => u.role === "member")))
+      .then((us) => setMembers(us.filter((u) => u.role === "member" || u.role === "admin")))
       .catch(() => setMembers([]));
   }, []);
 
@@ -119,7 +119,7 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
       setAddMsg(`${r.name || "Mitglied"} hinzugefügt — Bestätigungsmail gesendet.`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      setErr(/already_registered/i.test(msg) ? "Dieses Mitglied ist bereits angemeldet." : "Hinzufügen fehlgeschlagen.");
+      setErr(/already_registered/i.test(msg) ? "Diese Person ist bereits angemeldet." : "Hinzufügen fehlgeschlagen.");
     } finally {
       setAdding(false);
     }
@@ -180,10 +180,10 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
             </div>
           )}
 
-          {/* Mitglied manuell hinzufügen */}
+          {/* Person (Mitglied oder Admin) manuell hinzufügen */}
           <div className="mb-regs-add">
             <span className="mb-admin-eyebrow" style={{ display: "block", marginBottom: 8 }}>
-              Mitglied hinzufügen
+              Person hinzufügen
             </span>
             <div className="mb-regs-add-row">
               <select
@@ -193,9 +193,9 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
                 disabled={adding || members === null}
                 style={{ flex: 1, minWidth: 0 }}
               >
-                <option value="">{members === null ? "Mitglieder werden geladen …" : "Mitglied wählen …"}</option>
+                <option value="">{members === null ? "Personen werden geladen …" : "Mitglied oder Admin wählen …"}</option>
                 {addableMembers.map((m) => (
-                  <option key={m.id} value={m.id}>{m.name} · {m.email}</option>
+                  <option key={m.id} value={m.id}>{m.name} · {m.email}{m.role === "admin" ? " · Admin" : ""}</option>
                 ))}
               </select>
               <button
@@ -208,7 +208,7 @@ export default function EventRegistrationsModal({ event, onClose, onChanged }: P
               </button>
             </div>
             <p className="mb-regs-add-note">
-              Das Mitglied gilt als angemeldet und bekommt eine Bestätigungsmail mit Link zur Event-Seite.
+              Die Person gilt als angemeldet und bekommt eine Bestätigungsmail mit Link zur Event-Seite.
             </p>
             {addMsg && <div className="mb-admin-alert mb-admin-alert--ok" style={{ marginTop: 10 }}>{addMsg}</div>}
           </div>

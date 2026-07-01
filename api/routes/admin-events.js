@@ -303,7 +303,10 @@ router.post("/:id/registrations", (req, res) => {
   if (!event) return res.status(404).json({ error: "not_found" });
 
   const user = db.prepare("SELECT id, email, name, role FROM users WHERE id = ?").get(user_id);
-  if (!user || user.role !== "member") return res.status(404).json({ error: "member_not_found" });
+  // Mitglieder UND Admins können hinzugefügt werden.
+  if (!user || (user.role !== "member" && user.role !== "admin")) {
+    return res.status(404).json({ error: "member_not_found" });
+  }
 
   const existing = db.prepare(
     "SELECT id, status FROM event_registrations WHERE event_id = ? AND user_id = ?"
