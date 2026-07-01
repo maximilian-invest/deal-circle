@@ -10,7 +10,7 @@ export default function Format() {
         <div className="dc-format-image dc-reveal">
           <img
             src="/impressions/schloss-wiespach.jpg"
-            alt="Schloss Wiespach in Hallein — Innenhof mit gelber Fassade, Freitreppe und Gästen am Sommerabend."
+            alt="Schloss Wiespach in Hallein — gelbe Barockfassade mit festlich gedeckter Tafel im Garten."
             className="dc-format-image-photo"
             loading="lazy"
           />
