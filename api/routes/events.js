@@ -491,13 +491,17 @@ function loadLandingEvent(id) {
 }
 
 // Public: ein einzelnes OEFFENTLICHES Event fuer die Event-Landingpage.
-// Nur-Mitglieder-Events sind hier nicht abrufbar (404).
+// Oeffentliche Events sind direkt abrufbar. Nur-Mitglieder-Events existieren,
+// sind aber ohne Login gesperrt → 403 "members_only", damit die Event-Seite
+// zum Login auffordern kann (statt "nicht gefunden"). Versteckte/nicht
+// vorhandene Events → 404.
 router.get("/public/:id", (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "invalid_id" });
 
   const ev = loadLandingEvent(id);
-  if (!ev || ev.visibility !== "public" || ev.hidden === 1) return res.status(404).json({ error: "not_found" });
+  if (!ev || ev.hidden === 1) return res.status(404).json({ error: "not_found" });
+  if (ev.visibility !== "public") return res.status(403).json({ error: "members_only" });
   delete ev.visibility;
   delete ev.hidden;
   res.json({ event: ev });
