@@ -18,7 +18,7 @@ export default function Team() {
       n: "Stephanie Strobl",
       role: "Administration & Verwaltung",
       bio: "Hält den Kreis im Hintergrund zusammen — Termine, Location, Mitgliederbetreuung. Erste Ansprechperson für organisatorische Fragen.",
-      photo: null,
+      photo: "/team/stephanie.jpg",
     },
   ];
 
