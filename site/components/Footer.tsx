@@ -10,6 +10,7 @@ export default function Footer() {
     ]},
     { h: "Kontakt", l: [
       ["Mitglied werden",        "/mitglied-werden/"],
+      ["Sponsor werden",         "/sponsordeck/"],
       ["event@deal-circle.at",   "mailto:event@deal-circle.at"],
       ["FAQ",                    "/#faq"],
     ]},
