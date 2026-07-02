@@ -415,7 +415,15 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                         viewport={{ once: true, margin: "-10%" }}
                         transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                       >
-                        {t.badge && <span className="dc-ev-tier-badge">{t.badge}</span>}
+                        {t.badge && (
+                          <div className="dc-ev-tier-badges">
+                            {t.badge.split(/[,;]/).map((b) => b.trim()).filter(Boolean).map((b, bi) => {
+                              const variant = /limit/i.test(b) ? " dc-ev-tier-badge--urgent"
+                                : /early|früh/i.test(b) ? " dc-ev-tier-badge--early" : "";
+                              return <span key={bi} className={`dc-ev-tier-badge${variant}`}>{b}</span>;
+                            })}
+                          </div>
+                        )}
                         <div className="dc-ev-tier-name">{t.name}</div>
                         <div className="dc-ev-tier-price">{euro(showCents)}</div>
                         <MemberPriceMeta regularCents={t.price_cents} pct={tpct} isMember={isMember} anon={anon} />

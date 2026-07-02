@@ -2929,6 +2929,14 @@ html, body { overflow-x: hidden; }
   color: rgba(10, 10, 11, 0.72);
   background: rgba(255, 255, 255, 0.35);
 }
+/* Mehrere Badges pro Ticket (z. B. „Early Bird" + „streng limitiert") */
+.dc-ev-tier-badges { align-self: flex-start; display: flex; flex-wrap: wrap; gap: 6px; }
+/* Dringlichkeit: „streng limitiert" */
+.dc-ev-tier-badge--urgent { border-color: rgba(255, 138, 76, 0.55); color: #FF9A5C; }
+.dc-ev-tier.is-featured .dc-ev-tier-badge--urgent { border-color: rgba(180, 70, 20, 0.5); color: #B4431A; background: rgba(255, 255, 255, 0.4); }
+/* Early Bird: violett hervorgehoben */
+.dc-ev-tier-badge--early { border-color: rgba(177, 76, 255, 0.5); color: #C89BFF; }
+.dc-ev-tier.is-featured .dc-ev-tier-badge--early { border-color: rgba(110, 43, 255, 0.4); color: #6E2BFF; background: rgba(255, 255, 255, 0.4); }
 
 .dc-ev-tier-name {
   margin-top: 22px;

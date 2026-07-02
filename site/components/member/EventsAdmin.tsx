@@ -117,7 +117,7 @@ function blankForm(): EvForm {
 function fromForm(f: EvForm): CreateEventInput {
   const iso = new Date(`${f.date}T${(f.time || "00:00")}:00`).toISOString();
   const tickets = f.tickets.filter((t) => t.name.trim()).map((t) => ({
-    name: t.name.trim(), badge: t.badge, featured: t.vip,
+    name: t.name.trim(), badge: t.badge && t.badge.trim() ? t.badge.trim() : null, featured: t.vip,
     price_cents: Math.round(Number(t.price || "0") * 100),
     member_discount_pct: clamp(Math.round(Number(t.discount || "0")), 0, 90),
     perks: t.incl.map((p) => p.trim()).filter(Boolean),
@@ -424,6 +424,12 @@ function Editor({ initial, isNew, onCancel, onSave }: {
                     <input className="adm-input" type="number" min={0} max={90} value={tk.discount}
                       onChange={(e) => setTick(ti, "discount", e.target.value)} placeholder="0" style={{ maxWidth: 90 }} />
                     <span style={{ fontSize: 13, opacity: 0.75 }}>%</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 4 }}>
+                    <span style={{ fontSize: 13, opacity: 0.75, whiteSpace: "nowrap" }}>Badge(s)</span>
+                    <input className="adm-input" value={tk.badge ?? ""}
+                      placeholder="z. B. Early Bird, streng limitiert (mit Komma trennen)"
+                      onChange={(e) => setTick(ti, "badge", e.target.value)} />
                   </div>
                   <div className="adm-tick-vip" onClick={() => setTick(ti, "vip", !tk.vip)}>
                     <span className="adm-check" data-on={tk.vip ? "true" : "false"}><I d={ic.check} w={13} s={2.6} /></span>
