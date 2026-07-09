@@ -190,7 +190,7 @@ export async function addMemberToEvent(
   );
 }
 
-export type MailKind = "announcement" | "limited" | "soldout";
+export type MailKind = "announcement" | "limited" | "lastcall" | "soldout";
 
 export type MailStats = {
   member_count: number;

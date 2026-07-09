@@ -20,6 +20,11 @@ const KIND_INFO: Record<MailKind, { title: string; sub: string; icon: string }> 
     sub: "Knappheits-Reminder · an noch nicht gekaufte Mitglieder",
     icon: "⚠️",
   },
+  lastcall: {
+    title: "Last Call",
+    sub: "Event droht auszufallen · letzter Aufruf an noch nicht gekaufte Mitglieder",
+    icon: "⏰",
+  },
   soldout: {
     title: "Anmeldung geschlossen",
     sub: "Update an alle Mitglieder · Warteliste-Hinweis",

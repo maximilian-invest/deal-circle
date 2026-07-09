@@ -133,7 +133,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS event_mail_sends (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-    kind TEXT NOT NULL CHECK (kind IN ('announcement','limited','soldout')),
+    kind TEXT NOT NULL CHECK (kind IN ('announcement','limited','lastcall','soldout')),
     triggered_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     recipient_count INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -293,6 +293,34 @@ function migrateEventsSchema() {
     }
   }
   db.exec("CREATE INDEX IF NOT EXISTS idx_event_guest_regs_stripe_session ON event_guest_registrations (stripe_session_id)");
+
+  // event_mail_sends: kind-CHECK um 'lastcall' erweitern.
+  // SQLite kann CHECK nicht per ALTER ändern -> Tabelle neu aufbauen.
+  const mailSendsSql = (db.prepare(
+    "SELECT sql FROM sqlite_master WHERE type='table' AND name='event_mail_sends'"
+  ).get()?.sql) || "";
+  if (mailSendsSql.includes("CHECK") && !mailSendsSql.includes("lastcall")) {
+    console.log("[migrate] event_mail_sends: kind-CHECK erweitern (+lastcall)");
+    db.pragma("foreign_keys = OFF");
+    db.exec(`
+      BEGIN;
+      CREATE TABLE event_mail_sends_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL CHECK (kind IN ('announcement','limited','lastcall','soldout')),
+        triggered_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        recipient_count INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      INSERT INTO event_mail_sends_new (id, event_id, kind, triggered_by_user_id, recipient_count, created_at)
+        SELECT id, event_id, kind, triggered_by_user_id, recipient_count, created_at FROM event_mail_sends;
+      DROP TABLE event_mail_sends;
+      ALTER TABLE event_mail_sends_new RENAME TO event_mail_sends;
+      CREATE INDEX IF NOT EXISTS idx_event_mail_sends_event ON event_mail_sends (event_id, created_at DESC);
+      COMMIT;
+    `);
+    db.pragma("foreign_keys = ON");
+  }
 }
 migrateEventsSchema();
 

@@ -6,6 +6,7 @@ import { sendMailAsync } from "../lib/mailer.js";
 import { eventAnnouncement } from "../lib/templates/event-announcement.js";
 import { eventLimited } from "../lib/templates/event-limited.js";
 import { eventSoldout } from "../lib/templates/event-soldout.js";
+import { eventLastcall } from "../lib/templates/event-lastcall.js";
 import { eventRegistered } from "../lib/templates/event-registered.js";
 
 const router = Router();
@@ -390,7 +391,7 @@ router.get("/:id/mail-stats", (req, res) => {
 });
 
 const mailSendSchema = z.object({
-  kind: z.enum(["announcement","limited","soldout"]),
+  kind: z.enum(["announcement","limited","lastcall","soldout"]),
   exclude_registered: z.boolean().default(false),
   test_to_self: z.boolean().default(false),
 });
@@ -398,6 +399,7 @@ const mailSendSchema = z.object({
 const TEMPLATE_MAP = {
   announcement: { fn: eventAnnouncement, label: "Anmeldung möglich" },
   limited:      { fn: eventLimited,      label: "Wenige Plätze" },
+  lastcall:     { fn: eventLastcall,     label: "Last Call" },
   soldout:      { fn: eventSoldout,      label: "Ausgebucht" },
 };
 
