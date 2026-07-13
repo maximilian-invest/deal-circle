@@ -425,6 +425,139 @@ router.post("/:id/checkout-guest", guestCheckoutLimiter, async (req, res) => {
   }
 });
 
+// ---------- MEMBER: Ticket für eine BEGLEITUNG kaufen (Stripe) ----------
+// Eingeloggte Mitglieder/Admins können ein zusätzliches Ticket für eine andere
+// Person kaufen — auch bei Nur-Mitglieder-Events. Die Begleitung zahlt den
+// REGULÄREN Preis (bewusst OHNE Mitglieder-Rabatt; der Rabatt gilt pro Mitglied
+// genau einmal, für die eigene Anmeldung). Name/E-Mail/Adresse der Begleitung
+// erfasst Stripe; die Registrierung legt der Webhook als Gast-Eintrag an
+// (metadata.kind: "guest"), sodass die Begleitung eine eigene Bestätigung und
+// einen eigenen Eintrag in der Teilnehmerliste erhält.
+const companionCheckoutSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  email: z.string().email().max(200).optional(),
+  ticket_id: z.number().int().min(1).nullable().optional(),
+});
+
+router.post("/:id/checkout-companion", requireAuth, async (req, res) => {
+  const eventId = Number(req.params.id);
+  if (!Number.isInteger(eventId) || eventId < 1) return res.status(400).json({ error: "invalid_id" });
+
+  const parsed = companionCheckoutSchema.safeParse(req.body || {});
+  if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
+  const ticketId = parsed.data.ticket_id ?? null;
+
+  // Kein visibility-Check: ein eingeloggtes Mitglied darf auch zu einem
+  // Nur-Mitglieder-Event eine Begleitung mitnehmen.
+  const event = db.prepare(
+    "SELECT id, title, starts_at, status, fee_cents FROM events WHERE id = ?"
+  ).get(eventId);
+  if (!event) return res.status(404).json({ error: "not_found" });
+  if (event.status === "closed")   return res.status(409).json({ error: "event_closed" });
+  if (event.status === "waitlist") return res.status(409).json({ error: "on_waitlist" });
+
+  // Regulärer Ticketpreis — bewusst OHNE member_discount_pct.
+  let amountCents = event.fee_cents;
+  let ticketName = null, ticketBadge = null;
+  if (ticketId) {
+    const t = db.prepare(
+      "SELECT id, name, badge, price_cents FROM event_tickets WHERE id = ? AND event_id = ?"
+    ).get(ticketId, eventId);
+    if (!t) return res.status(400).json({ error: "invalid_ticket" });
+    amountCents = t.price_cents;
+    ticketName = t.name; ticketBadge = t.badge;
+  }
+
+  // Gratis-Event → kein Stripe; Name + E-Mail der Begleitung nötig.
+  if (amountCents <= 0) {
+    const name = parsed.data.name?.trim();
+    const email = parsed.data.email?.trim().toLowerCase();
+    if (!name || !email) return res.status(400).json({ error: "name_email_required" });
+
+    const existing = db.prepare(
+      "SELECT id, status FROM event_guest_registrations WHERE event_id = ? AND email = ?"
+    ).get(eventId, email);
+    if (existing && existing.status === "paid") return res.status(409).json({ error: "already_paid" });
+    if (existing) {
+      db.prepare(`
+        UPDATE event_guest_registrations
+        SET status = 'paid', name = ?, ticket_id = ?, amount_cents = 0,
+            amount_total_cents = 0, paid_at = datetime('now')
+        WHERE id = ?
+      `).run(name, ticketId, existing.id);
+    } else {
+      db.prepare(`
+        INSERT INTO event_guest_registrations
+          (event_id, ticket_id, name, email, amount_cents, status, amount_total_cents, paid_at)
+        VALUES (?, ?, ?, ?, 0, 'paid', 0, datetime('now'))
+      `).run(eventId, ticketId, name, email);
+    }
+    return res.json({ ok: true, free: true, redirect: `${SITE_URL}/event/?id=${eventId}&companion=1` });
+  }
+
+  // Bezahltes Event → direkt Stripe Checkout. E-Mail/Name/Adresse der Begleitung
+  // erfasst Stripe; die Registrierung legt der Webhook (kind: "guest") an.
+  const stripe = getStripe();
+  if (!stripe) return res.status(503).json({ error: "payments_disabled" });
+
+  const ticketLabel = ticketName
+    ? `${ticketName}${ticketBadge ? ` · ${ticketBadge}` : ""}`
+    : "Teilnahme";
+  const ticketMeta = ticketId ? String(ticketId) : "";
+  const companionOf = String(req.user.sub);
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [{
+        price_data: {
+          currency: "eur",
+          unit_amount: amountCents,
+          tax_behavior: "exclusive",
+          product_data: {
+            name: `${event.title} — ${ticketLabel} (Begleitung)`,
+            description: `Teilnahme · ${new Date(event.starts_at).toLocaleDateString("de-AT", { day: "2-digit", month: "long", year: "numeric" })}`,
+            tax_code: "txcd_20030000", // "Live events / Admissions"
+          },
+        },
+        quantity: 1,
+      }],
+      automatic_tax: { enabled: true },
+      tax_id_collection: { enabled: true },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Teilnahme (Begleitung): ${event.title}`,
+          metadata: { event_id: String(eventId), ticket_id: ticketMeta, companion_of: companionOf },
+          rendering_options: { amount_tax_display: "include_inclusive_tax" },
+        },
+      },
+      // KEIN customer_email → Stripe fragt E-Mail/Name der Begleitung selbst ab.
+      billing_address_collection: "required",
+      allow_promotion_codes: false,
+      metadata: {
+        kind: "guest",
+        event_id: String(eventId),
+        ticket_id: ticketMeta,
+        companion_of: companionOf,
+      },
+      payment_intent_data: {
+        description: `${event.title} (Begleitung)`,
+        metadata: { kind: "guest", event_id: String(eventId), ticket_id: ticketMeta, companion_of: companionOf },
+      },
+      success_url: `${SITE_URL}/danke/?id=${eventId}`,
+      cancel_url:  `${SITE_URL}/event/?id=${eventId}&cancelled=1`,
+      expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
+    });
+
+    res.json({ ok: true, checkout_url: session.url, session_id: session.id });
+  } catch (err) {
+    console.error("[stripe] companion checkout session create failed:", err);
+    res.status(502).json({ error: "stripe_error", detail: err?.message || "unknown" });
+  }
+});
+
 // Public: Main-Event fuer den Startseiten-Banner.
 // Zeigt NUR ein als "Main Event" getaggtes (oeffentliches, kommendes) Event.
 // Ist keines getaggt, kommt null zurueck -> der Banner bleibt leer.

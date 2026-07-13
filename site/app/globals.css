@@ -3004,6 +3004,26 @@ html, body { overflow-x: hidden; }
 .dc-ev-btn-tier.is-dark  { background: #0A0A0B; color: #fff; }
 .dc-ev-btn-tier:active { transform: scale(0.97); }
 
+/* Sekundär-Aktion: Begleitung zum regulären Preis mitbuchen (eingeloggte Mitglieder) */
+.dc-ev-companion-link {
+  margin-top: 12px;
+  display: inline-flex; width: 100%; justify-content: center; align-items: center;
+  gap: 6px;
+  background: transparent; border: 0;
+  padding: 9px 12px;
+  font: 500 13.5px/1.2 var(--font-body); letter-spacing: -0.1px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  border-radius: var(--r-pill);
+  transition: color 120ms ease;
+}
+.dc-ev-companion-link:hover { color: #C79BFF; text-decoration: underline; }
+.dc-ev-tier.is-featured .dc-ev-companion-link { color: rgba(10, 10, 11, 0.58); }
+.dc-ev-tier.is-featured .dc-ev-companion-link:hover { color: #0A0A0B; }
+/* Solo-Karte hat immer hellen (featured) Hintergrund */
+.dc-ev-companion-link--solo { color: rgba(10, 10, 11, 0.58); }
+.dc-ev-companion-link--solo:hover { color: #0A0A0B; }
+
 @media (max-width: 960px) {
   .dc-ev-tickets[data-count="3"] { grid-template-columns: 1fr 1fr; }
 }

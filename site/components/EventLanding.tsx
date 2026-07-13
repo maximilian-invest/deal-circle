@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import AuthBadge from "./AuthBadge";
 import Footer from "./Footer";
 import { fetchMe, logout, type AuthUser } from "./member/auth";
-import { registerForEvent, startCheckout, startGuestCheckout } from "./member/events";
+import { registerForEvent, startCheckout, startGuestCheckout, startCompanionCheckout } from "./member/events";
 import type { Speaker, Ticket, TimelineItem } from "./member/types";
 
 export type EventDetail = {
@@ -65,8 +65,8 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   const [paid, setPaid] = useState<boolean>(false);
   const [registering, setRegistering] = useState<number | "default" | null>(null);
   const [regError, setRegError] = useState<string | null>(null);
-  // Gast-Reservierung (ohne Login) für öffentliche Events
-  const [guestFor, setGuestFor] = useState<{ ticketId: number | null; cents: number; label: string } | null>(null);
+  // Gast-Reservierung (ohne Login) bzw. Begleitung-Kauf (eingeloggt): Modal-State.
+  const [guestFor, setGuestFor] = useState<{ ticketId: number | null; cents: number; label: string; mode: "guest" | "companion" } | null>(null);
   const [guestDone, setGuestDone] = useState(false);
 
   useEffect(() => {
@@ -126,9 +126,25 @@ export default function EventLanding({ event }: { event: EventDetail }) {
   // dort erfasst); Gratis-Tickets brauchen kurz Name + E-Mail über das Formular.
   const doGuestBuy = async (ticketId: number | null, cents: number, label: string) => {
     setRegError(null);
-    if (cents <= 0) { setGuestFor({ ticketId, cents, label }); return; }
+    if (cents <= 0) { setGuestFor({ ticketId, cents, label, mode: "guest" }); return; }
     try {
       const r = await startGuestCheckout(event.id, { ticket_id: ticketId });
+      if (r.checkout_url) { window.location.href = r.checkout_url; return; }
+      if (r.free && r.redirect) { window.location.href = r.redirect; return; }
+      setRegError("Zahlung konnte nicht gestartet werden.");
+    } catch (err) {
+      setRegError(err instanceof Error ? err.message : "Zahlung fehlgeschlagen.");
+    }
+  };
+
+  // Begleitung-Kauf (eingeloggtes Mitglied kauft ein weiteres Ticket zum
+  // regulären Preis für eine andere Person). Bezahlte Events gehen direkt zu
+  // Stripe (Daten der Begleitung dort); Gratis-Events brauchen Name + E-Mail.
+  const doCompanionBuy = async (ticketId: number | null, cents: number, label: string) => {
+    setRegError(null);
+    if (cents <= 0) { setGuestFor({ ticketId, cents, label, mode: "companion" }); return; }
+    try {
+      const r = await startCompanionCheckout(event.id, { ticket_id: ticketId });
       if (r.checkout_url) { window.location.href = r.checkout_url; return; }
       if (r.free && r.redirect) { window.location.href = r.redirect; return; }
       setRegError("Zahlung konnte nicht gestartet werden.");
@@ -447,6 +463,15 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                           guestDone={guestDone}
                           onGuest={() => doGuestBuy(t.id ?? null, t.price_cents, t.name)}
                         />
+                        {isMember && !isWaitlist && (
+                          <button
+                            type="button"
+                            className="dc-ev-companion-link"
+                            onClick={() => doCompanionBuy(t.id ?? null, t.price_cents, t.name)}
+                          >
+                            + Begleitung buchen · {euro(t.price_cents)} regulär
+                          </button>
+                        )}
                       </motion.div>
                     );
                   })}
@@ -491,6 +516,15 @@ export default function EventLanding({ event }: { event: EventDetail }) {
                     guestDone={guestDone}
                     onGuest={() => doGuestBuy(null, event.fee_cents, "Ticket")}
                   />
+                  {isMember && !isWaitlist && (
+                    <button
+                      type="button"
+                      className="dc-ev-companion-link dc-ev-companion-link--solo"
+                      onClick={() => doCompanionBuy(null, event.fee_cents, "Ticket")}
+                    >
+                      + Begleitung buchen · {euro(event.fee_cents)} regulär
+                    </button>
+                  )}
                   {regError && <p className="dc-ev-ticket-note" style={{ color: "#FFB0B0" }}>{regError}</p>}
                   <p className="dc-ev-ticket-note">Sichere Zahlung · Bestätigung per E-Mail</p>
                 </motion.div>
@@ -506,6 +540,7 @@ export default function EventLanding({ event }: { event: EventDetail }) {
           ticketId={guestFor.ticketId}
           label={guestFor.label}
           cents={guestFor.cents}
+          mode={guestFor.mode}
           onClose={() => setGuestFor(null)}
           onDone={() => { setGuestDone(true); setGuestFor(null); }}
         />
@@ -633,11 +668,14 @@ function SoloCta({
   );
 }
 
-// Gast-Reservierung ohne Login (öffentliche Events): Name + E-Mail.
-function GuestForm({ eventId, ticketId, label, cents, onClose, onDone }: {
+// Name + E-Mail-Formular: Gast-Reservierung ohne Login (öffentliche Gratis-Events)
+// bzw. Begleitung-Anmeldung durch ein eingeloggtes Mitglied (Gratis-Events).
+function GuestForm({ eventId, ticketId, label, cents, mode = "guest", onClose, onDone }: {
   eventId: number; ticketId: number | null; label: string; cents: number;
+  mode?: "guest" | "companion";
   onClose: () => void; onDone: () => void;
 }) {
+  const isCompanion = mode === "companion";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
@@ -649,7 +687,8 @@ function GuestForm({ eventId, ticketId, label, cents, onClose, onDone }: {
     if (!name.trim() || !email.trim()) { setErr("Bitte Name und E-Mail angeben."); return; }
     setBusy(true);
     try {
-      const r = await startGuestCheckout(eventId, { name: name.trim(), email: email.trim(), ticket_id: ticketId });
+      const call = isCompanion ? startCompanionCheckout : startGuestCheckout;
+      const r = await call(eventId, { name: name.trim(), email: email.trim(), ticket_id: ticketId });
       if (r.checkout_url) { window.location.href = r.checkout_url; return; }
       if (r.free && r.redirect) { window.location.href = r.redirect; return; }
       onDone();
@@ -663,26 +702,32 @@ function GuestForm({ eventId, ticketId, label, cents, onClose, onDone }: {
     <div className="dc-ev-guest-ov" onClick={onClose} role="dialog" aria-modal="true">
       <form className="dc-ev-guest" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
         <button type="button" className="dc-ev-guest-x" onClick={onClose} aria-label="Schließen">✕</button>
-        <div className="dc-ev-guest-eyebrow">{label} · {euro(cents)}</div>
-        <h3 className="dc-ev-guest-title">{cents > 0 ? "Ticket kaufen" : "Platz reservieren"}</h3>
+        <div className="dc-ev-guest-eyebrow">{label} · {euro(cents)}{isCompanion ? " · regulär" : ""}</div>
+        <h3 className="dc-ev-guest-title">
+          {isCompanion ? "Begleitung anmelden" : (cents > 0 ? "Ticket kaufen" : "Platz reservieren")}
+        </h3>
         <p className="dc-ev-guest-sub">
-          {cents > 0
+          {isCompanion
+            ? "Trag die Daten deiner Begleitung ein — sie bekommt eine eigene Bestätigung per E-Mail."
+            : cents > 0
             ? "Trag dich kurz ein — danach geht's direkt zur sicheren Zahlung."
             : "Trag dich kurz ein — du bekommst deine Bestätigung per E-Mail."}
         </p>
         <label className="dc-ev-guest-field">
-          <span>Name</span>
-          <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Max Mustermann" disabled={busy} required />
+          <span>{isCompanion ? "Name der Begleitung" : "Name"}</span>
+          <input value={name} onChange={(e) => setName(e.target.value)} autoComplete={isCompanion ? "off" : "name"} placeholder="Max Mustermann" disabled={busy} required />
         </label>
         <label className="dc-ev-guest-field">
-          <span>E-Mail</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="max@firma.at" disabled={busy} required />
+          <span>{isCompanion ? "E-Mail der Begleitung" : "E-Mail"}</span>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete={isCompanion ? "off" : "email"} placeholder="max@firma.at" disabled={busy} required />
         </label>
         {err && <p className="dc-ev-guest-err">{err}</p>}
         <button type="submit" className="dc-ev-btn-primary dc-ev-guest-submit" disabled={busy}>
-          {busy ? "Wird vorbereitet …" : <>{cents > 0 ? "Weiter zur Zahlung" : "Platz reservieren"} <Arrow /></>}
+          {busy ? "Wird vorbereitet …" : <>{isCompanion ? "Begleitung anmelden" : (cents > 0 ? "Weiter zur Zahlung" : "Platz reservieren")} <Arrow /></>}
         </button>
-        <p className="dc-ev-guest-note">Mitglied im DealCircle? <a href="/mitglieder/login/">Einloggen</a> und günstiger sichern.</p>
+        {!isCompanion && (
+          <p className="dc-ev-guest-note">Mitglied im DealCircle? <a href="/mitglieder/login/">Einloggen</a> und günstiger sichern.</p>
+        )}
       </form>
     </div>
   );

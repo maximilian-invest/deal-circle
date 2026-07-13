@@ -108,6 +108,15 @@ export async function startGuestCheckout(
   return api(`/events/${eventId}/checkout-guest`, { method: "POST", body, auth: false });
 }
 
+// Begleitung-Checkout: eingeloggtes Mitglied kauft ein zusätzliches Ticket zum
+// REGULÄREN Preis für eine andere Person — auch bei Nur-Mitglieder-Events.
+export async function startCompanionCheckout(
+  eventId: number,
+  body: { name?: string; email?: string; ticket_id?: number | null }
+): Promise<{ ok: boolean; checkout_url?: string; free?: boolean; redirect?: string }> {
+  return api(`/events/${eventId}/checkout-companion`, { method: "POST", body });
+}
+
 // Gast-Reservierung (ohne Login) für öffentliche Events.
 export async function registerGuest(
   eventId: number,
