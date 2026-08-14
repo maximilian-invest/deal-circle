@@ -1410,6 +1410,7 @@ html, body { overflow-x: hidden; }
 .mb-event-chip--open     { background: var(--color-canvas); color: var(--color-ink-muted); border: 1px solid var(--color-hairline-soft); }
 .mb-event-chip--limited  { background: rgba(255,154,168,0.16); color: #FFB1BD; border: 1px solid rgba(255,154,168,0.32); }
 .mb-event-chip--waitlist { background: rgba(255,106,44,0.15); color: #FFB07A; border: 1px solid rgba(255,106,44,0.3); }
+.mb-event-chip--abgesagt { background: rgba(229,72,77,0.16); color: #FF9C9C; border: 1px solid rgba(229,72,77,0.36); }
 
 .mb-event-cta { padding: 8px 14px; font-size: 13px; white-space: nowrap; }
 
@@ -2445,6 +2446,24 @@ html, body { overflow-x: hidden; }
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--vio);
 }
+
+/* Event abgesagt — deutlicher Hinweis im Hero */
+.dc-ev-cancelled {
+  position: relative; z-index: 2;
+  display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 18px;
+  padding: 12px 18px;
+  border-radius: var(--r-lg);
+  background: rgba(229, 72, 77, 0.12);
+  border: 1px solid rgba(229, 72, 77, 0.42);
+}
+.dc-ev-cancelled-badge {
+  display: inline-flex; align-items: center;
+  padding: 5px 12px; border-radius: var(--r-pill);
+  font: 700 12px/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase;
+  color: #fff; background: #E5484D;
+}
+.dc-ev-cancelled-text { color: #FFC7C7; font: 500 14.5px/1.4 var(--font-body); letter-spacing: -0.1px; }
 
 .dc-ev-hero-title {
   position: relative;
@@ -3778,6 +3797,13 @@ html, body { overflow-x: hidden; }
   color: var(--color-ink-muted);
   opacity: 0.75;
 }
+.mb-myreg-status--abgesagt {
+  color: #FF9C9C;
+  border-color: rgba(229,72,77,0.42);
+  background: rgba(229,72,77,0.12);
+}
+/* Karte einer Anmeldung zu einem abgesagten Event dezent hervorheben */
+.mb-myreg--cancelled { border-color: rgba(229,72,77,0.32); }
 
 /* ========== Admin: Event Mail Modal (Vorlagen + Empfänger) ========== */
 .mb-mailkind-list {
@@ -4148,6 +4174,8 @@ html, body { overflow-x: hidden; }
 .adm-status[data-s="waitlist"] i { background: #FF2D87; }
 .adm-status[data-s="closed"] { background: var(--color-surface-2); color: var(--color-ink-muted); }
 .adm-status[data-s="closed"] i { background: var(--color-ink-muted); }
+.adm-status[data-s="abgesagt"] { background: rgba(229,72,77,0.14); color: #FF8A8A; }
+.adm-status[data-s="abgesagt"] i { background: #E5484D; }
 
 .adm-row-actions { display: flex; align-items: center; gap: 8px; }
 .adm-menu-anchor { position: relative; }

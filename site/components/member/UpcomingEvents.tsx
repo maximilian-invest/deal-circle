@@ -7,6 +7,7 @@ const Icon = ({ d }: { d: string }) => (
 );
 
 function Chip({ status }: { status: EventStatus }) {
+  if (status === "abgesagt") return <span className="mb-event-chip mb-event-chip--abgesagt">Abgesagt</span>;
   if (status === "paid")     return <span className="mb-event-chip mb-event-chip--paid">Angemeldet & bezahlt</span>;
   if (status === "limited")  return <span className="mb-event-chip mb-event-chip--limited">Wenige Plätze</span>;
   if (status === "waitlist") return <span className="mb-event-chip mb-event-chip--waitlist">Warteliste</span>;
@@ -41,7 +42,7 @@ export default function UpcomingEvents({ events, onSignup }: Props) {
           <div className="mb-event-status">
             <Chip status={e.status} />
             <a className="dc-btn dc-btn-secondary mb-event-cta" href={`/event/?id=${e.eventId}#programm`}>Programm ansehen</a>
-            {e.status === "paid" ? null
+            {e.status === "paid" || e.status === "abgesagt" ? null
               : e.status === "waitlist" ? (
                 <button type="button" className="dc-btn dc-btn-secondary mb-event-cta" onClick={() => onSignup(e)}>Auf Warteliste</button>
               ) : (

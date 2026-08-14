@@ -19,7 +19,7 @@ router.get("/me/registrations", requireAuth, (req, res) => {
   const rows = db.prepare(`
     SELECT r.id, r.event_id, r.ticket_id, r.status, r.amount_cents,
            r.created_at, r.paid_at,
-           e.title AS event_title, e.starts_at, e.location,
+           e.title AS event_title, e.starts_at, e.location, e.status AS event_status,
            t.name AS ticket_name
     FROM event_registrations r
     JOIN events e ON e.id = r.event_id
@@ -48,6 +48,7 @@ router.post("/:id/register", requireAuth, (req, res) => {
   ).get(eventId);
   if (!event) return res.status(404).json({ error: "not_found" });
   if (event.status === "closed") return res.status(409).json({ error: "event_closed" });
+  if (event.status === "abgesagt") return res.status(409).json({ error: "event_cancelled" });
 
   // Schon bezahlt? → blockieren. Eine offene (reservierte/Warteliste-)Anmeldung
   // wird dagegen weiter unten auf die NEU gewählte Ticket-Stufe aktualisiert,
@@ -126,7 +127,7 @@ router.post("/:id/checkout", requireAuth, async (req, res) => {
 
   const reg = db.prepare(`
     SELECT r.id, r.status, r.amount_cents, r.ticket_id, r.event_id,
-           e.title AS event_title, e.starts_at,
+           e.title AS event_title, e.starts_at, e.status AS event_status,
            t.name AS ticket_name, t.badge AS ticket_badge,
            u.email, u.name AS user_name
     FROM event_registrations r
@@ -137,6 +138,7 @@ router.post("/:id/checkout", requireAuth, async (req, res) => {
   `).get(eventId, req.user.sub);
 
   if (!reg) return res.status(404).json({ error: "no_registration" });
+  if (reg.event_status === "abgesagt") return res.status(409).json({ error: "event_cancelled" });
   if (reg.status === "paid")      return res.status(409).json({ error: "already_paid" });
   if (reg.status === "cancelled") return res.status(409).json({ error: "registration_cancelled" });
   if (reg.status === "waitlist")  return res.status(409).json({ error: "on_waitlist" });
@@ -254,6 +256,7 @@ router.post("/:id/register-guest", (req, res) => {
   if (!event) return res.status(404).json({ error: "not_found" });
   if (event.visibility !== "public") return res.status(403).json({ error: "members_only" });
   if (event.status === "closed") return res.status(409).json({ error: "event_closed" });
+  if (event.status === "abgesagt") return res.status(409).json({ error: "event_cancelled" });
 
   let amountCents = event.fee_cents;
   if (ticketId) {
@@ -323,6 +326,7 @@ router.post("/:id/checkout-guest", guestCheckoutLimiter, async (req, res) => {
   if (!event) return res.status(404).json({ error: "not_found" });
   if (event.visibility !== "public") return res.status(403).json({ error: "members_only" });
   if (event.status === "closed")   return res.status(409).json({ error: "event_closed" });
+  if (event.status === "abgesagt") return res.status(409).json({ error: "event_cancelled" });
   if (event.status === "waitlist") return res.status(409).json({ error: "on_waitlist" });
 
   let amountCents = event.fee_cents;
@@ -454,6 +458,7 @@ router.post("/:id/checkout-companion", requireAuth, async (req, res) => {
   ).get(eventId);
   if (!event) return res.status(404).json({ error: "not_found" });
   if (event.status === "closed")   return res.status(409).json({ error: "event_closed" });
+  if (event.status === "abgesagt") return res.status(409).json({ error: "event_cancelled" });
   if (event.status === "waitlist") return res.status(409).json({ error: "on_waitlist" });
 
   // Regulärer Ticketpreis — bewusst OHNE member_discount_pct.
@@ -568,6 +573,7 @@ router.get("/public/next", (_req, res) => {
       FROM events
       WHERE starts_at >= datetime('now')
         AND status != 'closed'
+        AND status != 'abgesagt'
         AND visibility = 'public'
         AND hidden = 0
         AND is_main = 1

@@ -47,7 +47,7 @@ db.exec(`
     title TEXT NOT NULL,
     starts_at TEXT NOT NULL,
     location TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'limited', 'waitlist', 'closed')),
+    status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'limited', 'waitlist', 'closed', 'abgesagt')),
     fee_cents INTEGER NOT NULL DEFAULT 38000,
     max_attendees INTEGER,
     description TEXT,
@@ -317,6 +317,43 @@ function migrateEventsSchema() {
       DROP TABLE event_mail_sends;
       ALTER TABLE event_mail_sends_new RENAME TO event_mail_sends;
       CREATE INDEX IF NOT EXISTS idx_event_mail_sends_event ON event_mail_sends (event_id, created_at DESC);
+      COMMIT;
+    `);
+    db.pragma("foreign_keys = ON");
+  }
+
+  // events: status-CHECK um 'abgesagt' erweitern (abgesagte Events).
+  // SQLite kann CHECK nicht per ALTER ändern -> Tabelle neu aufbauen.
+  const eventsSql = (db.prepare(
+    "SELECT sql FROM sqlite_master WHERE type='table' AND name='events'"
+  ).get()?.sql) || "";
+  if (eventsSql.includes("CHECK") && eventsSql.includes("status") && !eventsSql.includes("abgesagt")) {
+    console.log("[migrate] events: status-CHECK erweitern (+abgesagt)");
+    db.pragma("foreign_keys = OFF");
+    db.exec(`
+      BEGIN;
+      CREATE TABLE events_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        starts_at TEXT NOT NULL,
+        location TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'limited', 'waitlist', 'closed', 'abgesagt')),
+        fee_cents INTEGER NOT NULL DEFAULT 38000,
+        max_attendees INTEGER,
+        description TEXT,
+        cover_path TEXT,
+        is_main INTEGER NOT NULL DEFAULT 0,
+        visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'members')),
+        hidden INTEGER NOT NULL DEFAULT 0,
+        member_discount_pct INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT
+      );
+      INSERT INTO events_new (id, title, starts_at, location, status, fee_cents, max_attendees, description, cover_path, is_main, visibility, hidden, member_discount_pct, created_at, updated_at)
+        SELECT id, title, starts_at, location, status, fee_cents, max_attendees, description, cover_path, is_main, visibility, hidden, member_discount_pct, created_at, updated_at FROM events;
+      DROP TABLE events;
+      ALTER TABLE events_new RENAME TO events;
+      CREATE INDEX IF NOT EXISTS idx_events_starts_at ON events (starts_at);
       COMMIT;
     `);
     db.pragma("foreign_keys = ON");

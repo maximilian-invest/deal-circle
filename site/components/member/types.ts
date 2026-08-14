@@ -1,4 +1,4 @@
-export type EventStatus = "open" | "paid" | "limited" | "waitlist";
+export type EventStatus = "open" | "paid" | "limited" | "waitlist" | "abgesagt";
 
 export type UpcomingEvent = {
   id: string;
@@ -52,7 +52,7 @@ export type TabKey =
   | "events-admin"
   | "dashboard";
 
-export type EventStatusApi = "open" | "limited" | "waitlist" | "closed";
+export type EventStatusApi = "open" | "limited" | "waitlist" | "closed" | "abgesagt";
 
 export type TimelineItem = {
   id?: number;

@@ -38,22 +38,33 @@ export default function MyRegistrations() {
         <h2 className="mb-section-title">Deine Anmeldungen.</h2>
       </div>
       <div className="mb-myregs">
-        {active.map((r) => (
-          <a key={r.id} className="mb-myreg" href={`/event/?id=${r.event_id}`}>
-            <div className="mb-myreg-date">{fmtDate(r.starts_at)}</div>
-            <div className="mb-myreg-title">{r.event_title}</div>
-            <div className="mb-myreg-meta">
-              <span>{r.location}</span>
-              {r.ticket_name && <span>· {r.ticket_name}</span>}
-              {r.amount_cents != null && (
-                <span>· € {Math.round(r.amount_cents / 100).toLocaleString("de-AT")}</span>
+        {active.map((r) => {
+          const isCancelled = r.event_status === "abgesagt";
+          return (
+            <a
+              key={r.id}
+              className={`mb-myreg${isCancelled ? " mb-myreg--cancelled" : ""}`}
+              href={`/event/?id=${r.event_id}`}
+            >
+              <div className="mb-myreg-date">{fmtDate(r.starts_at)}</div>
+              <div className="mb-myreg-title">{r.event_title}</div>
+              <div className="mb-myreg-meta">
+                <span>{r.location}</span>
+                {r.ticket_name && <span>· {r.ticket_name}</span>}
+                {r.amount_cents != null && (
+                  <span>· € {Math.round(r.amount_cents / 100).toLocaleString("de-AT")}</span>
+                )}
+              </div>
+              {isCancelled ? (
+                <span className="mb-myreg-status mb-myreg-status--abgesagt">Event abgesagt</span>
+              ) : (
+                <span className={`mb-myreg-status mb-myreg-status--${r.status}`}>
+                  {STATUS_LABELS[r.status] || r.status}
+                </span>
               )}
-            </div>
-            <span className={`mb-myreg-status mb-myreg-status--${r.status}`}>
-              {STATUS_LABELS[r.status] || r.status}
-            </span>
-          </a>
-        ))}
+            </a>
+          );
+        })}
       </div>
     </section>
   );

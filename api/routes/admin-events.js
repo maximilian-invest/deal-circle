@@ -37,7 +37,7 @@ const eventCreateSchema = z.object({
   title: z.string().min(1).max(200),
   starts_at: z.string().datetime({ offset: true }),
   location: z.string().min(1).max(200),
-  status: z.enum(["open", "limited", "waitlist", "closed"]).default("open"),
+  status: z.enum(["open", "limited", "waitlist", "closed", "abgesagt"]).default("open"),
   fee_cents: z.number().int().min(0).max(10_000_00).default(38000),
   max_attendees: z.number().int().min(0).max(10000).nullable().optional().default(null),
   description: z.string().max(2000).nullable().optional().default(null),

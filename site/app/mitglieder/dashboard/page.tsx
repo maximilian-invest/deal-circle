@@ -176,14 +176,14 @@ export default function DashboardPage() {
       .map(toPastShape);
 
     const firstUpcoming = visible
-      .filter((e) => !isPast(e, now))
+      .filter((e) => !isPast(e, now) && e.status !== "abgesagt")
       .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0];
 
     const nextEvent = firstUpcoming ? toNextEventShape(firstUpcoming) : null;
 
     // Main-Event (gross oben im Events-Tab): das naechste als is_main markierte Event.
     const mainEventRaw = visible
-      .filter((e) => !isPast(e, now) && e.is_main)
+      .filter((e) => !isPast(e, now) && e.is_main && e.status !== "abgesagt")
       .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0];
     const mainEvent = mainEventRaw ? toNextEventShape(mainEventRaw) : null;
     const mainEventId = mainEventRaw ? mainEventRaw.id : null;

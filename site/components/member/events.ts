@@ -59,6 +59,7 @@ export type MyRegistration = {
   event_title: string;
   starts_at: string;
   location: string;
+  event_status: "open" | "limited" | "waitlist" | "closed" | "abgesagt";
   ticket_name: string | null;
 };
 
@@ -341,7 +342,9 @@ export function toUpcomingShape(e: EventDto) {
     time: fmtTime(d),
     location: e.location,
     // Hat das Mitglied bereits bezahlt → als "paid" anzeigen (kein Anmelde-Button).
-    status: e.my_status === "paid" || e.status === "closed"
+    status: e.status === "abgesagt"
+      ? ("abgesagt" as const)
+      : e.my_status === "paid" || e.status === "closed"
       ? ("paid" as const)
       : (e.status as "open" | "limited" | "waitlist"),
     fee: Math.round(e.fee_cents / 100),

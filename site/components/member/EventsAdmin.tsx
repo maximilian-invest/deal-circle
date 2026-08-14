@@ -39,8 +39,9 @@ const STATUS_LABELS: Record<EventStatusApi, string> = {
   limited:  "Limitiert",
   waitlist: "Warteliste",
   closed:   "Abgeschlossen",
+  abgesagt: "Abgesagt",
 };
-const STATUS_KEYS: EventStatusApi[] = ["open", "limited", "waitlist", "closed"];
+const STATUS_KEYS: EventStatusApi[] = ["open", "limited", "waitlist", "closed", "abgesagt"];
 const MONTHS = ["Jan", "Feb", "März", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 function pad(n: number) { return String(n).padStart(2, "0"); }
 function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
@@ -576,7 +577,7 @@ export default function EventsAdmin() {
   const sorted = [...list].sort((a, b) => (a.starts_at < b.starts_at ? 1 : -1));
   const filtered = sorted.filter((e) => `${e.title} ${e.location}`.toLowerCase().includes(query.toLowerCase()));
   const totalReg = list.reduce((s, e) => s + (e.registered ?? 0), 0);
-  const upcoming = list.filter((e) => e.status !== "closed").length;
+  const upcoming = list.filter((e) => e.status !== "closed" && e.status !== "abgesagt").length;
 
   return (
     <div className="adm">

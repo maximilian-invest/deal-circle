@@ -63,7 +63,7 @@ export type FinanceEvent = {
   title: string;
   starts_at: string;
   location: string;
-  status: "open" | "limited" | "waitlist" | "closed";
+  status: "open" | "limited" | "waitlist" | "closed" | "abgesagt";
   revenue_cents: number;
   ticket_count: number;
   std_rev_cents: number;
